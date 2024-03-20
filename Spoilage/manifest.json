@@ -1,0 +1,22 @@
+﻿{
+	"Name": "Spoilage",
+	"Author": "aedenthorn",
+	"Version": "0.3.1",
+	"Description": "Spoilage.",
+	"UniqueID": "aedenthorn.Spoilage",
+	"EntryDll": "Spoilage.dll",
+	"MinimumApiVersion": "3.15.0",
+	"ModUpdater": {
+		"Repository": "StardewValleyMods",
+		"User": "aedenthorn",
+		"Directory": "_releases",
+		"ModFolder": "Spoilage"
+	},
+	"Dependencies": [
+		{
+			"UniqueID": "Platonymous.ModUpdater",
+			"IsRequired": false
+		}
+	],
+	"UpdateKeys": [ "Nexus:14712" ]
+}

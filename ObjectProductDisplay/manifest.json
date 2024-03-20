@@ -1,0 +1,22 @@
+﻿{
+	"Name": "Object Product Display",
+	"Author": "aedenthorn",
+	"Version": "0.1.1",
+	"Description": "Object Product Display.",
+	"UniqueID": "aedenthorn.ObjectProductDisplay",
+	"EntryDll": "ObjectProductDisplay.dll",
+	"MinimumApiVersion": "3.15.0",
+	"ModUpdater": {
+		"Repository": "StardewValleyMods",
+		"User": "aedenthorn",
+		"Directory": "_releases",
+		"ModFolder": "ObjectProductDisplay"
+	},
+	"Dependencies": [
+		{
+			"UniqueID": "Platonymous.ModUpdater",
+			"IsRequired": false
+		}
+	],
+	"UpdateKeys": [ "Nexus:18365" ]
+}

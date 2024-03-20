@@ -1,0 +1,22 @@
+﻿{
+	"Name": "Tile Transparency",
+	"Author": "aedenthorn",
+	"Version": "0.2.1",
+	"Description": "Tile Transparency.",
+	"UniqueID": "aedenthorn.TileTransparency",
+	"EntryDll": "TileTransparency.dll",
+	"MinimumApiVersion": "3.15.0",
+	"ModUpdater": {
+		"Repository": "StardewValleyMods",
+		"User": "aedenthorn",
+		"Directory": "_releases",
+		"ModFolder": "TileTransparency"
+	},
+	"Dependencies": [
+		{
+			"UniqueID": "Platonymous.ModUpdater",
+			"IsRequired": false
+		}
+	],
+	"UpdateKeys": [ "Nexus:17288" ]
+}

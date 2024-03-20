@@ -1,0 +1,26 @@
+﻿{
+	"Name": "Stardew RPG",
+	"Author": "aedenthorn",
+	"Version": "0.3.6",
+	"Description": "Stardew RPG.",
+	"UniqueID": "aedenthorn.StardewRPG",
+	"EntryDll": "StardewRPG.dll",
+	"MinimumApiVersion": "3.13.0",
+	"ModUpdater": {
+		"Repository": "StardewValleyMods",
+		"User": "aedenthorn",
+		"Directory": "_releases",
+		"ModFolder": "StardewRPG"
+	},
+	"UpdateKeys": [ "Nexus:11132" ],
+	"Dependencies": [
+		{
+			"UniqueID": "Platonymous.ModUpdater",
+			"IsRequired": false
+		},
+		{
+			"UniqueID": "Pathoschild.ContentPatcher",
+			"IsRequired": false
+		}
+	]
+}

@@ -1,0 +1,22 @@
+﻿{
+	"Name": "Hedge Maze",
+	"Author": "aedenthorn",
+	"Version": "0.3.0",
+	"Description": "Hedge Maze.",
+	"UniqueID": "aedenthorn.HedgeMaze",
+	"EntryDll": "HedgeMaze.dll",
+	"MinimumApiVersion": "3.15.0",
+	"ModUpdater": {
+		"Repository": "StardewValleyMods",
+		"User": "aedenthorn",
+		"Directory": "_releases",
+		"ModFolder": "HedgeMaze"
+	},
+	"Dependencies": [
+		{
+			"UniqueID": "Platonymous.ModUpdater",
+			"IsRequired": false
+		}
+	],
+	"UpdateKeys": [ "Nexus:14138" ]
+}

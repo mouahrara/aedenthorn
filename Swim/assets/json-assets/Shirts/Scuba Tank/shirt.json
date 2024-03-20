@@ -1,0 +1,35 @@
+{
+		"Name": "Scuba Tank",
+		"Description": "A scuba tank for your respirator.",
+		"HasFemaleVariant": true,
+		"Price": 100000,
+		"Dyeable": true,
+	"NameLocalization":
+	{
+		// "es": "",
+		"ko": "스쿠버 탱크",
+		// "de": "",
+		// "fr": "",
+		// "hu": "",
+		// "it": "",
+		// "ja": "",
+		"pt": "Tanque de mergulho",
+		"ru": "Костюм аквалангиста",
+		// "tr": "",
+		"zh":"水肺深潜气瓶",
+	},
+	"DescriptionLocalization":
+	{
+		// "es": "",
+		"ko": "물 속에서 호흡하기 위한 스쿠버 탱크.",
+		// "de": "",
+		// "fr": "",
+		// "hu": "",
+		// "it": "",
+		// "ja": "",
+		"pt": "Um tanque de mergulho para seu respirador",
+		"ru": "Костюм аквалангиста с кислородным баллоном.",
+		// "tr": "",
+		"zh":"为你的水肺（自携式水下呼吸装置）准备一个气瓶。",
+	},
+}

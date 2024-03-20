@@ -1,0 +1,22 @@
+﻿{
+	"Name": "Custom Starter Package",
+	"Author": "aedenthorn",
+	"Version": "0.2.0",
+	"Description": "Custom Starter Package.",
+	"UniqueID": "aedenthorn.CustomStarterPackage",
+	"EntryDll": "CustomStarterPackage.dll",
+	"MinimumApiVersion": "3.15.0",
+	"ModUpdater": {
+		"Repository": "StardewValleyMods",
+		"User": "aedenthorn",
+		"Directory": "_releases",
+		"ModFolder": "CustomStarterPackage"
+	},
+	"Dependencies": [
+		{
+			"UniqueID": "Platonymous.ModUpdater",
+			"IsRequired": false
+		}
+	],
+	"UpdateKeys": [ "Nexus:14152" ]
+}

@@ -1,0 +1,35 @@
+{
+		"Name": "Scuba Mask",
+		"Description": "A respirator for your scuba tank.",
+		"PurchasePrice": "50000",
+		"ShowHair": true,
+		"IgnoreHairstyleOffset": true,
+	"NameLocalization":
+	{
+		// "es": "",
+		"ko": "스쿠버 마스크",
+		// "de": "",
+		// "fr": "",
+		// "hu": "",
+		// "it": "",
+		// "ja": "",
+		"pt": "Máscara de mergulho",
+		"ru": "Маска аквалангиста",
+		// "tr": "",
+		"zh":"水肺深潜面罩",
+	},
+	"DescriptionLocalization":
+	{
+		// "es": "",
+		"ko": "물 속에서 호흡하기 위한 스쿠버 마스크.",
+		// "de": "",
+		// "fr": "",
+		// "hu": "",
+		// "it": "",
+		// "ja": "",
+		"pt": "Um respirador para o seu tanque de mergulho",
+		"ru": "Ребризер для длительных погружений.",
+		// "tr": "",
+		"zh":"为你的气瓶配置的呼吸器。",
+	},
+}

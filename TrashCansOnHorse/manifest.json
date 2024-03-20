@@ -1,0 +1,22 @@
+﻿{
+	"Name": "Trash Cans On Horse",
+	"Author": "aedenthorn",
+	"Version": "0.1.1",
+	"Description": "Napalm Mummies.",
+	"UniqueID": "aedenthorn.TrashCansOnHorse",
+	"EntryDll": "TrashCansOnHorse.dll",
+	"MinimumApiVersion": "3.15.0",
+	"ModUpdater": {
+		"Repository": "StardewValleyMods",
+		"User": "aedenthorn",
+		"Directory": "_releases",
+		"ModFolder": "TrashCansOnHorse"
+	},
+	"Dependencies": [
+		{
+			"UniqueID": "Platonymous.ModUpdater",
+			"IsRequired": false
+		}
+	],
+	"UpdateKeys": [ "Nexus:16394" ]
+}

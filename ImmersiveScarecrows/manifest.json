@@ -1,0 +1,22 @@
+﻿{
+	"Name": "Immersive Scarecrows",
+	"Author": "aedenthorn",
+	"Version": "0.5.0",
+	"Description": "Immersive Scarecrows.",
+	"UniqueID": "aedenthorn.ImmersiveScarecrows",
+	"EntryDll": "ImmersiveScarecrows.dll",
+	"MinimumApiVersion": "3.15.0",
+	"ModUpdater": {
+		"Repository": "StardewValleyMods",
+		"User": "aedenthorn",
+		"Directory": "_releases",
+		"ModFolder": "ImmersiveScarecrows"
+	},
+	"UpdateKeys": [ "Nexus:15290" ],
+	"Dependencies": [
+		{
+			"UniqueID": "Platonymous.ModUpdater",
+			"IsRequired": false
+		}
+	]
+}

@@ -1,0 +1,22 @@
+﻿{
+	"Name": "Planter Trees",
+	"Author": "aedenthorn",
+	"Version": "0.2.0",
+	"Description": "Planter Trees.",
+	"UniqueID": "aedenthorn.PlanterTrees",
+	"EntryDll": "PlanterTrees.dll",
+	"MinimumApiVersion": "3.13.0",
+	"ModUpdater": {
+		"Repository": "StardewValleyMods",
+		"User": "aedenthorn",
+		"Directory": "_releases",
+		"ModFolder": "PlanterTrees"
+	},
+	"UpdateKeys": [ "Nexus:11687" ],
+	"Dependencies": [
+		{
+			"UniqueID": "Platonymous.ModUpdater",
+			"IsRequired": false
+		}
+	]
+}

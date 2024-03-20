@@ -1,0 +1,22 @@
+﻿{
+	"Name": "Help Wanted",
+	"Author": "aedenthorn",
+	"Version": "0.8.2",
+	"Description": "Help Wanted.",
+	"UniqueID": "aedenthorn.HelpWanted",
+	"EntryDll": "HelpWanted.dll",
+	"MinimumApiVersion": "3.15.0",
+	"ModUpdater": {
+		"Repository": "StardewValleyMods",
+		"User": "aedenthorn",
+		"Directory": "_releases",
+		"ModFolder": "HelpWanted"
+	},
+	"Dependencies": [
+		{
+			"UniqueID": "Platonymous.ModUpdater",
+			"IsRequired": false
+		}
+	],
+	"UpdateKeys": [ "Nexus:14640" ]
+}

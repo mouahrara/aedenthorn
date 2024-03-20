@@ -1,0 +1,22 @@
+﻿{
+	"Name": "Crop Growth Information",
+	"Author": "aedenthorn",
+	"Version": "0.1.0",
+	"Description": "Crop Growth Information.",
+	"UniqueID": "aedenthorn.CropGrowthInformation",
+	"EntryDll": "CropGrowthInformation.dll",
+	"MinimumApiVersion": "3.13.0",
+	"ModUpdater": {
+		"Repository": "StardewValleyMods",
+		"User": "aedenthorn",
+		"Directory": "_releases",
+		"ModFolder": "CropGrowthInformation"
+	},
+	"UpdateKeys": [ "Nexus:12178" ],
+	"Dependencies": [
+		{
+			"UniqueID": "Platonymous.ModUpdater",
+			"IsRequired": false
+		}
+	]
+}
