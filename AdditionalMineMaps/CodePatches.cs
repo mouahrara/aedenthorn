@@ -1,16 +1,12 @@
-﻿using HarmonyLib;
+﻿using System.Collections.Generic;
+using System.Linq;
 using StardewValley;
 using StardewValley.Locations;
-using StardewValley.Objects;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace AdditionalMineMaps
 {
 	public partial class ModEntry
 	{
-
-		[HarmonyPatch(typeof(MineShaft), nameof(MineShaft.loadLevel))]
 		public class MineShaft_loadLevel_Patch
 		{
 			public static void Prefix(MineShaft __instance)
@@ -47,7 +43,7 @@ namespace AdditionalMineMaps
 				__instance.modData[mapPathKey] = map;
 			}
 		}
-		[HarmonyPatch(typeof(GameLocation), nameof(GameLocation.updateMap))]
+
 		public class GameLocation_updateMap_Patch
 		{
 			public static void Prefix(GameLocation __instance)

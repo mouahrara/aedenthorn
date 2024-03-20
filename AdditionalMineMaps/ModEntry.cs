@@ -1,25 +1,26 @@
-﻿using HarmonyLib;
+﻿using System;
+using System.Collections.Generic;
+using HarmonyLib;
 using StardewModdingAPI;
 using StardewValley;
-using System.Collections.Generic;
-using System.Linq;
+using StardewValley.Locations;
 
 namespace AdditionalMineMaps
 {
 	/// <summary>The mod entry point.</summary>
 	public partial class ModEntry : Mod
 	{
+		internal static IMonitor SMonitor;
+		internal static IModHelper SHelper;
+		internal static ModConfig Config;
 
-		public static IMonitor SMonitor;
-		public static IModHelper SHelper;
-		public static ModConfig Config;
+		internal static ModEntry context;
 
-		public static ModEntry context;
+		internal static string dictPath = "aedenthorn.AdditionalMineMaps/dictionary";
+		internal static string mapPathKey = "aedenthorn.AdditionalMineMaps/mapPath";
 
-		public static string dictPath = "aedenthorn.AdditionalMineMaps/dictionary";
-		public static string mapPathKey = "aedenthorn.AdditionalMineMaps/mapPath";
-		public static Dictionary<string, MapData> mapDict;
-		public static Dictionary<int, MapData> forcedMapDict = new Dictionary<int, MapData>();
+		internal static Dictionary<string, MapData> mapDict;
+		internal static Dictionary<int, MapData> forcedMapDict = new();
 
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
 		/// <param name="helper">Provides simplified APIs for writing mods.</param>
@@ -36,11 +37,27 @@ namespace AdditionalMineMaps
 			Helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
 			Helper.Events.Content.AssetRequested += Content_AssetRequested;
 
-			var harmony = new Harmony(ModManifest.UniqueID);
-			harmony.PatchAll();
+			// Load Harmony patches
+			try
+			{
+				Harmony harmony = new(ModManifest.UniqueID);
 
-
+				harmony.Patch(
+					original: AccessTools.Method(typeof(MineShaft), nameof(MineShaft.loadLevel)),
+					prefix: new HarmonyMethod(typeof(MineShaft_loadLevel_Patch), nameof(MineShaft_loadLevel_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(GameLocation), nameof(GameLocation.updateMap)),
+					prefix: new HarmonyMethod(typeof(GameLocation_updateMap_Patch), nameof(GameLocation_updateMap_Patch.Prefix))
+				);
+			}
+			catch (Exception e)
+			{
+				Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
+				return;
+			}
 		}
+
 		private void GameLoop_DayStarted(object sender, StardewModdingAPI.Events.DayStartedEventArgs e)
 		{
 			if (!Config.ModEnabled)
@@ -80,13 +97,13 @@ namespace AdditionalMineMaps
 
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_ModEnabled_Name"),
+				name: () => SHelper.Translation.Get("GMCM.ModEnabled.Name"),
 				getValue: () => Config.ModEnabled,
 				setValue: value => Config.ModEnabled = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_AllowVanillaMaps_Name"),
+				name: () => SHelper.Translation.Get("GMCM.AllowVanillaMaps.Name"),
 				getValue: () => Config.AllowVanillaMaps,
 				setValue: value => Config.AllowVanillaMaps = value
 			);
