@@ -1,26 +1,20 @@
-﻿using HarmonyLib;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using StardewModdingAPI.Utilities;
-using StardewValley;
-using StardewValley.Tools;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Microsoft.Xna.Framework;
 using xTile.Dimensions;
 using xTile.Layers;
 using xTile.ObjectModel;
-using xTile.Tiles;
+using StardewModdingAPI.Utilities;
+using StardewValley;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace DynamicMapTiles
 {
 	public partial class ModEntry
 	{
-		private static PerScreen<Farmer> explodingFarmer = new PerScreen<Farmer>();
-		
-		[HarmonyPatch(typeof(GameLocation), nameof(GameLocation.explode))]
+		private static PerScreen<Farmer> explodingFarmer = new();
+
 		public class GameLocation_explode_Patch
 		{
 			public static void Prefix(Farmer who)
@@ -30,7 +24,7 @@ namespace DynamicMapTiles
 				explodingFarmer.Value = who;
 			}
 		}
-		[HarmonyPatch(typeof(GameLocation), nameof(GameLocation.explosionAt))]
+
 		public class GameLocation_explosionAt_Patch
 		{
 			public static void Postfix(GameLocation __instance, float x, float y)
@@ -57,7 +51,7 @@ namespace DynamicMapTiles
 				}
 			}
 		}
-		[HarmonyPatch(typeof(GameLocation), nameof(GameLocation.isCollidingPosition), new Type[] { typeof(Rectangle), typeof(xTile.Dimensions.Rectangle), typeof(bool), typeof(int), typeof(bool), typeof(Character) })]
+
 		public class GameLocation_isCollidingPosition_Patch
 		{
 			public static bool Prefix(GameLocation __instance, Rectangle position, ref bool __result)
@@ -66,7 +60,7 @@ namespace DynamicMapTiles
 					return true;
 				foreach (var tile in tiles)
 				{
-					Rectangle tileRect = new Rectangle(tile.position, new Point(64, 64));
+					Rectangle tileRect = new(tile.position, new Point(64, 64));
 					if (position.Intersects(tileRect))
 					{
 						__result = true;
@@ -76,10 +70,10 @@ namespace DynamicMapTiles
 				return true;
 			}
 		}
-		[HarmonyPatch(typeof(GameLocation), nameof(GameLocation.draw))]
+
 		public class GameLocation_draw_Patch
 		{
-			public static void Postfix(GameLocation __instance, SpriteBatch b)
+			public static void Postfix(GameLocation __instance)
 			{
 				if (!Config.ModEnabled || !pushingDict.TryGetValue(__instance.Name, out List<PushedTile> tiles))
 					return;
@@ -89,7 +83,7 @@ namespace DynamicMapTiles
 				}
 			}
 		}
-		[HarmonyPatch(typeof(GameLocation), nameof(GameLocation.performToolAction))]
+
 		public class GameLocation_performToolAction_Patch
 		{
 			public static bool Prefix(GameLocation __instance, Tool t, int tileX, int tileY, ref bool __result)
@@ -105,10 +99,10 @@ namespace DynamicMapTiles
 				return true;
 			}
 		}
-		[HarmonyPatch(typeof(GameLocation), nameof(GameLocation.checkAction))]
+
 		public class GameLocation_checkAction_Patch
 		{
-			public static bool Prefix(GameLocation __instance, Location tileLocation, xTile.Dimensions.Rectangle viewport, Farmer who, ref bool __result)
+			public static bool Prefix(GameLocation __instance, Location tileLocation, Farmer who, ref bool __result)
 			{
 				if (!Config.ModEnabled || !__instance.isTileOnMap(new Vector2(tileLocation.X, tileLocation.Y)))
 					return true;
@@ -120,14 +114,14 @@ namespace DynamicMapTiles
 				return true;
 			}
 		}
-		[HarmonyPatch(typeof(Farmer), nameof(Farmer.getMovementSpeed))]
+
 		public class Farmer_getMovementSpeed_Patch
 		{
 			public static void Postfix(Farmer __instance, ref float __result)
 			{
 				if (!Config.ModEnabled || (!Config.TriggerDuringEvents && Game1.eventUp) || __instance.currentLocation is null)
 					return;
-				var tileLoc = __instance.getTileLocation();
+				var tileLoc = __instance.Tile;
 				if (__instance.currentLocation.isTileOnMap(tileLoc))
 				{
 					var tile = __instance.currentLocation.Map.GetLayer("Back").Tiles[(int)tileLoc.X, (int)tileLoc.Y];
@@ -138,14 +132,14 @@ namespace DynamicMapTiles
 				}
 			}
 		}
-		[HarmonyPatch(typeof(Farmer), nameof(Farmer.MovePosition))]
+
 		public class Farmer_MovePosition_Patch
 		{
 			public static void Prefix(Farmer __instance, ref Vector2[] __state)
 			{
 				if (!Config.ModEnabled || (!Config.TriggerDuringEvents && Game1.eventUp) || __instance.currentLocation is null)
 					return;
-				var tileLoc = __instance.getTileLocation();
+				var tileLoc = __instance.Tile;
 				if (__instance.currentLocation.isTileOnMap(tileLoc))
 				{
 					var tile = __instance.currentLocation.Map.GetLayer("Back").Tiles[(int)tileLoc.X, (int)tileLoc.Y];
@@ -156,14 +150,14 @@ namespace DynamicMapTiles
 						__instance.yVelocity = float.Parse(split[1], NumberStyles.Any, CultureInfo.InvariantCulture);
 					}
 				}
-
 				__state = new Vector2[] { __instance.Position, tileLoc };
 			}
+
 			public static void Postfix(Farmer __instance, Vector2[] __state)
 			{
 				if (!Config.ModEnabled || (!Config.TriggerDuringEvents && Game1.eventUp) || __state is null || __instance.currentLocation is null)
 					return;
-				var tilePos = __instance.getTileLocationPoint();
+				var tilePos = __instance.TilePoint;
 				var oldTile = Utility.Vector2ToPoint(__state[1]);
 				if(oldTile != tilePos)
 				{
@@ -186,7 +180,7 @@ namespace DynamicMapTiles
 						if (__instance.movementDirections.Contains(3))
 							__instance.xVelocity -= amount;
 					}
-					else if (backOldTile != null && backOldTile.Properties.TryGetValue(slipperyKey, out value) && float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out amount))
+					else if (backOldTile != null && backOldTile.Properties.TryGetValue(slipperyKey, out value) && float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out _))
 					{
 						__instance.xVelocity = 0;
 						__instance.yVelocity = 0;
@@ -197,7 +191,7 @@ namespace DynamicMapTiles
 				{
 					var startTile = new Point(__instance.GetBoundingBox().Center.X / 64, __instance.GetBoundingBox().Center.Y / 64);
 					startTile += GetNextTile(__instance.FacingDirection);
-					Point start = new Point(startTile.X * 64, startTile.Y * 64);
+					Point start = new(startTile.X * 64, startTile.Y * 64);
 					var startLoc = new Location(start.X, start.Y);
 
 					var build = __instance.currentLocation.Map.GetLayer("Buildings");

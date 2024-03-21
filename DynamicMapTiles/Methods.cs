@@ -1,17 +1,17 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using StardewValley;
-using StardewValley.Objects;
-using StardewValley.Tools;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using xTile;
 using xTile.Dimensions;
 using xTile.Layers;
 using xTile.ObjectModel;
 using xTile.Tiles;
+using StardewValley;
+using StardewValley.Objects;
+using StardewValley.Tools;
 using Object = StardewValley.Object;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
@@ -21,7 +21,7 @@ namespace DynamicMapTiles
 	{
 		private static void DoStepOnActions(Farmer farmer, Point tilePos)
 		{
-			TriggerActions(new List<Layer>() { farmer.currentLocation.Map.GetLayer("Back") }, farmer, tilePos, new List<string>() { "On" });
+			TriggerActions(new List<Layer>() { farmer.currentLocation.Map.GetLayer("Back") }, farmer, tilePos, new List<string>() { "On", string.Empty });
 		}
 
 		private static void DoStepOffActions(Farmer farmer, Point tilePos)
@@ -50,7 +50,7 @@ namespace DynamicMapTiles
 						{
 							if (key.EndsWith(postfix))
 							{
-								key = key.Substring(0, key.Length - postfix.Length);
+								key = key[..^postfix.Length];
 								found = true;
 								break;
 							}
@@ -62,7 +62,7 @@ namespace DynamicMapTiles
 					if (key.EndsWith("Once"))
 					{
 						remove = true;
-						key = key.Substring(0, key.Length - 4);
+						key = key[..^4];
 					}
 					if (!actionKeys.Contains(key) || !tile.Properties.TryGetValue(k, out PropertyValue v))
 						continue;
@@ -110,7 +110,7 @@ namespace DynamicMapTiles
 							{
 								var indexesDuration = value.ToString().Split(',');
 								var indexes = indexesDuration[0].Split(' ');
-								List<StaticTile> tiles = new List<StaticTile>();
+								List<StaticTile> tiles = new();
 								foreach (var index in indexes)
 								{
 									if (int.TryParse(index, out number))
@@ -140,10 +140,7 @@ namespace DynamicMapTiles
 								var pair = tileInfo.Split('=');
 								var layerXY = pair[0].Split(' ');
 								var l = farmer.currentLocation.Map.GetLayer(layerXY[0]);
-								if(l is null)
-								{
-									l = AddLayer(farmer.currentLocation.Map, layerXY[0]);
-								}
+								l ??= AddLayer(farmer.currentLocation.Map, layerXY[0]);
 								if (string.IsNullOrEmpty(pair[1]))
 								{
 									l.Tiles[int.Parse(layerXY[1]), int.Parse(layerXY[2])] = null;
@@ -156,7 +153,7 @@ namespace DynamicMapTiles
 								{
 									var indexesDuration = pair[1].ToString().Split(',');
 									var indexes = indexesDuration[0].Split(' ');
-									List<StaticTile> tiles = new List<StaticTile>();
+									List<StaticTile> tiles = new();
 									foreach (var index in indexes)
 									{
 										if (int.TryParse(index, out number))
@@ -211,10 +208,7 @@ namespace DynamicMapTiles
 									else if (tileInfo.Length == 4)
 									{
 										var l = farmer.currentLocation.Map.GetLayer(tileInfo[0]);
-										if (l is null)
-										{
-											l = AddLayer(farmer.currentLocation.Map, tileInfo[0]);
-										}
+										l ??= AddLayer(farmer.currentLocation.Map, tileInfo[0]);
 										l.Tiles[int.Parse(tileInfo[1]), int.Parse(tileInfo[2])].Properties[tileInfo[3]] = pair[1];
 									}
 								}
@@ -225,12 +219,12 @@ namespace DynamicMapTiles
 							var split = value.Split('|');
 							for(int i = 0; i < split.Length; i++)
 							{
-								if (split[i].Contains(","))
+								if (split[i].Contains(','))
 								{
 									var split2 = split[i].Split(',');
 									if (int.TryParse(split2[1], out int delay))
 									{
-										DelayedAction.playSoundAfterDelay(split2[0], delay, farmer.currentLocation, -1);
+										DelayedAction.playSoundAfterDelay(split2[0], delay, farmer.currentLocation);
 									}
 								}
 								else
@@ -241,7 +235,7 @@ namespace DynamicMapTiles
 									}
 									else
 									{
-										DelayedAction.playSoundAfterDelay(split[i], i * 300, farmer.currentLocation, -1);
+										DelayedAction.playSoundAfterDelay(split[i], i * 300, farmer.currentLocation);
 									}
 								}
 							}
@@ -252,7 +246,7 @@ namespace DynamicMapTiles
 						}
 						else if (key == eventKey)
 						{
-							Game1.currentLocation.currentEvent = new Event(value, -1, null);
+							Game1.currentLocation.currentEvent = new Event(value);
 							Game1.currentLocation.checkForEvents();
 						}
 						else if (key == musicKey)
@@ -325,7 +319,7 @@ namespace DynamicMapTiles
 							else
 							{
 								Game1.player.health = Math.Min(Game1.player.health + number, Game1.player.maxHealth);
-								Game1.player.currentLocation.debris.Add(new Debris(number, new Vector2((float)(Game1.player.getStandingX() + 8), (float)Game1.player.getStandingY()), Color.LimeGreen, 1f, Game1.player));
+								Game1.player.currentLocation.debris.Add(new Debris(number, new Vector2(Game1.player.StandingPixel.X + 8, Game1.player.StandingPixel.Y), Color.LimeGreen, 1f, Game1.player));
 							}
 						}
 						else if (key == staminaKey && int.TryParse(value, out number))
@@ -334,7 +328,7 @@ namespace DynamicMapTiles
 						}
 						else if (key == buffKey && int.TryParse(value, out number))
 						{
-							Game1.buffsDisplay.addOtherBuff(new Buff(number));
+							Game1.player.buffs.Apply(new Buff(number.ToString()));
 						}
 						else if (key == emoteKey && int.TryParse(value, out number))
 						{
@@ -350,32 +344,22 @@ namespace DynamicMapTiles
 						{
 							var split = value.Split('=');
 							var split2 = split[0].Split(' ');
-							Vector2 p = new Vector2(int.Parse(split2[0]), int.Parse(split2[1]));
+							Vector2 p = new(int.Parse(split2[0]), int.Parse(split2[1]));
 							if (!farmer.currentLocation.objects.TryGetValue(p, out Object o) || o is not Chest)
 							{
-								int money = 0;
 								var items = new List<Item>();
 								split2 = split[1].Split(' ');
 								foreach (var str in split2)
 								{
-									if (str.StartsWith("Money/"))
-									{
-										int.TryParse(str.Split('/')[1], out money);
-									}
-									else
-									{
-										var item = GetItemFromString(str);
-										if (item is not null)
-											items.Add(item);
-									}
+									var item = GetItemFromString(str);
+									if (item is not null)
+										items.Add(item);
 								}
-								var chest = new Chest(true, p, 130);
-								chest.items.AddRange(items);
-								chest.coins.Value = money;
-								chest.Type = "interactive";
-								chest.bigCraftable.Value = false;
+								var chest = new Chest(true, p);
+								chest.Items.AddRange(items);
 								chest.CanBeSetDown = false;
-								farmer.currentLocation.overlayObjects[p] = chest;
+								farmer.currentLocation.objects.Remove(chest.TileLocation);
+								farmer.currentLocation.objects.Add(chest.TileLocation, chest);
 							}
 						}
 						else if (key == animationKey)
@@ -442,7 +426,7 @@ namespace DynamicMapTiles
 					}
 					catch(Exception ex)
 					{
-						SMonitor.Log($"Error triggering {key} with value {value} at {tilePos}:\n\n{ex.ToString()}", StardewModdingAPI.LogLevel.Error);
+						SMonitor.Log($"Error triggering {key} with value {value} at {tilePos}:\n\n{ex}", StardewModdingAPI.LogLevel.Error);
 					}
 
 				}
@@ -470,16 +454,16 @@ namespace DynamicMapTiles
 		{
 			Item item = null;
 			int number;
-			if (!value.ToString().Contains("/"))
+			if (!value.ToString().Contains('/'))
 			{
 				if (int.TryParse(value, out number))
 				{
-					item = new Object(number, 1);
+					item = new Object(number.ToString(), 1);
 				}
 				else
 				{
 					var amount = 1;
-					if (value.Contains(","))
+					if (value.Contains(','))
 					{
 						var split = value.Split(',');
 						value = split[0];
@@ -487,13 +471,13 @@ namespace DynamicMapTiles
 					}
 					if (int.TryParse(value, out number))
 					{
-						item = new Object(number, amount);
+						item = new Object(number.ToString(), amount);
 					}
 					else
 					{
-						foreach (var pair in Game1.objectInformation)
+						foreach (var pair in Game1.objectData)
 						{
-							if (pair.Value.StartsWith(value + "/"))
+							if (pair.Value.Name.Equals(value))
 							{
 								item = new Object(pair.Key, amount);
 								break;
@@ -510,11 +494,11 @@ namespace DynamicMapTiles
 					case "Hat":
 						if (int.TryParse(split[1], out number))
 						{
-							item = new Hat(number);
+							item = new Hat(number.ToString());
 						}
 						else
 						{
-							Dictionary<int, string> dictionary = Game1.content.Load<Dictionary<int, string>>("Data\\hats");
+							Dictionary<string, string> dictionary = Game1.content.Load<Dictionary<string, string>>("Data\\hats");
 							foreach (var pair in dictionary)
 							{
 								if (pair.Value.StartsWith(split[1] + "/"))
@@ -528,13 +512,13 @@ namespace DynamicMapTiles
 					case "Clothing":
 						if (int.TryParse(split[1], out number))
 						{
-							item = new Clothing(number);
+							item = new Clothing(number.ToString());
 						}
 						else
 						{
-							foreach (var pair in Game1.clothingInformation)
+							foreach (var pair in Game1.shirtData)
 							{
-								if (pair.Value.StartsWith(split[1] + "/"))
+								if (pair.Value.Name.Equals(split[1]))
 								{
 									item = new Clothing(pair.Key);
 									break;
@@ -545,13 +529,13 @@ namespace DynamicMapTiles
 					case "Craftable":
 						if (int.TryParse(split[1], out number))
 						{
-							item = new Object(Vector2.Zero, number, false);
+							item = new Object(Vector2.Zero, number.ToString(), false);
 						}
 						else
 						{
-							foreach (var pair in Game1.bigCraftablesInformation)
+							foreach (var pair in Game1.bigCraftableData)
 							{
-								if (pair.Value.StartsWith(split[1] + "/"))
+								if (pair.Value.Name.Equals(split[1]))
 								{
 									item = new Object(Vector2.Zero, pair.Key, false);
 									break;
@@ -562,11 +546,11 @@ namespace DynamicMapTiles
 					case "Furniture":
 						if (int.TryParse(split[1], out number))
 						{
-							item = new Furniture(number, Vector2.Zero);
+							item = new Furniture(number.ToString(), Vector2.Zero);
 						}
 						else
 						{
-							foreach (var pair in Game1.content.Load<Dictionary<int, string>>("Data\\Furniture"))
+							foreach (var pair in Game1.content.Load<Dictionary<string, string>>("Data\\Furniture"))
 							{
 								if (pair.Value.StartsWith(split[1] + "/"))
 								{
@@ -579,13 +563,13 @@ namespace DynamicMapTiles
 					case "Weapon":
 						if (int.TryParse(split[1], out number))
 						{
-							item = new MeleeWeapon(number);
+							item = new MeleeWeapon(number.ToString());
 						}
 						else
 						{
-							foreach (var pair in Game1.content.Load<Dictionary<int, string>>("Data\\weapons"))
+							foreach (var pair in Game1.weaponData)
 							{
-								if (pair.Value.StartsWith(split[1] + "/"))
+								if (pair.Value.Name.Equals(split[1]))
 								{
 									item = new MeleeWeapon(pair.Key);
 									break;
@@ -635,7 +619,7 @@ namespace DynamicMapTiles
 			for(int i = 0; i < tileList.Count; i++)
 			{
 				Point destTile = tileList[i].Item1 + GetNextTile(dir);
-				if (!location.isTileOnMap(tileList[i].Item1.ToVector2()) || !location.isTileOnMap(destTile.ToVector2()) || 
+				if (!location.isTileOnMap(tileList[i].Item1.ToVector2()) || !location.isTileOnMap(destTile.ToVector2()) ||
 					(
 						tileList[i].Item2.Layer.Tiles[destTile.X, destTile.Y] is not null &&
 						(tileList[i].Item2.Layer.Tiles[destTile.X, destTile.Y].Properties.ContainsKey(pushKey) || tileList[i].Item2.Layer.Tiles[destTile.X, destTile.Y].Properties.ContainsKey(pushableKey)) &&
@@ -662,17 +646,13 @@ namespace DynamicMapTiles
 
 		public static Point GetNextTile(int dir)
 		{
-			switch (dir)
+			return dir switch
 			{
-				case 0:
-					return new Point(0, -1);
-				case 1:
-					return new Point(1, 0);
-				case 2:
-					return new Point(0, 1);
-				default:
-					return new Point(-1, 0);
-			}
+				0 => new Point(0, -1),
+				1 => new Point(1, 0),
+				2 => new Point(0, 1),
+				_ => new Point(-1, 0),
+			};
 		}
 	}
 }
