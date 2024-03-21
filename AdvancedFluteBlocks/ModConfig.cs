@@ -11,6 +11,6 @@ namespace AdvancedFluteBlocks
 		public string CurrentTone { get; set; } = "flute";
 		public int PitchStep { get; set; } = 100;
 		public int CurrentPitch { get; set; } = 0;
-		public string ToneList { get; set; } = "flute,toyPiano,crystal,clam_tone,toolCharge";
+		public string ToneList { get; set; } = "flute,toyPiano,crystal,clam_tone,toolCharge,telephone_buttonPush,miniharp_note,Duck,pig,dustMeep";
 	}
 }

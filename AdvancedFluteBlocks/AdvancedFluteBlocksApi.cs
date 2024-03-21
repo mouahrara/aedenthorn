@@ -2,7 +2,7 @@
 {
 	public class AdvancedFluteBlocksApi
 	{
-		public string GetFluteBlockToneFromIndex(int index)
+		public static string GetFluteBlockToneFromIndex(int index)
 		{
 			var tones = ModEntry.Config.ToneList.Split(',');
 			if (index >= tones.Length)
