@@ -1,22 +1,13 @@
 ﻿{
-	"Name": "AFK Time Pause",
+	"Name": "AFK Pause",
 	"Author": "aedenthorn",
-	"Version": "0.7.0",
-	"Description": "AFK Time Pause.",
-	"UniqueID": "aedenthorn.AFKTimePause",
-	"EntryDll": "AFKTimePause.dll",
-	"MinimumApiVersion": "3.15.0",
-	"ModUpdater": {
-		"Repository": "StardewValleyMods",
-		"User": "aedenthorn",
-		"Directory": "_releases",
-		"ModFolder": "AFKTimePause"
-	},
-	"Dependencies": [
-		{
-			"UniqueID": "Platonymous.ModUpdater",
-			"IsRequired": false
-		}
-	],
-	"UpdateKeys": [ "Nexus:14228" ]
+	"Version": "0.7.1-unofficial.1-mouahrara",
+	"Description": "Pauses the game if it doesn't receive player input after a specified number of game ticks.",
+	"UniqueID": "aedenthorn.AFKPause",
+	"EntryDll": "AFKPause.dll",
+	"MinimumApiVersion": "4.0.0",
+	"UpdateKeys": [
+		"Nexus:14228",
+		"UpdateManifest:https://github.com/mouahrara/aedenthorn/update-manifest.json@AFKPause"
+	]
 }

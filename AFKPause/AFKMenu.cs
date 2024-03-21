@@ -1,9 +1,9 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using StardewValley.Menus;
 using StardewValley;
+using StardewValley.Menus;
 using StardewValley.BellsAndWhistles;
 
-namespace AFKTimePause
+namespace AFKPause
 {
 	public class AFKMenu : IClickableMenu
 	{
