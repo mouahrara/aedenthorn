@@ -2,6 +2,21 @@
 
 # Global release notes
 
+## 24 March 2024
+* Released Additional Mine Maps version [0.2.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AdditionalMineMaps/release-notes.md#022-unofficial1-mouahrara)
+* Released Advanced Cooking version [0.1.5-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AdvancedCooking/release-notes.md#015-unofficial1-mouahrara)
+* Released Advanced Flute Blocks version [0.2.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AdvancedFluteBlocks/release-notes.md#021-unofficial1-mouahrara)
+* Released Advanced Menu Positioning version [0.2.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AdvancedMenuPositioning/release-notes.md#021-unofficial1-mouahrara)
+* Released AFK Pause version [0.7.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AFKPause/release-notes.md#071-unofficial1-mouahrara)
+* Released Alarms version [0.1.4-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/Alarms/release-notes.md#014-unofficial1-mouahrara)
+* Released All Chests Menu version [0.3.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AllChestsMenu/release-notes.md#032-unofficial1-mouahrara)
+* Released Bat Form version [0.3.4-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BatForm/release-notes.md#034-unofficial1-mouahrara)
+* Released Bed Tweaks version [0.3.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BedTweaks/release-notes.md#031-unofficial1-mouahrara)
+* Released Bee Paths version [0.2.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BeePaths/release-notes.md#021-unofficial1-mouahrara)
+* Released Better Elevator version [0.2.5-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BetterElevator/release-notes.md#025-unofficial1-mouahrara)
+* Released BirthdayKnowledgeFriendship version [0.1.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BirthdayKnowledgeFriendship/release-notes.md#011-unofficial1-mouahrara)
+* Released Dynamic Map Tiles version [0.9.6-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/DynamicMapTiles/release-notes.md#097-unofficial1-mouahrara)
+
 ## 20 March 2024
 * Forked from commit [134e32e](https://github.com/aedenthorn/StardewValleyMods/commit/134e32e45fb76423b462243fd4f588afc5347a75) dated January 8, 2024, of the original [StardewValleyMods](https://github.com/aedenthorn/StardewValleyMods) repository by [@aedenthorn](https://github.com/aedenthorn) (aka Erinthe). 🎉
 * Added several missing update keys 🔧

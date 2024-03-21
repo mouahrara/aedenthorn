@@ -1,0 +1,96 @@
+{
+	"Format": "4.0.0",
+	"Mods": {
+		"AdditionalMineMaps": {
+			"Name": "Additional Mine Maps",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/releases",
+			"Versions": [
+				{ "Version": "0.2.2-unofficial.1-mouahrara" }
+			]
+		},
+		"AdvancedCooking": {
+			"Name": "Advanced Cooking",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/releases",
+			"Versions": [
+				{ "Version": "0.1.5-unofficial.1-mouahrara" }
+			]
+		},
+		"AdvancedFluteBlocks": {
+			"Name": "Advanced Flute Blocks",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/releases",
+			"Versions": [
+				{ "Version": "0.2.1-unofficial.1-mouahrara" }
+			]
+		},
+		"AdvancedMenuPositioning": {
+			"Name": "Advanced Menu Positioning",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/releases",
+			"Versions": [
+				{ "Version": "0.2.1-unofficial.1-mouahrara" }
+			]
+		},
+		"AFKPause": {
+			"Name": "AFK Pause",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/releases",
+			"Versions": [
+				{ "Version": "0.7.1-unofficial.1-mouahrara" }
+			]
+		},
+		"Alarms": {
+			"Name": "Alarms",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/releases",
+			"Versions": [
+				{ "Version": "0.1.4-unofficial.1-mouahrara" }
+			]
+		},
+		"AllChestsMenu": {
+			"Name": "All Chests Menu",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/releases",
+			"Versions": [
+				{ "Version": "0.3.2-unofficial.1-mouahrara" }
+			]
+		},
+		"BatForm": {
+			"Name": "Bat Form",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/releases",
+			"Versions": [
+				{ "Version": "0.3.4-unofficial.1-mouahrara" }
+			]
+		},
+		"BedTweaks": {
+			"Name": "Bed Tweaks",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/releases",
+			"Versions": [
+				{ "Version": "0.3.1-unofficial.1-mouahrara" }
+			]
+		},
+		"BeePaths": {
+			"Name": "Bee Paths",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/releases",
+			"Versions": [
+				{ "Version": "0.2.1-unofficial.1-mouahrara" }
+			]
+		},
+		"BetterElevator": {
+			"Name": "Better Elevator",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/releases",
+			"Versions": [
+				{ "Version": "0.2.5-unofficial.1-mouahrara" }
+			]
+		},
+		"BirthdayKnowledgeFriendship": {
+			"Name": "Birthday Knowledge Friendship",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/releases",
+			"Versions": [
+				{ "Version": "0.1.1-unofficial.1-mouahrara" }
+			]
+		},
+		"DynamicMapTiles": {
+			"Name": "Dynamic Map Tiles",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/releases",
+			"Versions": [
+				{ "Version": "0.9.7-unofficial.1-mouahrara" }
+			]
+		}
+	}
+}
