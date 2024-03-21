@@ -12,15 +12,15 @@
 	"fridge-x": "Fridge {0}",
 
 	// GMCM
-	"GMCM_Option_CookAllModKey_Name": "Cook All Mod Key",
-	"GMCM_Option_StoreOtherHeldItemOnCook_Name": "Store Held Item On Cook",
-	"GMCM_Option_ConsumeIngredientsOnFail_Name": "Consume Ingredients On Fail",
-	"GMCM_Option_ConsumeExtraIngredientsOnSucceed_Name": "Consume Excess On Success",
-	"GMCM_Option_GiveTrashOnFail_Name": "Give Trash On Fail",
-	"GMCM_Option_AllowUnknownRecipes_Name": "Allow Unknown Recipes",
-	"GMCM_Option_LearnUnknownRecipes_Name": "Learn Unknown Recipes",
-	"GMCM_Option_ShowProductInfo_Name": "Show Product Info",
-	"GMCM_Option_ShowCookTooltip_Name": "Show Cook Tooltip",
-	"GMCM_Option_ShowProductsInTooltip_Name": "Show Products In Tooltip",
-	"GMCM_Option_YOffset_Name": "Height Offset"
+	"GMCM.CookAllModKey.Name": "Cook All Mod Key",
+	"GMCM.StoreOtherHeldItemOnCook.Name": "Store Held Item On Cook",
+	"GMCM.ConsumeIngredientsOnFail.Name": "Consume Ingredients On Fail",
+	"GMCM.ConsumeExtraIngredientsOnSucceed.Name": "Consume Excess On Success",
+	"GMCM.GiveTrashOnFail.Name": "Give Trash On Fail",
+	"GMCM.AllowUnknownRecipes.Name": "Allow Unknown Recipes",
+	"GMCM.LearnUnknownRecipes.Name": "Learn Unknown Recipes",
+	"GMCM.ShowProductInfo.Name": "Show Product Info",
+	"GMCM.ShowCookTooltip.Name": "Show Cook Tooltip",
+	"GMCM.ShowProductsInTooltip.Name": "Show Products In Tooltip",
+	"GMCM.YOffset.Name": "Height Offset"
 }

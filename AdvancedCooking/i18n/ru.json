@@ -12,15 +12,15 @@
 	"fridge-x": "Холодильник {0}",
 
 	// GMCM
-	"GMCM_Option_CookAllModKey_Name": "Клавиша 'Приготовить всё'",
-	"GMCM_Option_StoreOtherHeldItemOnCook_Name": "Перемещать в хранилище при готовке",
-	"GMCM_Option_ConsumeIngredientsOnFail_Name": "Потреблять ингредиенты при неудаче",
-	"GMCM_Option_ConsumeExtraIngredientsOnSucceed_Name": "Повышение потребления при неудаче",
-	"GMCM_Option_GiveTrashOnFail_Name": "Выдавать мусор при неудаче",
-	"GMCM_Option_AllowUnknownRecipes_Name": "Разрешить неизвестные рецепты",
-	"GMCM_Option_LearnUnknownRecipes_Name": "Изучать неизвестные рецепты",
-	"GMCM_Option_ShowProductInfo_Name": "Отображать информацию по продукту",
-	"GMCM_Option_ShowCookTooltip_Name": "Отображать информацию по готовке",
-	"GMCM_Option_ShowProductsInTooltip_Name": "Отображать продукты в подсказке",
-	"GMCM_Option_YOffset_Name": "Смещение высоты"
+	"GMCM.CookAllModKey.Name": "Клавиша 'Приготовить всё'",
+	"GMCM.StoreOtherHeldItemOnCook.Name": "Перемещать в хранилище при готовке",
+	"GMCM.ConsumeIngredientsOnFail.Name": "Потреблять ингредиенты при неудаче",
+	"GMCM.ConsumeExtraIngredientsOnSucceed.Name": "Повышение потребления при неудаче",
+	"GMCM.GiveTrashOnFail.Name": "Выдавать мусор при неудаче",
+	"GMCM.AllowUnknownRecipes.Name": "Разрешить неизвестные рецепты",
+	"GMCM.LearnUnknownRecipes.Name": "Изучать неизвестные рецепты",
+	"GMCM.ShowProductInfo.Name": "Отображать информацию по продукту",
+	"GMCM.ShowCookTooltip.Name": "Отображать информацию по готовке",
+	"GMCM.ShowProductsInTooltip.Name": "Отображать продукты в подсказке",
+	"GMCM.YOffset.Name": "Смещение высоты"
 }

@@ -1,12 +1,12 @@
-﻿using HarmonyLib;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using HarmonyLib;
 using Netcode;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Inventories;
 using StardewValley.Menus;
-using StardewValley.Objects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Object = StardewValley.Object;
 
 namespace AdvancedCooking
@@ -14,23 +14,20 @@ namespace AdvancedCooking
 	/// <summary>The mod entry point.</summary>
 	public partial class ModEntry : Mod
 	{
-
-		public static IMonitor SMonitor;
-		public static IModHelper SHelper;
-		public static ModConfig Config;
-		public static ModEntry context;
-		public static bool startedWalking;
-		private static Dictionary<string, int> currentCookables; 
+		internal static IMonitor SMonitor;
+		internal static IModHelper SHelper;
+		internal static ModConfig Config;
+		internal static ModEntry context;
+		private static Dictionary<string, int> currentCookables;
 		private static bool isCookingMenu;
 		private static ClickableTextureComponent cookButton;
 		private static ClickableTextureComponent fridgeRightButton;
 		private static ClickableTextureComponent fridgeLeftButton;
-		private static List<Chest> containers;
+		private static List<IInventory> containers;
 		private static NetList<Item, NetRef<Item>> ingredients;
 		private static Item[] oldIngredients;
 		private static InventoryMenu ingredientMenu;
 		private static int fridgeIndex = 0;
-		private Harmony harmony;
 
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
 		/// <param name="helper">Provides simplified APIs for writing mods.</param>
@@ -50,25 +47,33 @@ namespace AdvancedCooking
 			helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
 			helper.Events.Input.ButtonPressed += Input_ButtonPressed;
 
-			harmony = new Harmony(ModManifest.UniqueID);
+			// Load Harmony patches
+			try
+			{
+				Harmony harmony = new(ModManifest.UniqueID);
 
-			harmony.Patch(
-			   original: AccessTools.Constructor(typeof(CraftingPage), new Type[] { typeof(int), typeof(int), typeof(int), typeof(int), typeof(bool), typeof(bool), typeof(List<Chest>) }),
-			   prefix: new HarmonyMethod(typeof(ModEntry), nameof(ModEntry.CraftingPage_Prefix))
-			);
-			harmony.Patch(
-			   original: AccessTools.Method(typeof(CraftingPage), nameof(CraftingPage.receiveLeftClick)),
-			   prefix: new HarmonyMethod(typeof(ModEntry), nameof(ModEntry.CraftingPage_receiveLeftClick_Prefix))
-			);
-			harmony.Patch(
-			   original: AccessTools.Constructor(typeof(InventoryMenu), new Type[] { typeof(int), typeof(int), typeof(bool), typeof(IList<Item>), typeof(InventoryMenu.highlightThisItem), typeof(int), typeof(int), typeof(int), typeof(int), typeof(bool) }),
-			   prefix: new HarmonyMethod(typeof(ModEntry), nameof(ModEntry.InventoryMenu_Prefix))
-			);
-			harmony.Patch(
-			   original: AccessTools.Method(typeof(Game1), nameof(Game1.drawDialogueBox), new Type[] { typeof(int), typeof(int), typeof(int), typeof(int), typeof(bool), typeof(bool), typeof(string), typeof(bool), typeof(bool), typeof(int), typeof(int), typeof(int) }),
-			   postfix: new HarmonyMethod(typeof(ModEntry), nameof(ModEntry.Game1_drawDialogueBox_Postfix))
-			);
-
+				harmony.Patch(
+					original: AccessTools.Constructor(typeof(CraftingPage), new Type[] { typeof(int), typeof(int), typeof(int), typeof(int), typeof(bool), typeof(bool), typeof(List<IInventory>) }),
+					prefix: new HarmonyMethod(typeof(ModEntry), nameof(CraftingPage_Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(CraftingPage), nameof(CraftingPage.receiveLeftClick)),
+					prefix: new HarmonyMethod(typeof(ModEntry), nameof(CraftingPage_receiveLeftClick_Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Constructor(typeof(InventoryMenu), new Type[] { typeof(int), typeof(int), typeof(bool), typeof(IList<Item>), typeof(InventoryMenu.highlightThisItem), typeof(int), typeof(int), typeof(int), typeof(int), typeof(bool) }),
+					prefix: new HarmonyMethod(typeof(ModEntry), nameof(InventoryMenu_Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Game1), nameof(Game1.drawDialogueBox), new Type[] { typeof(int), typeof(int), typeof(int), typeof(int), typeof(bool), typeof(bool), typeof(string), typeof(bool), typeof(bool), typeof(int), typeof(int), typeof(int) }),
+					postfix: new HarmonyMethod(typeof(ModEntry), nameof(Game1_drawDialogueBox_Postfix))
+				);
+			}
+			catch (Exception e)
+			{
+				Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
+				return;
+			}
 		}
 
 		private void Input_ButtonPressed(object sender, StardewModdingAPI.Events.ButtonPressedEventArgs e)
@@ -98,14 +103,6 @@ namespace AdvancedCooking
 
 		private void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
 		{
-			if (false && Helper.ModRegistry.IsLoaded("blueberry.LoveOfCooking"))
-			{
-				harmony.Patch(
-				   original: AccessTools.Method("LoveOfCooking.Objects.CookingMenu:DrawActualInventory"),
-				   postfix: new HarmonyMethod(typeof(ModEntry), nameof(CookingMenu_DrawActualInventory_Postfix))
-				);
-			}
-
 			// get Generic Mod Config Menu's API (if it's installed)
 			var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
 			if (configMenu is null)
@@ -119,67 +116,67 @@ namespace AdvancedCooking
 			);
 			configMenu.AddKeybind(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_CookAllModKey_Name"),
+				name: () => SHelper.Translation.Get("GMCM.CookAllModKey.Name"),
 				getValue: () => Config.CookAllModKey,
 				setValue: value => Config.CookAllModKey = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_StoreOtherHeldItemOnCook_Name"),
+				name: () => SHelper.Translation.Get("GMCM.StoreOtherHeldItemOnCook.Name"),
 				getValue: () => Config.StoreOtherHeldItemOnCook,
 				setValue: value => Config.StoreOtherHeldItemOnCook = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_ConsumeIngredientsOnFail_Name"),
+				name: () => SHelper.Translation.Get("GMCM.ConsumeIngredientsOnFail.Name"),
 				getValue: () => Config.ConsumeIngredientsOnFail,
 				setValue: value => Config.ConsumeIngredientsOnFail = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_ConsumeExtraIngredientsOnSucceed_Name"),
+				name: () => SHelper.Translation.Get("GMCM.ConsumeExtraIngredientsOnSucceed.Name"),
 				getValue: () => Config.ConsumeExtraIngredientsOnSucceed,
 				setValue: value => Config.ConsumeExtraIngredientsOnSucceed = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_GiveTrashOnFail_Name"),
+				name: () => SHelper.Translation.Get("GMCM.GiveTrashOnFail.Name"),
 				getValue: () => Config.GiveTrashOnFail,
 				setValue: value => Config.GiveTrashOnFail = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_AllowUnknownRecipes_Name"),
+				name: () => SHelper.Translation.Get("GMCM.AllowUnknownRecipes.Name"),
 				getValue: () => Config.AllowUnknownRecipes,
 				setValue: value => Config.AllowUnknownRecipes = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_LearnUnknownRecipes_Name"),
+				name: () => SHelper.Translation.Get("GMCM.LearnUnknownRecipes.Name"),
 				getValue: () => Config.LearnUnknownRecipes,
 				setValue: value => Config.LearnUnknownRecipes = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_ShowProductInfo_Name"),
+				name: () => SHelper.Translation.Get("GMCM.ShowProductInfo.Name"),
 				getValue: () => Config.ShowProductInfo,
 				setValue: value => Config.ShowProductInfo = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_ShowCookTooltip_Name"),
+				name: () => SHelper.Translation.Get("GMCM.ShowCookTooltip.Name"),
 				getValue: () => Config.ShowCookTooltip,
 				setValue: value => Config.ShowCookTooltip = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_ShowProductsInTooltip_Name"),
+				name: () => SHelper.Translation.Get("GMCM.ShowProductsInTooltip.Name"),
 				getValue: () => Config.ShowProductsInTooltip,
 				setValue: value => Config.ShowProductsInTooltip = value
 			);
 			configMenu.AddNumberOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_YOffset_Name"),
+				name: () => SHelper.Translation.Get("GMCM.YOffset.Name"),
 				getValue: () => Config.YOffset,
 				setValue: value => Config.YOffset = value
 			);
@@ -187,7 +184,7 @@ namespace AdvancedCooking
 
 		private static void DrawCookButtonTooltip()
 		{
-			List<string> text = new List<string>();
+			List<string> text = new();
 			if (Config.ShowProductsInTooltip)
 			{
 				var keys = currentCookables.Keys.ToArray();
@@ -204,8 +201,9 @@ namespace AdvancedCooking
 						break;
 				}
 			}
-			IClickableMenu.drawHoverText(Game1.spriteBatch, string.Join("\n", text), Game1.smallFont, 0, 0, -1, SHelper.Translation.Get("cook"), -1, null, null, 0, -1, -1, -1, -1, 1f, null, null);
+			IClickableMenu.drawHoverText(Game1.spriteBatch, string.Join("\n", text), Game1.smallFont, 0, 0, -1, SHelper.Translation.Get("cook"));
 		}
+
 		private static void TryCookRecipe(CraftingPage cookingMenu, ref Item heldItem)
 		{
 			SMonitor.Log("Trying to cook recipe");
@@ -214,12 +212,12 @@ namespace AdvancedCooking
 			while (true)
 			{
 				bool keepCooking = false;
-				List<string> possible = new List<string>();
+				List<string> possible = new();
 				foreach (var name in CraftingRecipe.cookingRecipes.Keys)
 				{
 					if (!Config.AllowUnknownRecipes && !Game1.player.cookingRecipes.ContainsKey(name))
 						continue;
-					CraftingRecipe recipe = new CraftingRecipe(name, true);
+					CraftingRecipe recipe = new(name, true);
 					Item crafted = recipe.createItem();
 					if (crafted == null)
 						continue;
@@ -249,7 +247,7 @@ namespace AdvancedCooking
 				possible.Sort(delegate (string a, string b) { return new CraftingRecipe(b, true).recipeList.Count.CompareTo(new CraftingRecipe(a, true).recipeList.Count); });
 				foreach (var name in possible)
 				{
-					CraftingRecipe recipe = new CraftingRecipe(name, true);
+					CraftingRecipe recipe = new(name, true);
 					Item crafted = recipe.createItem();
 					if (crafted == null)
 						continue;
@@ -312,7 +310,7 @@ namespace AdvancedCooking
 						Game1.playSound("breathin");
 					}
 					Game1.player.checkForQuestComplete(null, -1, -1, crafted, null, 2, -1);
-					Game1.player.cookedRecipe(heldItem.ParentSheetIndex);
+					Game1.player.cookedRecipe(heldItem.QualifiedItemId);
 					Game1.stats.checkForCookingAchievements();
 					if (Game1.options.gamepadControls && heldItem != null && Game1.player.couldInventoryAcceptThisItem(heldItem))
 					{
@@ -324,7 +322,7 @@ namespace AdvancedCooking
 						Game1.player.cookingRecipes.Add(name, 0);
 						Game1.playSound("yoba");
 						SMonitor.Log("Added new recipe");
-						Game1.showGlobalMessage(string.Format(SHelper.Translation.Get("new-recipe-x"), name));
+						Game1.showGlobalMessage(string.Format(SHelper.Translation.Get("new-recipe-x"), recipe.DisplayName));
 						AccessTools.Method(typeof(CraftingPage), "layoutRecipes").Invoke(cookingMenu, new object[] { CraftingRecipe.cookingRecipes.Keys.ToList() });
 					}
 					succeeded = true;
@@ -367,7 +365,7 @@ namespace AdvancedCooking
 							ingredients[i] = null;
 						if (Config.GiveTrashOnFail)
 						{
-							Object trash = new Object(168, 1);
+							Object trash = new("168", 1);
 							if (heldItem == null)
 							{
 								heldItem = trash;
@@ -386,13 +384,13 @@ namespace AdvancedCooking
 		private static void UpdateCurrentCookables()
 		{
 			oldIngredients = ingredients.ToArray();
-			Dictionary<string, int> dict = new Dictionary<string, int>();
+			Dictionary<string, int> dict = new();
 			if (Game1.activeClickableMenu is not CraftingPage)
 			{
 				currentCookables = dict;
 				return;
 			}
-			List<Item> tempIngredients = new List<Item>();
+			List<Item> tempIngredients = new();
 			foreach(var item in ingredients)
 			{
 				if(item == null)
@@ -411,7 +409,7 @@ namespace AdvancedCooking
 				{
 					if (!Config.AllowUnknownRecipes && !Game1.player.cookingRecipes.ContainsKey(name))
 						continue;
-					CraftingRecipe recipe = new CraftingRecipe(name, true);
+					CraftingRecipe recipe = new(name, true);
 					Item crafted = recipe.createItem();
 					if (crafted == null)
 						continue;
@@ -465,7 +463,7 @@ namespace AdvancedCooking
 
 		private static void UpdateActualInventory(CraftingPage instance)
 		{
-			var list = fridgeIndex < 0 ? Game1.player.Items : instance._materialContainers[Math.Min(instance._materialContainers.Count - 1 ,fridgeIndex)].items;
+			var list = fridgeIndex < 0 ? Game1.player.Items : instance._materialContainers[Math.Min(instance._materialContainers.Count - 1 ,fridgeIndex)];
 
 			for (int i = 0; i < Game1.player.maxItems.Value; i++)
 			{
@@ -474,14 +472,15 @@ namespace AdvancedCooking
 			}
 			instance.inventory.actualInventory = list;
 		}
-		private static bool IsCorrectIngredient(Item item, int key)
-		{
-			Object obj = item as Object;
 
-			if (obj is null)
+		private static bool IsCorrectIngredient(Item item, string key)
+		{
+			if (item is not Object obj)
 				return false;
 			else
-				return !obj.bigCraftable.Value && (obj.ParentSheetIndex == key || obj.Category == key || CraftingRecipe.isThereSpecialIngredientRule(obj, key));
+			{
+				return !obj.bigCraftable.Value && (obj.ItemId == key || obj.Category.ToString() == key || CraftingRecipe.isThereSpecialIngredientRule(obj, key));
+			}
 		}
 	}
 }
