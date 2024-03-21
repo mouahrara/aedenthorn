@@ -1,15 +1,12 @@
-﻿using Force.DeepCloner;
-using HarmonyLib;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
-using StardewModdingAPI;
-using StardewValley;
-using StardewValley.Menus;
-using StardewValley.Objects;
-using System;
+﻿using System;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
+using Force.DeepCloner;
+using Microsoft.Xna.Framework;
+using StardewModdingAPI;
+using StardewValley;
+using StardewValley.Menus;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace AdvancedMenuPositioning
@@ -17,18 +14,17 @@ namespace AdvancedMenuPositioning
 	/// <summary>The mod entry point.</summary>
 	public partial class ModEntry : Mod
 	{
-
-		public static IMonitor SMonitor;
-		public static IModHelper SHelper;
-		public static ModConfig Config;
-		public static ModEntry context;
+		internal static IMonitor SMonitor;
+		internal static IModHelper SHelper;
+		internal static ModConfig Config;
+		internal static ModEntry context;
 		private static Point lastMousePosition;
 		private static IClickableMenu currentlyDragging;
 		private static int RightClickLimiter;
 
-		private static List<ClickableComponent> adjustedComponents = new List<ClickableComponent>();
-		private static List<IClickableMenu> adjustedMenus = new List<IClickableMenu>();
-		private static List<IClickableMenu> detachedMenus = new List<IClickableMenu>();
+		private static readonly List<ClickableComponent> adjustedComponents = new();
+		private static readonly List<IClickableMenu> adjustedMenus = new();
+		private static readonly List<IClickableMenu> detachedMenus = new();
 
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
 		/// <param name="helper">Provides simplified APIs for writing mods.</param>
@@ -78,9 +74,8 @@ namespace AdvancedMenuPositioning
 				Game1.options.showMenuBackground = true;
 				foreach (var m in detachedMenus)
 				{
-					var f = AccessTools.Field(m.GetType(), "drawBG");
-					if (f != null)
-						f.SetValue(m, false);
+					var f = m.GetType().GetField("drawBG", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+					f?.SetValue(m, false);
 					m.draw(e.SpriteBatch);
 				}
 				Game1.options.showMenuBackground = back;
@@ -91,7 +86,7 @@ namespace AdvancedMenuPositioning
 		{
 			if (!Context.IsWorldReady || !Config.EnableMod)
 				return;
-			if (Game1.activeClickableMenu != null && isKeybindPressed(Config.DetachKeys.Keybinds[0].Buttons) && new Rectangle(Game1.activeClickableMenu.xPositionOnScreen, Game1.activeClickableMenu.yPositionOnScreen, Game1.activeClickableMenu.width, Game1.activeClickableMenu.height).Contains(Game1.getMouseX(), Game1.getMouseY()))
+			if (Game1.activeClickableMenu != null && IsKeybindPressed(Config.DetachKeys.Keybinds[0].Buttons) && new Rectangle(Game1.activeClickableMenu.xPositionOnScreen, Game1.activeClickableMenu.yPositionOnScreen, Game1.activeClickableMenu.width, Game1.activeClickableMenu.height).Contains(Game1.getMouseX(), Game1.getMouseY()))
 			{
 				detachedMenus.Add(Game1.activeClickableMenu);
 				Game1.activeClickableMenu = null;
@@ -101,9 +96,9 @@ namespace AdvancedMenuPositioning
 			}
 			else if(detachedMenus.Count > 0)
 			{
-				if (isKeybindPressed(Config.MoveKeys.Keybinds[0].Buttons))
+				if (IsKeybindPressed(Config.MoveKeys.Keybinds[0].Buttons))
 					return;
-				if (isKeybindPressed(Config.CloseKeys.Keybinds[0].Buttons))
+				if (IsKeybindPressed(Config.CloseKeys.Keybinds[0].Buttons))
 				{
 					for (int i = detachedMenus.Count - 1; i >= 0; i--)
 					{
@@ -116,7 +111,7 @@ namespace AdvancedMenuPositioning
 						}
 					}
 				}
-				if (isKeybindPressed(Config.DetachKeys.Keybinds[0].Buttons) && Game1.activeClickableMenu == null)
+				if (IsKeybindPressed(Config.DetachKeys.Keybinds[0].Buttons) && Game1.activeClickableMenu == null)
 				{
 					for (int i = detachedMenus.Count - 1; i >= 0; i--)
 					{
@@ -143,7 +138,7 @@ namespace AdvancedMenuPositioning
 						Game1.activeClickableMenu.receiveLeftClick(Game1.getMouseX(), Game1.getMouseY());
 						ItemGrabMenu menuAsItemGrabMenu = Game1.activeClickableMenu as ItemGrabMenu;
 						if (menuAsItemGrabMenu is not null)
-							Game1.activeClickableMenu = (IClickableMenu) new ItemGrabMenu(menuAsItemGrabMenu.ItemsToGrabMenu.actualInventory, false, true, new InventoryMenu.highlightThisItem(InventoryMenu.highlightAllItems), (ItemGrabMenu.behaviorOnItemSelect)typeof(ItemGrabMenu).GetField("behaviorFunction", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(menuAsItemGrabMenu), (string) null, menuAsItemGrabMenu.behaviorOnItemGrab, canBeExitedWithKey: true, showOrganizeButton: true, source: menuAsItemGrabMenu.source, sourceItem: (Item)typeof(ItemGrabMenu).GetField("sourceItem", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(menuAsItemGrabMenu), whichSpecialButton: menuAsItemGrabMenu.whichSpecialButton, context: menuAsItemGrabMenu.context).setEssential((bool)typeof(ItemGrabMenu).GetField("essential", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(menuAsItemGrabMenu));
+							Game1.activeClickableMenu = new ItemGrabMenu(menuAsItemGrabMenu.ItemsToGrabMenu.actualInventory, false, true, new InventoryMenu.highlightThisItem(InventoryMenu.highlightAllItems), menuAsItemGrabMenu.behaviorFunction, null, menuAsItemGrabMenu.behaviorOnItemGrab, canBeExitedWithKey: true, showOrganizeButton: true, source: menuAsItemGrabMenu.source, sourceItem: menuAsItemGrabMenu.sourceItem, whichSpecialButton: menuAsItemGrabMenu.whichSpecialButton, context: menuAsItemGrabMenu.context).setEssential(menuAsItemGrabMenu.essential);
 						if (Game1.activeClickableMenu != null)
 						{
 							var d = new Point(detachedMenus[i].xPositionOnScreen - Game1.activeClickableMenu.xPositionOnScreen, detachedMenus[i].yPositionOnScreen - Game1.activeClickableMenu.yPositionOnScreen);
@@ -262,7 +257,7 @@ namespace AdvancedMenuPositioning
 		{
 			if (!Context.IsWorldReady || !Config.EnableMod)
 				return;
-			if(isKeybindPressed(Config.MoveKeys.Keybinds[0].Buttons))
+			if(IsKeybindPressed(Config.MoveKeys.Keybinds[0].Buttons))
 			{
 				if(Game1.activeClickableMenu != null)
 				{
@@ -321,7 +316,6 @@ namespace AdvancedMenuPositioning
 			}
 		}
 
-
 		private void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
 		{
 			// get Generic Mod Config Menu's API (if it's installed)
@@ -338,35 +332,35 @@ namespace AdvancedMenuPositioning
 
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_ModEnabled_Name"),
+				name: () => SHelper.Translation.Get("GMCM.ModEnabled.Name"),
 				getValue: () => Config.EnableMod,
 				setValue: value => Config.EnableMod = value
 			);
 			configMenu.AddKeybindList(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_MoveKeys_Name"),
+				name: () => SHelper.Translation.Get("GMCM.MoveKeys.Name"),
 				getValue: () => Config.MoveKeys,
 				setValue: value => Config.MoveKeys = value
 			);
 			configMenu.AddKeybindList(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_DetachKeys_Name"),
+				name: () => SHelper.Translation.Get("GMCM.DetachKeys.Name"),
 				getValue: () => Config.DetachKeys,
 				setValue: value => Config.DetachKeys = value
 			);
 			configMenu.AddKeybindList(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_CloseKeys_Name"),
+				name: () => SHelper.Translation.Get("GMCM.CloseKeys.Name"),
 				getValue: () => Config.CloseKeys,
 				setValue: value => Config.CloseKeys = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_StrictKeybindings_Name"),
-				tooltip: () => ModEntry.SHelper.Translation.Get("GMCM_Option_StrictKeybindings_Tooltip"),
+				name: () => SHelper.Translation.Get("GMCM.StrictKeybindings.Name"),
+				tooltip: () => SHelper.Translation.Get("GMCM.StrictKeybindings_Tooltip"),
 				getValue: () => Config.StrictKeybindings,
 				setValue: value => Config.StrictKeybindings = value
 			);
 		}
-   }
+	}
 }

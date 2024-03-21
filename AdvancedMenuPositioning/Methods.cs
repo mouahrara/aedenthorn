@@ -1,19 +1,18 @@
-﻿using HarmonyLib;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace AdvancedMenuPositioning
 {
 	public partial class ModEntry : Mod
 	{
-
 		private static void AdjustMenu(IClickableMenu menu, Point delta, bool first = false)
 		{
 			if (first)
@@ -25,10 +24,10 @@ namespace AdvancedMenuPositioning
 				return;
 			menu.xPositionOnScreen += delta.X;
 			menu.yPositionOnScreen += delta.Y;
-			var types = AccessTools.GetDeclaredFields(menu.GetType());
+			var types = menu.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static).ToList();
 			if (menu is ItemGrabMenu)
 			{
-				types.AddRange(AccessTools.GetDeclaredFields(typeof(MenuWithInventory)));
+				types.AddRange(typeof(MenuWithInventory).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static));
 			}
 			foreach (var f in types)
 			{
@@ -170,7 +169,7 @@ namespace AdvancedMenuPositioning
 			}
 		}
 
-		private static bool isKeybindPressed(SButton[] buttons)
+		private static bool IsKeybindPressed(SButton[] buttons)
 		{
 			if (!buttons.All(button => SHelper.Input.IsDown(button) || SHelper.Input.IsSuppressed(button)))
 				return false;
