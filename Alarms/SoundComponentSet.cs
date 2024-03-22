@@ -1,6 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using StardewValley.Menus;
-using System.Collections.Generic;
+﻿using StardewValley.Menus;
 
 namespace Alarms
 {

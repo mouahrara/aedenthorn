@@ -1,35 +1,30 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Newtonsoft.Json;
 using StardewModdingAPI;
 using StardewValley;
-using StardewValley.BellsAndWhistles;
 using StardewValley.Menus;
-using StardewValley.SDKs;
-using System;
-using System.Buffers.Text;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
 
 namespace Alarms
 {
 	public class ClockSoundMenu : IClickableMenu
 	{
-		public static int scrolled;
-		public static int setsPerPage = 6;
-		public static int windowWidth = 64 * 16;
-		public static ClockSoundMenu instance;
-		public List<SoundComponentSet> soundComponentSets = new();
-		public List<ClickableComponent> allComponents = new();
-		public ClickableTextureComponent addCC;
-		public ClickableTextureComponent upCC;
-		public ClickableTextureComponent downCC;
-		public string hoverText;
-		public string hoveredItem;
-		public static List<ClockSound> soundList = new();
+		internal static int scrolled;
+		internal static int setsPerPage = 6;
+		internal static int windowWidth = 64 * 16;
+		internal List<SoundComponentSet> soundComponentSets = new();
+		internal List<ClickableComponent> allComponents = new();
+		internal ClickableTextureComponent addCC;
+		internal ClickableTextureComponent upCC;
+		internal ClickableTextureComponent downCC;
+		internal string hoverText;
+		internal string hoveredItem;
+		internal static List<ClockSound> soundList = new();
 
 		public ClockSoundMenu() : base(Game1.uiViewport.Width / 2 - (windowWidth + borderWidth * 2) / 2, -borderWidth, windowWidth + borderWidth * 2, Game1.uiViewport.Height, false)
 		{
@@ -45,7 +40,7 @@ namespace Alarms
 		{
 			soundComponentSets.Clear();
 			allComponents.Clear();
-			
+
 			int count = 0;
 			int setHeight = 192;
 			int lineHeight = 96;
@@ -82,7 +77,7 @@ namespace Alarms
 					upNeighborID = baseID,
 					downNeighborID = baseID + 1000
 				});
-				allComponents.Add(new ClickableComponent(new Rectangle(xStart + 360 + 48, yStart + lineHeight, 192, 48), "soundCC", "Sound " + i) 
+				allComponents.Add(new ClickableComponent(new Rectangle(xStart + 360 + 48, yStart + lineHeight, 192, 48), "soundCC", "Sound " + i)
 				{
 					myID = baseID + 3,
 					rightNeighborID = baseID + 15,
@@ -97,8 +92,7 @@ namespace Alarms
 						X = xStart,
 						Y = yStart + 8,
 						Width = 64,
-						Text = soundList[i].hours + "",
-						
+						Text = soundList[i].hours + ""
 					},
 					minText = new TextBox(textBox, null, Game1.smallFont, Game1.textColor)
 					{
@@ -122,7 +116,7 @@ namespace Alarms
 					},
 					seasonCCs = new ClickableTextureComponent[]
 					{
-						new ClickableTextureComponent("Spring", new Rectangle(xStart + clockWidth, yStart, 48, 32), "", Utility.getSeasonNameFromNumber(0), Game1.mouseCursors, new Rectangle(406, 441, 12, 8), 4f)
+						new("Spring", new Rectangle(xStart + clockWidth, yStart, 48, 32), "", Utility.getSeasonNameFromNumber(0), Game1.mouseCursors, new Rectangle(406, 441, 12, 8), 4f)
 						{
 							myID = baseID + 4,
 							upNeighborID = count > 0 ? baseID - 1000 : -9999,
@@ -130,7 +124,7 @@ namespace Alarms
 							leftNeighborID = baseID + 1,
 							downNeighborID = baseID + 6
 						},
-						new ClickableTextureComponent("Summer", new Rectangle(xStart + clockWidth + 48, yStart, 48, 32), "", Utility.getSeasonNameFromNumber(1),  Game1.mouseCursors, new Rectangle(406, 441 + 8, 12, 8), 4f)
+						new("Summer", new Rectangle(xStart + clockWidth + 48, yStart, 48, 32), "", Utility.getSeasonNameFromNumber(1), Game1.mouseCursors, new Rectangle(406, 441 + 8, 12, 8), 4f)
 						{
 							myID = baseID + 5,
 							upNeighborID = count > 0 ? baseID - 1000 : -9999,
@@ -138,7 +132,7 @@ namespace Alarms
 							leftNeighborID = baseID + 4,
 							downNeighborID = baseID + 7
 						},
-						new ClickableTextureComponent("Fall", new Rectangle(xStart + clockWidth, yStart + 32, 48, 32), "", Utility.getSeasonNameFromNumber(2), Game1.mouseCursors, new Rectangle(406, 441 + 16, 12, 8), 4f)
+						new("Fall", new Rectangle(xStart + clockWidth, yStart + 32, 48, 32), "", Utility.getSeasonNameFromNumber(2), Game1.mouseCursors, new Rectangle(406, 441 + 16, 12, 8), 4f)
 						{
 							myID = baseID + 6,
 							upNeighborID = baseID + 4,
@@ -146,7 +140,7 @@ namespace Alarms
 							leftNeighborID = baseID + 1,
 							downNeighborID = baseID + 2
 						},
-						new ClickableTextureComponent("Winter", new Rectangle(xStart + clockWidth + 48, yStart + 32, 48, 32),"", Utility.getSeasonNameFromNumber(3), Game1.mouseCursors, new Rectangle(406, 441 + 24, 12, 8), 4f)
+						new("Winter", new Rectangle(xStart + clockWidth + 48, yStart + 32, 48, 32),"", Utility.getSeasonNameFromNumber(3), Game1.mouseCursors, new Rectangle(406, 441 + 24, 12, 8), 4f)
 						{
 							myID = baseID + 7,
 							upNeighborID = baseID + 5,
@@ -157,7 +151,7 @@ namespace Alarms
 					},
 					weekCCs = new ClickableComponent[]
 					{
-						new ClickableComponent(new Rectangle(xStart + clockWidth + seasonWidth, yStart + 8, dowWidth, lineHeight), ModEntry.SHelper.Translation.Get("monday"), ModEntry.SHelper.Translation.Get("monday-s"))
+						new(new Rectangle(xStart + clockWidth + seasonWidth, yStart + 8, dowWidth, lineHeight), ModEntry.SHelper.Translation.Get("monday"), ModEntry.SHelper.Translation.Get("monday-s"))
 						{
 							myID = baseID + 8,
 							upNeighborID = count > 0 ? baseID - 1000 : -9999,
@@ -165,7 +159,7 @@ namespace Alarms
 							leftNeighborID = baseID + 7,
 							downNeighborID = baseID + 2
 						},
-						new ClickableComponent(new Rectangle(xStart + clockWidth + seasonWidth + dowWidth, yStart + 8, dowWidth, lineHeight), ModEntry.SHelper.Translation.Get("tuesday"), ModEntry.SHelper.Translation.Get("tuesday-s"))
+						new(new Rectangle(xStart + clockWidth + seasonWidth + dowWidth, yStart + 8, dowWidth, lineHeight), ModEntry.SHelper.Translation.Get("tuesday"), ModEntry.SHelper.Translation.Get("tuesday-s"))
 						{
 							myID = baseID + 9,
 							upNeighborID = count > 0 ? baseID - 1000 : -9999,
@@ -173,7 +167,7 @@ namespace Alarms
 							leftNeighborID = baseID + 8,
 							downNeighborID = baseID + 2
 						},
-						new ClickableComponent(new Rectangle(xStart + clockWidth + seasonWidth + dowWidth * 2, yStart + 8, dowWidth, lineHeight), ModEntry.SHelper.Translation.Get("wednesday"), ModEntry.SHelper.Translation.Get("wednesday-s"))
+						new(new Rectangle(xStart + clockWidth + seasonWidth + dowWidth * 2, yStart + 8, dowWidth, lineHeight), ModEntry.SHelper.Translation.Get("wednesday"), ModEntry.SHelper.Translation.Get("wednesday-s"))
 						{
 							myID = baseID + 10,
 							upNeighborID = count > 0 ? baseID - 1000 : -9999,
@@ -181,7 +175,7 @@ namespace Alarms
 							leftNeighborID = baseID + 9,
 							downNeighborID = baseID + 2
 						},
-						new ClickableComponent(new Rectangle(xStart + clockWidth + seasonWidth + dowWidth * 3, yStart + 8, dowWidth, lineHeight), ModEntry.SHelper.Translation.Get("thursday"), ModEntry.SHelper.Translation.Get("thursday-s"))
+						new(new Rectangle(xStart + clockWidth + seasonWidth + dowWidth * 3, yStart + 8, dowWidth, lineHeight), ModEntry.SHelper.Translation.Get("thursday"), ModEntry.SHelper.Translation.Get("thursday-s"))
 						{
 							myID = baseID + 11,
 							upNeighborID = count > 0 ? baseID - 1000 : -9999,
@@ -189,7 +183,7 @@ namespace Alarms
 							leftNeighborID = baseID + 10,
 							downNeighborID = baseID + 3
 						},
-						new ClickableComponent(new Rectangle(xStart + clockWidth + seasonWidth + dowWidth * 4, yStart + 8, dowWidth, lineHeight), ModEntry.SHelper.Translation.Get("friday"), ModEntry.SHelper.Translation.Get("friday-s"))
+						new(new Rectangle(xStart + clockWidth + seasonWidth + dowWidth * 4, yStart + 8, dowWidth, lineHeight), ModEntry.SHelper.Translation.Get("friday"), ModEntry.SHelper.Translation.Get("friday-s"))
 						{
 							myID = baseID + 12,
 							upNeighborID = count > 0 ? baseID - 1000 : -9999,
@@ -197,7 +191,7 @@ namespace Alarms
 							leftNeighborID = baseID + 11,
 							downNeighborID = baseID + 3
 						},
-						new ClickableComponent(new Rectangle(xStart + clockWidth + seasonWidth + dowWidth * 5, yStart + 8, dowWidth, lineHeight), ModEntry.SHelper.Translation.Get("saturday"), ModEntry.SHelper.Translation.Get("saturday-s"))
+						new(new Rectangle(xStart + clockWidth + seasonWidth + dowWidth * 5, yStart + 8, dowWidth, lineHeight), ModEntry.SHelper.Translation.Get("saturday"), ModEntry.SHelper.Translation.Get("saturday-s"))
 						{
 							myID = baseID + 13,
 							upNeighborID = count > 0 ? baseID - 1000 : -9999,
@@ -205,7 +199,7 @@ namespace Alarms
 							leftNeighborID = baseID + 12,
 							downNeighborID = baseID + 3
 						},
-						new ClickableComponent(new Rectangle(xStart + clockWidth + seasonWidth + dowWidth * 6, yStart + 8, dowWidth, lineHeight), ModEntry.SHelper.Translation.Get("sunday"), ModEntry.SHelper.Translation.Get("sunday-s"))
+						new(new Rectangle(xStart + clockWidth + seasonWidth + dowWidth * 6, yStart + 8, dowWidth, lineHeight), ModEntry.SHelper.Translation.Get("sunday"), ModEntry.SHelper.Translation.Get("sunday-s"))
 						{
 							myID = baseID + 14,
 							upNeighborID = count > 0 ? baseID - 1000 : -9999,
@@ -233,7 +227,6 @@ namespace Alarms
 						downNeighborID = baseID + 1000
 					},
 					sound = soundList[i]
-					
 				};
 				allComponents.AddRange(set.seasonCCs);
 				allComponents.AddRange(set.weekCCs);
@@ -286,7 +279,7 @@ namespace Alarms
 					upNeighborID = -1,
 				};
 			}
-			else 
+			else
 				downCC = null;
 			populateClickableComponentList();
 		}
@@ -361,7 +354,6 @@ namespace Alarms
 				{
 					if (set.seasonCCs[j].containsPoint(x, y))
 					{
-						
 						if (soundComponentSets[i].sound.seasons is null)
 							soundComponentSets[i].sound.seasons = new bool[4];
 						soundComponentSets[i].sound.seasons[j] = !soundComponentSets[i].sound.seasons[j];
@@ -418,7 +410,7 @@ namespace Alarms
 					RepopulateComponentList();
 					return;
 				}
-				if(set.deleteCC.containsPoint(x, y)) 
+				if(set.deleteCC.containsPoint(x, y))
 				{
 					Game1.playSound("trashcan");
 					soundList.RemoveAt(i + scrolled);
@@ -457,18 +449,18 @@ namespace Alarms
 			}
 		}
 
-
 		public override void receiveRightClick(int x, int y, bool playSound = true)
 		{
 			base.receiveRightClick(x, y, playSound);
 		}
+
 		public override void receiveScrollWheelAction(int direction)
 		{
 			DoScroll(direction);
 			RepopulateComponentList();
 		}
 
-		private bool DoScroll(int direction)
+		private static bool DoScroll(int direction)
 		{
 			if (direction < 0 && scrolled < soundList.Count - setsPerPage)
 			{
@@ -550,7 +542,6 @@ namespace Alarms
 			}
 		}
 
-
 		public override void snapToDefaultClickableComponent()
 		{
 			if(Game1.options.snappyMenus && Game1.options.gamepadControls)
@@ -559,6 +550,7 @@ namespace Alarms
 				snapCursorToCurrentSnappedComponent();
 			}
 		}
+
 		public override void applyMovementKey(int direction)
 		{
 
@@ -588,6 +580,7 @@ namespace Alarms
 				}
 			}
 		}
+
 		public override void update(GameTime time)
 		{
 			base.update(time);
@@ -663,12 +656,13 @@ namespace Alarms
 				return;
 			}
 		}
+
 		public override void emergencyShutDown()
 		{
 			base.emergencyShutDown();
 		}
 
-		private void ReloadSounds()
+		private static void ReloadSounds()
 		{
 			var path = Path.Combine(ModEntry.SHelper.DirectoryPath, "assets", $"sounds-{Constants.SaveFolderName}.json");
 			if (!File.Exists(path))
@@ -681,6 +675,7 @@ namespace Alarms
 				soundList = JsonConvert.DeserializeObject<List<ClockSound>>(File.ReadAllText(path));
 			}
 		}
+
 		public static void SaveSounds()
 		{
 			for (int i = 0; i < soundList.Count; i++)
@@ -704,7 +699,6 @@ namespace Alarms
 			}
 			var path = Path.Combine(ModEntry.SHelper.DirectoryPath, "assets", $"sounds-{Constants.SaveFolderName}.json");
 			File.WriteAllText(path, JsonConvert.SerializeObject(soundList, Formatting.Indented));
-
 		}
 	}
 }

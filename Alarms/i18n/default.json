@@ -1,7 +1,7 @@
 {
-	"GMCM_Option_ModEnabled_Name": "Mod Enabled",
-	"GMCM_Option_DefaultSound_Name": "Default Sound",
-	"GMCM_Option_MenuButton_Name": "Menu Button",
+	"GMCM.ModEnabled.Name": "Mod Enabled",
+	"GMCM.DefaultSound.Name": "Default Sound",
+	"GMCM.MenuButton.Name": "Menu Button",
 	"add": "Add New Alarm",
 	"up": "Up",
 	"down": "Down",

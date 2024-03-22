@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Alarms
+﻿namespace Alarms
 {
 	public class ClockSound
 	{

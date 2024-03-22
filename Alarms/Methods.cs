@@ -1,16 +1,10 @@
-﻿using Newtonsoft.Json;
-using StardewModdingAPI;
-using StardewValley;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using StardewValley;
 
 namespace Alarms
 {
 	public partial class ModEntry
 	{
-		private void CheckForSound(int time)
+		private static void CheckForSound(int time)
 		{
 			foreach (var sound in ClockSoundMenu.soundList)
 			{

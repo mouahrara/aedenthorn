@@ -1,7 +1,7 @@
 {
-	"GMCM_Option_ModEnabled_Name": "Activer le Mod",
-	"GMCM_Option_DefaultSound_Name": "Son par défaut",
-	"GMCM_Option_MenuButton_Name": "Touches pour ouvrir le menu",
+	"GMCM.ModEnabled.Name": "Activer le Mod",
+	"GMCM.DefaultSound.Name": "Son par défaut",
+	"GMCM.MenuButton.Name": "Touches pour ouvrir le menu",
 	"add": "Ajouter une nouvelle alarme",
 	"up": "Haut",
 	"down": "Bas",
