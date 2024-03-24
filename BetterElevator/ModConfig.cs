@@ -1,5 +1,4 @@
 ﻿using StardewModdingAPI;
-using System.Collections.Generic;
 
 namespace BetterElevator
 {

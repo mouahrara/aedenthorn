@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -12,9 +11,10 @@ namespace BetterElevator
 	public class BetterElevatorMenu : IClickableMenu
 	{
 		public int levelToGoto;
+
 		public BetterElevatorMenu() : base(0, 0, 0, 0, true)
 		{
-			width = (484 + borderWidth * 2);
+			width = 484 + borderWidth * 2;
 			height = 54 + borderWidth * 3;
 			xPositionOnScreen = Game1.uiViewport.Width / 2 - width / 2;
 			yPositionOnScreen = Game1.uiViewport.Height / 2 - height / 2;
@@ -25,12 +25,12 @@ namespace BetterElevator
 		{
 			if (isWithinBounds(x, y))
 			{
-
 				base.receiveLeftClick(x, y, true);
 				return;
 			}
 			Game1.exitActiveMenu();
 		}
+
 		public override void receiveKeyPress(Keys key)
 		{
 			switch (key)
@@ -90,13 +90,13 @@ namespace BetterElevator
 					if(levelToGoto > 0)
 					{
 						string ls = levelToGoto.ToString();
-						if (ls.Length == 1) 
+						if (ls.Length == 1)
 						{
 							levelToGoto = 0;
 						}
 						else
 						{
-							ls = ls.Substring(0, ls.Length - 1);
+							ls = ls[..^1];
 							levelToGoto = int.Parse(ls);
 						}
 					}
@@ -110,8 +110,10 @@ namespace BetterElevator
 		{
 			if (n == 0 && levelToGoto == 0)
 				return;
-			string ls = (levelToGoto == 0 ? "" : levelToGoto.ToString())  + n;
+
+			string ls = (levelToGoto == 0 ? "" : levelToGoto.ToString()) + n;
 			int newLevel;
+
 			try
 			{
 				newLevel = int.Parse(ls);
@@ -149,17 +151,16 @@ namespace BetterElevator
 			levelToGoto = newLevel;
 		}
 
-		private bool IsSkullCave()
+		private static bool IsSkullCave()
 		{
-			return ((Game1.player.currentLocation is MineShaft && (Game1.player.currentLocation as MineShaft).getMineArea(-1) == 121) || Game1.player.currentLocation.Name == "SkullCave");
-
+			return (Game1.player.currentLocation is MineShaft && (Game1.player.currentLocation as MineShaft).getMineArea(-1) == 121) || Game1.player.currentLocation.Name == "SkullCave";
 		}
 
 		public override void receiveRightClick(int x, int y, bool playSound = true)
 		{
 		}
 
-		public static int drawTicks;
+		internal static int drawTicks;
 
 		public override void draw(SpriteBatch b)
 		{
@@ -168,7 +169,8 @@ namespace BetterElevator
 			base.draw(b);
 
 			int lowestLevel = MineShaft.lowestLevelReached;
-			if (IsSkullCave()) { 
+			if (IsSkullCave())
+			{
 				lowestLevel = Math.Max(0, lowestLevel - 120);
 			}
 			else
@@ -176,8 +178,8 @@ namespace BetterElevator
 				lowestLevel = Math.Min(120, lowestLevel);
 			}
 
-			string level = (levelToGoto > 0 ?  levelToGoto.ToString() : "");
-			
+			string level = levelToGoto > 0 ? levelToGoto.ToString() : "";
+
 			int blinkRate = 16;
 			drawTicks++;
 			if (drawTicks < blinkRate)
@@ -189,7 +191,6 @@ namespace BetterElevator
 			b.DrawString(Game1.dialogueFont, string.Format(ModEntry.SHelper.Translation.Get("level-reached-x"), lowestLevel), new Vector2(xPositionOnScreen + offset, yPositionOnScreen + offset), Game1.textColor);
 			b.DrawString(Game1.dialogueFont, string.Format(ModEntry.SHelper.Translation.Get("enter-level")) + " " + level, new Vector2(xPositionOnScreen + offset, yPositionOnScreen + offset * 2), Game1.textColor);
 			drawMouse(b, false, -1);
-
 		}
 	}
 }

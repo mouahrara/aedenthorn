@@ -1,21 +1,20 @@
-﻿using HarmonyLib;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using System;
+using HarmonyLib;
+using xTile.Dimensions;
 using StardewModdingAPI;
+using StardewValley;
+using StardewValley.Locations;
 
 namespace BetterElevator
 {
 	/// <summary>The mod entry point.</summary>
 	public partial class ModEntry : Mod
 	{
+		internal static IMonitor SMonitor;
+		internal static IModHelper SHelper;
+		internal static ModConfig Config;
 
-		public static IMonitor SMonitor;
-		public static IModHelper SHelper;
-		public static ModConfig Config;
-
-		public static ModEntry context;
-
-		public static string coopName;
+		internal static ModEntry context;
 
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
 		/// <param name="helper">Provides simplified APIs for writing mods.</param>
@@ -33,10 +32,31 @@ namespace BetterElevator
 
 			helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
 
-			var harmony = new Harmony(ModManifest.UniqueID);
-			harmony.PatchAll();
+			// Load Harmony patches
+			try
+			{
+				Harmony harmony = new(ModManifest.UniqueID);
 
+				harmony.Patch(
+					original: AccessTools.Method(typeof(GameLocation), nameof(GameLocation.performAction), new Type[] { typeof(string), typeof(Farmer), typeof(Location) }),
+					prefix: new HarmonyMethod(typeof(GameLocation_performAction_Patch), nameof(GameLocation_performAction_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(MineShaft), nameof(MineShaft.checkAction)),
+					prefix: new HarmonyMethod(typeof(MineShaft_checkAction_Patch), nameof(MineShaft_checkAction_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(MineShaft), nameof(MineShaft.shouldCreateLadderOnThisLevel)),
+					postfix: new HarmonyMethod(typeof(MineShaft_shouldCreateLadderOnThisLevel_Patch), nameof(MineShaft_shouldCreateLadderOnThisLevel_Patch.Postfix))
+				);
+			}
+			catch (Exception e)
+			{
+				Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
+				return;
+			}
 		}
+
 		private void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
 		{
 			// get Generic Mod Config Menu's API (if it's installed)
@@ -53,22 +73,20 @@ namespace BetterElevator
 
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_ModEnabled_Name"),
+				name: () => ModEntry.SHelper.Translation.Get("GMCM.ModEnabled.Name"),
 				getValue: () => Config.ModEnabled,
 				setValue: value => Config.ModEnabled = value
 			);
-			
 			configMenu.AddKeybind(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_ModKey_Name"),
+				name: () => SHelper.Translation.Get("GMCM.ModKey.Name"),
 				getValue: () => Config.ModKey,
 				setValue: value => Config.ModKey = value
 			);
-
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_Unrestricted_Name"),
-				tooltip: () => ModEntry.SHelper.Translation.Get("GMCM_Option_Unrestricted_Tooltip"),
+				name: () => SHelper.Translation.Get("GMCM.Unrestricted.Name"),
+				tooltip: () => SHelper.Translation.Get("GMCM.Unrestricted_Tooltip"),
 				getValue: () => Config.Unrestricted,
 				setValue: value => Config.Unrestricted = value
 			);
