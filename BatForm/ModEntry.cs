@@ -1,37 +1,33 @@
-﻿using HarmonyLib;
+using System;
+using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Newtonsoft.Json;
 using StardewModdingAPI;
 using StardewModdingAPI.Utilities;
 using StardewValley;
-using StardewValley.Objects;
+using StardewValley.Buffs;
 using StardewValley.TerrainFeatures;
-using StardewValley.Tools;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Object = StardewValley.Object;
 
 namespace BatForm
 {
 	/// <summary>The mod entry point.</summary>
 	public partial class ModEntry : Mod
 	{
+		internal static IMonitor SMonitor;
+		internal static IModHelper SHelper;
+		internal static IManifest SModManifest;
+		internal static ModConfig Config;
 
-		public static IMonitor SMonitor;
-		public static IModHelper SHelper;
-		public static ModConfig Config;
+		internal static ModEntry context;
 
-		public static ModEntry context;
+		internal static int maxHeight = 50;
 
-		
-		public static string batFormKey = "aedenthorn.BatForm";
+		internal static string batFormKey = "aedenthorn.BatForm";
 
-		public static PerScreen<ICue> batSound = new();
-		public static PerScreen<int> height = new();
-		public static PerScreen<AnimatedSprite> batSprite = new();
+		internal static PerScreen<ICue> batSound = new();
+		internal static PerScreen<int> height = new();
+		internal static PerScreen<int> heightViewportLimit = new(() => maxHeight);
+		internal static PerScreen<AnimatedSprite> batSprite = new();
 
 		public enum BatForm
 		{
@@ -50,13 +46,11 @@ namespace BatForm
 		{
 			Config = Helper.ReadConfig<ModConfig>();
 
-			if (!Config.ModEnabled)
-				return;
-
 			context = this;
 
 			SMonitor = Monitor;
 			SHelper = helper;
+			SModManifest = ModManifest;
 
 			helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
 			helper.Events.GameLoop.UpdateTicked += GameLoop_UpdateTicked;
@@ -66,14 +60,50 @@ namespace BatForm
 			helper.Events.GameLoop.ReturnedToTitle += GameLoop_ReturnedToTitle;
 
 			helper.Events.Player.Warped += Player_Warped;
-			
+
 			helper.Events.Input.ButtonsChanged += Input_ButtonsChanged;
-			
+
 			helper.Events.Display.RenderedWorld += Display_RenderedWorld;
 
-			var harmony = new Harmony(ModManifest.UniqueID);
-			harmony.PatchAll();
+			// Load Harmony patches
+			try
+			{
+				Harmony harmony = new(ModManifest.UniqueID);
 
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Farmer), nameof(Farmer.draw), new Type[] { typeof(SpriteBatch) }),
+					prefix: new HarmonyMethod(typeof(Farmer_draw_Patch), nameof(Farmer_draw_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.PropertyGetter(typeof(Options), nameof(Options.zoomLevel)),
+					postfix: new HarmonyMethod(typeof(Options_zoomLevel_Patch), nameof(Options_zoomLevel_Patch.Postfix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(FarmerSprite), "checkForFootstep"),
+					prefix: new HarmonyMethod(typeof(FarmerSprite_checkForFootstep_Patch), nameof(FarmerSprite_checkForFootstep_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Grass), nameof(Grass.doCollisionAction)),
+					prefix: new HarmonyMethod(typeof(Grass_doCollisionAction_Patch), nameof(Grass_doCollisionAction_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Farmer), nameof(Farmer.takeDamage)),
+					prefix: new HarmonyMethod(typeof(Farmer_takeDamage_Patch), nameof(Farmer_takeDamage_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Game1), nameof(Game1.pressActionButton)),
+					prefix: new HarmonyMethod(typeof(Game1_pressActionButton_Patch), nameof(Game1_pressActionButton_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Game1), nameof(Game1.pressUseToolButton)),
+					prefix: new HarmonyMethod(typeof(Game1_pressUseToolButton_Patch), nameof(Game1_pressUseToolButton_Patch.Prefix))
+				);
+			}
+			catch (Exception e)
+			{
+				Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
+				return;
+			}
 		}
 
 		private void GameLoop_DayEnding(object sender, StardewModdingAPI.Events.DayEndingEventArgs e)
@@ -85,6 +115,9 @@ namespace BatForm
 		{
 			if (!Config.ModEnabled || e.Player != Game1.player || BatFormStatus(e.Player) == BatForm.Inactive)
 				return;
+			heightViewportLimit.Value = maxHeight;
+			Game1.forceSnapOnNextViewportUpdate = true;
+			Game1.game1.refreshWindowSettings();
 			if(Config.OutdoorsOnly && !e.NewLocation.IsOutdoors)
 			{
 				ResetBat();
@@ -107,7 +140,7 @@ namespace BatForm
 
 		private void GameLoop_OneSecondUpdateTicked(object sender, StardewModdingAPI.Events.OneSecondUpdateTickedEventArgs e)
 		{
-			if(!Config.ModEnabled || BatFormStatus(Game1.player) != BatForm.Active || Config.StaminaUse <= 0) 
+			if(!Config.ModEnabled || BatFormStatus(Game1.player) != BatForm.Active || Config.StaminaUse <= 0)
 				return;
 			if(Game1.player.Stamina <= Config.StaminaUse)
 			{
@@ -121,13 +154,10 @@ namespace BatForm
 		{
 			if (!Config.ModEnabled || BatFormStatus(Game1.player) == BatForm.Inactive)
 				return;
-			if (batSprite.Value is null)
-			{
-				batSprite.Value = new AnimatedSprite("Characters\\Monsters\\Bat");
-			}
-			e.SpriteBatch.Draw(batSprite.Value.Texture, Game1.player.getLocalPosition(Game1.viewport) + new Vector2(32f, -height.Value * 8), new Rectangle?(batSprite.Value.SourceRect), Color.White, 0f, new Vector2(8f, 16f), (1 + height.Value / 50f) * 4f, SpriteEffects.None, Game1.player.getStandingY() / 10000 + 0.05f + height.Value / 750f);
+			batSprite.Value ??= new AnimatedSprite("Characters\\Monsters\\Bat");
+			e.SpriteBatch.Draw(batSprite.Value.Texture, Game1.player.getLocalPosition(Game1.viewport) + new Vector2(32f, -height.Value * 8), new Rectangle?(batSprite.Value.SourceRect), Color.White, 0f, new Vector2(8f, 16f), (1 + height.Value / 50f) * 4f, SpriteEffects.None, Game1.player.StandingPixel.Y / 10000 + 0.05f + height.Value / 750f);
 			batSprite.Value.Animate(Game1.currentGameTime, 0, 4, 80f);
-			if (batSprite.Value.currentFrame % 3 == 0 && Game1.soundBank != null && (batSound.Value is null || !batSound.Value.IsPlaying) && Game1.player.currentLocation == Game1.currentLocation)
+			if (batSprite.Value.currentFrame % 3 == 0 && Game1.soundBank != null && batSound.Value is null || !batSound.Value.IsPlaying && Game1.player.currentLocation == Game1.currentLocation)
 			{
 				batSound.Value = Game1.soundBank.GetCue("batFlap");
 				batSound.Value.Play();
@@ -136,16 +166,25 @@ namespace BatForm
 
 		private void GameLoop_UpdateTicked(object sender, StardewModdingAPI.Events.UpdateTickedEventArgs e)
 		{
-			if(!Config.ModEnabled || !Context.IsWorldReady || Game1.killScreen || Game1.player is null || Game1.player.health <= 0 || Game1.timeOfDay >= 2600 || Game1.eventUp || Game1.CurrentEvent != null)
+			if (!Config.ModEnabled || !Context.IsWorldReady)
+				return;
+
+			if(Game1.killScreen || Game1.player is null || Game1.player.health <= 0 || Game1.timeOfDay >= 2600 || Game1.eventUp || Game1.CurrentEvent != null)
 			{
 				ResetBat();
 				return;
 			}
+
 			var status = BatFormStatus(Game1.player);
+
 			if (status != BatForm.Inactive)
-				Game1.player.temporarilyInvincible = true;
+			{
+				EnforceMapBounds();
+			}
 			else
+			{
 				return;
+			}
 			if (status != BatForm.Active)
 			{
 				if (status == BatForm.SwitchingFrom)
@@ -154,7 +193,9 @@ namespace BatForm
 					if (height.Value == 0)
 					{
 						PlayTransform();
+						heightViewportLimit.Value = maxHeight;
 						Game1.player.ignoreCollisions = false;
+						Game1.player.buffs.Remove($"{SModManifest.UniqueID}.BatForm");
 						Game1.player.modData[batFormKey] = BatForm.Inactive + "";
 					}
 				}
@@ -164,9 +205,17 @@ namespace BatForm
 					if (height.Value == 0)
 					{
 						PlayTransform();
+						Game1.player.applyBuff(new Buff(
+							id: $"{SModManifest.UniqueID}.BatForm",
+							effects: new BuffEffects()
+							{
+								Speed = { Config.MoveSpeed }
+							},
+							duration: Buff.ENDLESS
+						) { visible = false });
 					}
-					height.Value = Math.Min(Config.MaxHeight, height.Value + 1);
-					if (height.Value == Config.MaxHeight)
+					height.Value = Math.Min(maxHeight, height.Value + 1);
+					if (height.Value == maxHeight)
 					{
 						Game1.player.modData[batFormKey] = BatForm.Active + "";
 					}
@@ -178,14 +227,13 @@ namespace BatForm
 
 		private void Input_ButtonsChanged(object sender, StardewModdingAPI.Events.ButtonsChangedEventArgs e)
 		{
-			if(!Config.ModEnabled || !Context.CanPlayerMove || !Config.TransformKey.JustPressed() || BatFormStatus(Game1.player) == BatForm.SwitchingFrom || BatFormStatus(Game1.player) == BatForm.SwitchingTo || (Config.NightOnly && Game1.timeOfDay < 1800) || (Config.OutdoorsOnly && !Game1.player.currentLocation.IsOutdoors)) 
+			if(!Config.ModEnabled || !Context.CanPlayerMove || !Config.TransformKey.JustPressed() || BatFormStatus(Game1.player) == BatForm.SwitchingFrom || BatFormStatus(Game1.player) == BatForm.SwitchingTo || (Config.NightOnly && Game1.timeOfDay < 1800) || (Config.OutdoorsOnly && !Game1.player.currentLocation.IsOutdoors) || (!Config.ActionsEnabled && Game1.player.isRidingHorse()))
 				return;
 			TransformBat();
 		}
 
 		private void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
 		{
-
 			// get Generic Mod Config Menu's API (if it's installed)
 			var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
 			if (configMenu is null)
@@ -200,59 +248,75 @@ namespace BatForm
 
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => "Mod Enabled",
+				name: () => SHelper.Translation.Get("GMCM.ModEnabled.Name"),
 				getValue: () => Config.ModEnabled,
-				setValue: value => Config.ModEnabled = value
+				setValue: value => {
+					if (value == false)
+					{
+						ResetBat();
+					}
+					Config.ModEnabled = value;
+				}
 			);
-			
-
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => "Night Only",
+				name: () => SHelper.Translation.Get("GMCM.NightOnly.Name"),
 				getValue: () => Config.NightOnly,
-				setValue: value => Config.NightOnly = value
+				setValue: value => {
+					Config.NightOnly = value;
+					if (value == true && Game1.timeOfDay < 1800)
+					{
+						Game1.player.modData[batFormKey] = BatForm.SwitchingFrom.ToString();
+					}
+				}
 			);
-			
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => "Outdoors Only",
+				name: () => SHelper.Translation.Get("GMCM.OutdoorsOnly.Name"),
 				getValue: () => Config.OutdoorsOnly,
-				setValue: value => Config.OutdoorsOnly = value
+				setValue: value => {
+					Config.OutdoorsOnly = value;
+					if (value == true && !Game1.player.currentLocation.IsOutdoors)
+					{
+						Game1.player.modData[batFormKey] = BatForm.SwitchingFrom.ToString();
+					}
+				}
 			);
-			
 			configMenu.AddKeybindList(
 				mod: ModManifest,
-				name: () => "Transform Key",
+				name: () => SHelper.Translation.Get("GMCM.TransformKey.Name"),
 				getValue: () => Config.TransformKey,
 				setValue: value => Config.TransformKey = value
 			);
-			
+			configMenu.AddBoolOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.ActionsEnabled.Name"),
+				getValue: () => Config.ActionsEnabled,
+				setValue: value => {
+					Config.ActionsEnabled = value;
+					if (value == false && Game1.player.isRidingHorse())
+					{
+						Game1.player.modData[batFormKey] = BatForm.SwitchingFrom.ToString();
+					}
+				}
+			);
 			configMenu.AddNumberOption(
 				mod: ModManifest,
-				name: () => "Move Speed",
+				name: () => SHelper.Translation.Get("GMCM.MoveSpeed.Name"),
 				getValue: () => Config.MoveSpeed,
 				setValue: value => Config.MoveSpeed = value
 			);
-			
 			configMenu.AddNumberOption(
 				mod: ModManifest,
-				name: () => "Stamina Use",
+				name: () => SHelper.Translation.Get("GMCM.StaminaUse.Name"),
 				getValue: () => Config.StaminaUse,
 				setValue: value => Config.StaminaUse = value
 			);
-
 			configMenu.AddTextOption(
 				mod: ModManifest,
-				name: () => "Transform Sound",
+				name: () => SHelper.Translation.Get("GMCM.TransformSound.Name"),
 				getValue: () => Config.TransformSound,
 				setValue: value => Config.TransformSound = value
-			);
-
-			configMenu.AddNumberOption(
-				mod: ModManifest,
-				name: () => "Max Height",
-				getValue: () => Config.MaxHeight,
-				setValue: value => Config.MaxHeight = value
 			);
 		}
 	}
