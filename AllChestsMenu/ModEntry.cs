@@ -1,20 +1,21 @@
-﻿using HarmonyLib;
+﻿using System;
+using System.IO;
+using HarmonyLib;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
-using System.IO;
+using StardewValley.SpecialOrders.Objectives;
 
 namespace AllChestsMenu
 {
 	/// <summary>The mod entry point.</summary>
 	public partial class ModEntry : Mod
 	{
+		internal static IMonitor SMonitor;
+		internal static IModHelper SHelper;
+		internal static ModConfig Config;
 
-		public static IMonitor SMonitor;
-		public static IModHelper SHelper;
-		public static ModConfig Config;
-
-		public static ModEntry context;
+		internal static ModEntry context;
 
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
 		/// <param name="helper">Provides simplified APIs for writing mods.</param>
@@ -33,8 +34,21 @@ namespace AllChestsMenu
 			Helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
 			Helper.Events.Input.ButtonPressed += Input_ButtonPressed;
 
-			var harmony = new Harmony(ModManifest.UniqueID);
-			harmony.PatchAll();
+			// Load Harmony patches
+			try
+			{
+				Harmony harmony = new(ModManifest.UniqueID);
+
+				harmony.Patch(
+					original: AccessTools.Method(typeof(ShipObjective), nameof(ShipObjective.OnItemShipped)),
+					prefix: new HarmonyMethod(typeof(ShipObjective_OnItemShipped_Patch), nameof(ShipObjective_OnItemShipped_Patch.Prefix))
+				);
+			}
+			catch (Exception e)
+			{
+				Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
+				return;
+			}
 		}
 
 		public void Input_ButtonPressed(object sender, StardewModdingAPI.Events.ButtonPressedEventArgs e)
@@ -66,10 +80,9 @@ namespace AllChestsMenu
 		public void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
 		{
 			var phoneAPI = Helper.ModRegistry.GetApi<IMobilePhoneApi>("aedenthorn.MobilePhone");
-			if (phoneAPI != null)
-			{
-				phoneAPI.AddApp("aedenthorn.AllChestsMenu", "Mailbox", OpenMenu, Helper.ModContent.Load<Texture2D>(Path.Combine("assets", "icon.png")));
-			}
+
+			phoneAPI?.AddApp("aedenthorn.AllChestsMenu", "Mailbox", OpenMenu, Helper.ModContent.Load<Texture2D>(Path.Combine("assets", "icon.png")));
+
 			// get Generic Mod Config Menu's API (if it's installed)
 			var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
 			if (configMenu is null)
@@ -84,51 +97,49 @@ namespace AllChestsMenu
 
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_ModEnabled_Name"),
+				name: () => SHelper.Translation.Get("GMCM.ModEnabled.Name"),
 				getValue: () => Config.ModEnabled,
 				setValue: value => Config.ModEnabled = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_LimitToCurrentLocation_Name"),
+				name: () => SHelper.Translation.Get("GMCM.LimitToCurrentLocation.Name"),
 				getValue: () => Config.LimitToCurrentLocation,
 				setValue: value => Config.LimitToCurrentLocation = value
 			);
 			configMenu.AddKeybind(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_MenuKey_Name"),
+				name: () => SHelper.Translation.Get("GMCM.MenuKey.Name"),
 				getValue: () => Config.MenuKey,
 				setValue: value => Config.MenuKey = value
 			);
-
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_ModToOpen_Name"),
+				name: () => SHelper.Translation.Get("GMCM.ModToOpen.Name"),
 				getValue: () => Config.ModToOpen,
 				setValue: value => Config.ModToOpen = value
 			);
 			configMenu.AddKeybind(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_ModKey_Name"),
-				tooltip: () => ModEntry.SHelper.Translation.Get("GMCM_Option_ModKey_Tooltip"),
+				name: () => SHelper.Translation.Get("GMCM.ModKey.Name"),
+				tooltip: () => SHelper.Translation.Get("GMCM.ModKey.Tooltip"),
 				getValue: () => Config.ModKey,
 				setValue: value => Config.ModKey = value
 			);
 			configMenu.AddKeybind(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_ModKey2_Name"),
-				tooltip: () => ModEntry.SHelper.Translation.Get("GMCM_Option_ModKey2_Tooltip"),
+				name: () => SHelper.Translation.Get("GMCM.ModKey2.Name"),
+				tooltip: () => SHelper.Translation.Get("GMCM.ModKey2.Tooltip"),
 				getValue: () => Config.ModKey2,
 				setValue: value => Config.ModKey2 = value
 			);
 			configMenu.AddKeybind(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_SwitchButton_Name"),
-				tooltip: () => ModEntry.SHelper.Translation.Get("GMCM_Option_SwitchButton_Tooltip"),
+				name: () => SHelper.Translation.Get("GMCM.SwitchButton.Name"),
+				tooltip: () => SHelper.Translation.Get("GMCM.SwitchButton.Tooltip"),
 				getValue: () => Config.SwitchButton,
 				setValue: value => Config.SwitchButton = value
 			);
 		}
-
 	}
 }

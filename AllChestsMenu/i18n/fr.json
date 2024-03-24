@@ -18,14 +18,14 @@
 	"sort-ID": "Objets (Desc)",
 
 	// GMCM
-	"GMCM_Option_ModEnabled_Name": "Activer le Mod",
-	"GMCM_Option_LimitToCurrentLocation_Name": "Emplacement actuel uniquement",
-	"GMCM_Option_MenuKey_Name": "Touche pour ouvrir le menu",
-	"GMCM_Option_ModToOpen_Name": "Nécessite la touche secondaire",
-	"GMCM_Option_ModKey_Name": "Touche secondaire",
-	"GMCM_Option_ModKey_Tooltip": "Maintenez enfoncé pour ouvrir le menu et pour transférer le contenu au lieu d'intervertir les menus.",
-	"GMCM_Option_ModKey2_Name": "Touche tertiaire",
-	"GMCM_Option_ModKey2_Tooltip": "Maintenez enfoncé pour transférer uniquement les objets similaires lorsque les objets sont tous pris ou déposés.",
-	"GMCM_Option_SwitchButton_Name": "Touche de commutation",
-	"GMCM_Option_SwitchButton_Tooltip": "Touche permettant aux manettes de basculer entre les interfaces supérieure et inférieure."
+	"GMCM.ModEnabled.Name": "Activer le Mod",
+	"GMCM.LimitToCurrentLocation.Name": "Emplacement actuel uniquement",
+	"GMCM.MenuKey.Name": "Touche pour ouvrir le menu",
+	"GMCM.ModToOpen.Name": "Nécessite la touche secondaire",
+	"GMCM.ModKey.Name": "Touche secondaire",
+	"GMCM.ModKey.Tooltip": "Maintenez enfoncé pour ouvrir le menu et pour transférer le contenu au lieu d'intervertir les menus.",
+	"GMCM.ModKey2.Name": "Touche tertiaire",
+	"GMCM.ModKey2.Tooltip": "Maintenez enfoncé pour transférer uniquement les objets similaires lorsque les objets sont tous pris ou déposés.",
+	"GMCM.SwitchButton.Name": "Touche de commutation",
+	"GMCM.SwitchButton.Tooltip": "Touche permettant aux manettes de basculer entre les interfaces supérieure et inférieure."
 }

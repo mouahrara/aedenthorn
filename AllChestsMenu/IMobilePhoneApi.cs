@@ -1,12 +1,12 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
-using System;
 
 namespace AllChestsMenu
 {
 	public interface IMobilePhoneApi
-	{   
+	{
 		bool AddApp(string id, string name, Action action, Texture2D icon);
 
 		Vector2 GetScreenPosition();
