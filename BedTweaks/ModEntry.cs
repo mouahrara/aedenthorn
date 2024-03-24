@@ -1,8 +1,8 @@
-﻿using HarmonyLib;
+﻿using System;
+using HarmonyLib;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley.Objects;
-using System;
 using Object = StardewValley.Object;
 
 namespace BedTweaks
@@ -10,10 +10,9 @@ namespace BedTweaks
 	/// <summary>The mod entry point.</summary>
 	public partial class ModEntry : Mod
 	{
-
-		public static IMonitor SMonitor;
-		public static IModHelper SHelper;
-		public static ModConfig Config;
+		internal static IMonitor SMonitor;
+		internal static IModHelper SHelper;
+		internal static ModConfig Config;
 
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
 		/// <param name="helper">Provides simplified APIs for writing mods.</param>
@@ -26,21 +25,27 @@ namespace BedTweaks
 
 			Helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
 
-			var harmony = new Harmony(ModManifest.UniqueID);
+			// Load Harmony patches
+			try
+			{
+				Harmony harmony = new(ModManifest.UniqueID);
 
-			// Object patches
-
-			harmony.Patch(
-			   original: AccessTools.Method(typeof(Object), nameof(Object.draw), new Type[] { typeof(SpriteBatch), typeof(int), typeof(int), typeof(float) }),
-			   prefix: new HarmonyMethod(typeof(ModEntry), nameof(Object_draw_Prefix))
-			);
-
-			// Furniture patches
-
-			harmony.Patch(
-			   original: AccessTools.Method(typeof(BedFurniture), nameof(BedFurniture.draw), new Type[] { typeof(SpriteBatch), typeof(int), typeof(int), typeof(float) }),
-			   prefix: new HarmonyMethod(typeof(ModEntry), nameof(BedFurniture_draw_Prefix))
-			);
+				// Object patches
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Object), nameof(Object.draw), new Type[] { typeof(SpriteBatch), typeof(int), typeof(int), typeof(float) }),
+					prefix: new HarmonyMethod(typeof(ModEntry), nameof(Object_draw_Prefix))
+				);
+				// Furniture patches
+				harmony.Patch(
+					original: AccessTools.Method(typeof(BedFurniture), nameof(BedFurniture.draw), new Type[] { typeof(SpriteBatch), typeof(int), typeof(int), typeof(float) }),
+					prefix: new HarmonyMethod(typeof(ModEntry), nameof(BedFurniture_draw_Prefix))
+				);
+			}
+			catch (Exception e)
+			{
+				Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
+				return;
+			}
 		}
 
 		private void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
@@ -59,25 +64,25 @@ namespace BedTweaks
 
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => "Mod Enabled",
+				name: () => SHelper.Translation.Get("GMCM.ModEnabled.Name"),
 				getValue: () => Config.EnableMod,
 				setValue: value => Config.EnableMod = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => "Redraw Middle Pillows",
+				name: () => SHelper.Translation.Get("GMCM.RedrawMiddlePillows.Name"),
 				getValue: () => Config.RedrawMiddlePillows,
 				setValue: value => Config.RedrawMiddlePillows = value
 			);
 			configMenu.AddNumberOption(
 				mod: ModManifest,
-				name: () => "Bed Width",
+				name: () => SHelper.Translation.Get("GMCM.BedWidth.Name"),
 				getValue: () => Config.BedWidth,
 				setValue: value => Config.BedWidth = value
 			);
 			configMenu.AddNumberOption(
 				mod: ModManifest,
-				name: () => "Sheet Opacity %",
+				name: () => SHelper.Translation.Get("GMCM.SheetTransparency.Name"),
 				getValue: () => (int)(Config.SheetTransparency * 100),
 				setValue: value => Config.SheetTransparency = value / 100f,
 				min: 1,
