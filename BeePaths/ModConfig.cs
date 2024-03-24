@@ -1,6 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using StardewModdingAPI;
-using System.Collections.Generic;
 
 namespace BeePaths
 {
@@ -18,6 +16,5 @@ namespace BeePaths
 		public int BeeStingChance { get; set; } = 0;
 		public string BeeSound { get; set; } = "flybuzzing";
 		public float MaxSoundDistance { get; set; } = 0;
-
 	}
 }

@@ -1,35 +1,27 @@
-﻿using HarmonyLib;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
-using Newtonsoft.Json;
-using StardewModdingAPI;
-using StardewModdingAPI.Utilities;
-using StardewValley;
-using StardewValley.Locations;
-using StardewValley.Monsters;
-using StardewValley.Objects;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Reflection.Metadata;
+using HarmonyLib;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Graphics;
+using StardewModdingAPI;
+using StardewValley;
 
 namespace BeePaths
 {
 	public partial class ModEntry : Mod
 	{
+		internal static IMonitor SMonitor;
+		internal static IModHelper SHelper;
+		internal static ModConfig Config;
 
-		public static IMonitor SMonitor;
-		public static IModHelper SHelper;
-		public static ModConfig Config;
-
-		public static ModEntry context;
-		public static Dictionary<string, Dictionary<Vector2, HiveData>> hiveDict = new();
-		public static string flooringKey = "aedenthorn.BeePaths/flooring";
-		public static bool drawingTiles;
-		public static Texture2D beeDot;
-		public static ICue buzz;
+		internal static ModEntry context;
+		internal static Dictionary<string, Dictionary<Vector2, HiveData>> hiveDict = new();
+		internal static string flooringKey = "aedenthorn.BeePaths/flooring";
+		internal static Texture2D beeDot;
+		internal static ICue buzz;
 
 		public override void Entry(IModHelper helper)
 		{
@@ -44,8 +36,21 @@ namespace BeePaths
 			Helper.Events.Display.RenderedWorld += Display_RenderedWorld;
 			Helper.Events.GameLoop.OneSecondUpdateTicked += GameLoop_OneSecondUpdateTicked;
 
-			var harmony = new Harmony(ModManifest.UniqueID);
-			harmony.PatchAll();
+			// Load Harmony patches
+			try
+			{
+				Harmony harmony = new(ModManifest.UniqueID);
+
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Utility), nameof(Utility.findCloseFlower), new Type[] { typeof(GameLocation), typeof(Vector2), typeof(int), typeof(Func<Crop, bool>) }),
+					prefix: new HarmonyMethod(typeof(FindCloseFlower_Patch), nameof(FindCloseFlower_Patch.Prefix))
+				);
+			}
+			catch (Exception e)
+			{
+				Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
+				return;
+			}
 
 			beeDot = new Texture2D(Game1.graphics.GraphicsDevice, 1, 1);
 			beeDot.SetData(new Color[] { Color.White });
@@ -66,13 +71,13 @@ namespace BeePaths
 				{
 					dict[key].cropTile = AccessTools.FieldRefAccess<Crop, Vector2>(c, "tilePosition");
 				}
-
 			}
 		}
 
 		private void Display_RenderedWorld(object sender, StardewModdingAPI.Events.RenderedWorldEventArgs e)
 		{
-			if(!Config.ModEnabled || !Context.IsPlayerFree || Game1.IsRainingHere(Game1.currentLocation)) return;
+			if(!Config.ModEnabled || !Context.IsPlayerFree || Game1.IsRainingHere(Game1.currentLocation))
+				return;
 			bool buzzing = false;
 			float buzzDistance = float.MaxValue;
 			foreach (var kvp in Game1.currentLocation.objects.Pairs)
@@ -117,7 +122,7 @@ namespace BeePaths
 								f.takeDamage(Config.BeeDamage, true, null);
 						}
 					}
-					var distance = Vector2.Distance(Game1.player.getTileLocation(), bee.pos / 64 + new Vector2(-0.5f, 0.5f));
+					var distance = Vector2.Distance(Game1.player.Tile, bee.pos / 64 + new Vector2(-0.5f, 0.5f));
 					if (!string.IsNullOrEmpty(Config.BeeSound) && distance < Config.MaxSoundDistance && distance < buzzDistance)
 					{
 						buzzing = true;
@@ -135,8 +140,7 @@ namespace BeePaths
 				}
 				if (buzzing)
 				{
-					if(buzz is null)
-						buzz = Game1.soundBank.GetCue(Config.BeeSound);
+					buzz ??= Game1.soundBank.GetCue(Config.BeeSound);
 					var vol = 100 - 100 * buzzDistance / Config.MaxSoundDistance - 10;
 					buzz.Pitch = 0;
 					buzz.SetVariable("Volume", vol);
@@ -150,7 +154,6 @@ namespace BeePaths
 				buzz.Stop(AudioStopOptions.AsAuthored);
 			}
 		}
-
 
 		private void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
 		{
@@ -168,43 +171,43 @@ namespace BeePaths
 
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => "Mod Enabled",
+				name: () => SHelper.Translation.Get("GMCM.ModEnabled.Name"),
 				getValue: () => Config.ModEnabled,
 				setValue: value => Config.ModEnabled = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => "Show When Raining",
+				name: () => SHelper.Translation.Get("GMCM.ShowWhenRaining.Name"),
 				getValue: () => Config.ShowWhenRaining,
 				setValue: value => Config.ShowWhenRaining = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => "Fix Flower Find",
+				name: () => SHelper.Translation.Get("GMCM.FixFlowerFind.Name"),
 				getValue: () => Config.FixFlowerFind,
 				setValue: value => Config.FixFlowerFind = value
 			);
 			configMenu.AddNumberOption(
 				mod: ModManifest,
-				name: () => "Number of Bees",
+				name: () => SHelper.Translation.Get("GMCM.NumberBees.Name"),
 				getValue: () => Config.NumberBees,
 				setValue: value => Config.NumberBees = value
 			);
 			configMenu.AddNumberOption(
 				mod: ModManifest,
-				name: () => "Bee Range",
+				name: () => SHelper.Translation.Get("GMCM.BeeRange.Name"),
 				getValue: () => Config.BeeRange,
 				setValue: value => Config.BeeRange = value
 			);
 			configMenu.AddNumberOption(
 				mod: ModManifest,
-				name: () => "Bee Damage",
+				name: () => SHelper.Translation.Get("GMCM.BeeDamage.Name"),
 				getValue: () => Config.BeeDamage,
 				setValue: value => Config.BeeDamage = value
 			);
 			configMenu.AddNumberOption(
 				mod: ModManifest,
-				name: () => "Sting % Chance",
+				name: () => SHelper.Translation.Get("GMCM.BeeStingChance.Name"),
 				getValue: () => Config.BeeStingChance,
 				setValue: value => Config.BeeStingChance = value,
 				min: 0,
@@ -212,31 +215,31 @@ namespace BeePaths
 			);
 			configMenu.AddTextOption(
 				mod: ModManifest,
-				name: () => "Bee Scale",
+				name: () => SHelper.Translation.Get("GMCM.BeeScale.Name"),
 				getValue: () => Config.BeeScale+"",
 				setValue: delegate(string value){ if (float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var f)) Config.BeeScale = f; }
 			);
 			configMenu.AddTextOption(
 				mod: ModManifest,
-				name: () => "Bee Speed",
+				name: () => SHelper.Translation.Get("GMCM.BeeSpeed.Name"),
 				getValue: () => Config.BeeSpeed+"",
 				setValue: delegate(string value){ if (float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var f)) Config.BeeSpeed = f; }
 			);
 			configMenu.AddTextOption(
 				mod: ModManifest,
-				name: () => "Bee Sound",
+				name: () => SHelper.Translation.Get("GMCM.BeeSound.Name"),
 				getValue: () => Config.BeeSound,
 				setValue: value => Config.BeeSound = value
 			);
 			configMenu.AddTextOption(
 				mod: ModManifest,
-				name: () => "Bee Sound Distance",
+				name: () => SHelper.Translation.Get("GMCM.MaxSoundDistance.Name"),
 				getValue: () => Config.MaxSoundDistance + "",
 				setValue: delegate (string value) { if (float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var f)) Config.MaxSoundDistance = f; }
 			);
 			configMenu.AddNumberOption(
 				mod: ModManifest,
-				name: () => "Bee Color R",
+				name: () => SHelper.Translation.Get("GMCM.BeeColorR.Name"),
 				getValue: () => Config.BeeColor.R,
 				setValue: value => Config.BeeColor = new Color(value, Config.BeeColor.G, Config.BeeColor.B, Config.BeeColor.A),
 				min: 0,
@@ -244,7 +247,7 @@ namespace BeePaths
 			);
 			configMenu.AddNumberOption(
 				mod: ModManifest,
-				name: () => "Bee Color G",
+				name: () => SHelper.Translation.Get("GMCM.BeeColorG.Name"),
 				getValue: () => Config.BeeColor.G,
 				setValue: value => Config.BeeColor = new Color(Config.BeeColor.R, value, Config.BeeColor.B, Config.BeeColor.A),
 				min: 0,
@@ -252,7 +255,7 @@ namespace BeePaths
 			);
 			configMenu.AddNumberOption(
 				mod: ModManifest,
-				name: () => "Bee Color B",
+				name: () => SHelper.Translation.Get("GMCM.BeeColorB.Name"),
 				getValue: () => Config.BeeColor.B,
 				setValue: value => Config.BeeColor = new Color(Config.BeeColor.R, Config.BeeColor.G, value, Config.BeeColor.A),
 				min: 0,

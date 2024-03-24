@@ -1,22 +1,13 @@
 ﻿{
 	"Name": "Bee Paths",
 	"Author": "aedenthorn",
-	"Version": "0.2.0",
-	"Description": "Bee Paths.",
+	"Version": "0.2.1-unofficial.1-mouahrara",
+	"Description": "Indicates flower <-> bee house connections by showing bees traveling between them.",
 	"UniqueID": "aedenthorn.BeePaths",
 	"EntryDll": "BeePaths.dll",
-	"MinimumApiVersion": "3.15.0",
-	"ModUpdater": {
-		"Repository": "StardewValleyMods",
-		"User": "aedenthorn",
-		"Directory": "_releases",
-		"ModFolder": "BeePaths"
-	},
-	"Dependencies": [
-		{
-			"UniqueID": "Platonymous.ModUpdater",
-			"IsRequired": false
-		}
-	],
-	"UpdateKeys": [ "Nexus:14812" ]
+	"MinimumApiVersion": "4.0.0",
+	"UpdateKeys": [
+		"Nexus:14812",
+		"UpdateManifest:https://github.com/mouahrara/aedenthorn/update-manifest.json@BeePaths"
+	]
 }
