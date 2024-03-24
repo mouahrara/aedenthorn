@@ -1,22 +1,13 @@
 ﻿{
-	"Name": "Birthday Friendship",
+	"Name": "Birthday Knowledge Friendship",
 	"Author": "aedenthorn",
-	"Version": "0.1.0",
-	"Description": "Birthday Friendship.",
-	"UniqueID": "aedenthorn.BirthdayFriendship",
-	"EntryDll": "BirthdayFriendship.dll",
-	"MinimumApiVersion": "3.15.0",
-	"ModUpdater": {
-		"Repository": "StardewValleyMods",
-		"User": "aedenthorn",
-		"Directory": "_releases",
-		"ModFolder": "BirthdayFriendship"
-	},
-	"Dependencies": [
-		{
-			"UniqueID": "Platonymous.ModUpdater",
-			"IsRequired": false
-		}
-	],
-	"UpdateKeys": [ "Nexus:17974" ]
+	"Version": "0.1.1-unofficial.1-mouahrara",
+	"Description": "Makes it so showing villagers birthdays on the calendar requires a minimum number of friendship hearts.",
+	"UniqueID": "aedenthorn.BirthdayKnowledgeFriendship",
+	"EntryDll": "BirthdayKnowledgeFriendship.dll",
+	"MinimumApiVersion": "4.0.0",
+	"UpdateKeys": [
+		"Nexus:17974",
+		"UpdateManifest:https://github.com/mouahrara/aedenthorn/update-manifest.json@BirthdayKnowledgeFriendship"
+	]
 }

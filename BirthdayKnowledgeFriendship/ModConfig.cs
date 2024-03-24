@@ -1,7 +1,4 @@
-﻿using StardewModdingAPI;
-using StardewModdingAPI.Utilities;
-
-namespace BirthdayFriendship
+﻿namespace BirthdayKnowledgeFriendship
 {
 	public class ModConfig
 	{
