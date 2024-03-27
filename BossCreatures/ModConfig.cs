@@ -3,6 +3,7 @@
 	public class ModConfig
 	{
 		public bool ModEnabled { get; set; } = true;
+		public bool BattleWeather { get; set; } = true;
 		public int PercentChanceOfBossInMonsterArea { get; set; } = 100;
 		public int PercentChanceOfBossInFarm { get; set; } = 0;
 		public int PercentChanceOfBossInTown { get; set; } = 0;
@@ -42,5 +43,7 @@
 		public float SlimeBossScale { get; set; } = 2.0f;
 		public int SlimeBossHeight { get; set; } = 32;
 		public int SlimeBossWidth { get; set; } = 32;
+		public string BattleMusic {get; set; } = "cowboy_boss";
+		public string VictorySound {get; set; } = "Cowboy_Secret";
 	}
 }
