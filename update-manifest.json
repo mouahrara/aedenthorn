@@ -78,11 +78,32 @@
 				{ "Version": "0.2.5-unofficial.1-mouahrara" }
 			]
 		},
+		"BirthdayBuff": {
+			"Name": "Birthday Buff",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/releases",
+			"Versions": [
+				{ "Version": "0.1.1-unofficial.1-mouahrara" }
+			]
+		},
 		"BirthdayKnowledgeFriendship": {
 			"Name": "Birthday Knowledge Friendship",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/releases",
 			"Versions": [
 				{ "Version": "0.1.1-unofficial.1-mouahrara" }
+			]
+		},
+		"BossCreatures": {
+			"Name": "Boss Creatures",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/releases",
+			"Versions": [
+				{ "Version": "1.5.1-unofficial.1-mouahrara" }
+			]
+		},
+		"BuffFramework": {
+			"Name": "Buff Framework",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/releases",
+			"Versions": [
+				{ "Version": "0.6.1-unofficial.1-mouahrara" }
 			]
 		},
 		"DynamicMapTiles": {

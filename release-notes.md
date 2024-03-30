@@ -2,6 +2,11 @@
 
 # Global release notes
 
+## 30 March 2024
+* Released Birthday Buff version [0.1.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BirthdayBuff/release-notes.md#011-unofficial1-mouahrara)
+* Released Boss Creatures version [1.5.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BossCreatures/release-notes.md#151-unofficial1-mouahrara)
+* Released Buff Framework version [0.6.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BuffFramework/release-notes.md#061-unofficial1-mouahrara)
+
 ## 24 March 2024
 * Released Additional Mine Maps version [0.2.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AdditionalMineMaps/release-notes.md#022-unofficial1-mouahrara)
 * Released Advanced Cooking version [0.1.5-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AdvancedCooking/release-notes.md#015-unofficial1-mouahrara)
