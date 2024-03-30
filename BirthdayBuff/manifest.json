@@ -1,22 +1,12 @@
 ﻿{
 	"Name": "Birthday Buff",
 	"Author": "aedenthorn",
-	"Version": "0.1.0",
-	"Description": "Birthday Buff.",
+	"Version": "0.1.1-unofficial.1-mouahrara",
+	"Description": "Gives farmers a slight universal buff on their birthdays using Buff Framework and Happy Birthday mods.",
 	"UniqueID": "aedenthorn.BirthdayBuff",
 	"EntryDll": "BirthdayBuff.dll",
-	"MinimumApiVersion": "3.15.0",
-	"ModUpdater": {
-		"Repository": "StardewValleyMods",
-		"User": "aedenthorn",
-		"Directory": "_releases",
-		"ModFolder": "BirthdayBuff"
-	},
+	"MinimumApiVersion": "4.0.0",
 	"Dependencies": [
-		{
-			"UniqueID": "Platonymous.ModUpdater",
-			"IsRequired": false
-		},
 		{
 			"UniqueID": "Omegasis.HappyBirthday",
 			"IsRequired": true
@@ -26,5 +16,8 @@
 			"IsRequired": true
 		}
 	],
-	"UpdateKeys": [ "Nexus:17747" ]
+	"UpdateKeys": [
+		"Nexus:17747",
+		"UpdateManifest:https://github.com/mouahrara/aedenthorn/update-manifest.json@BirthdayBuff"
+	]
 }

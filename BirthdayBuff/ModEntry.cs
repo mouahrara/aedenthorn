@@ -1,23 +1,21 @@
-﻿using HarmonyLib;
-using Microsoft.Xna.Framework.Graphics;
+﻿using System.Collections.Generic;
 using StardewModdingAPI;
 using StardewValley;
-using System;
-using System.Collections.Generic;
 
 namespace BirthdayBuff
 {
 	/// <summary>The mod entry point.</summary>
 	public partial class ModEntry : Mod
 	{
+		internal static IMonitor SMonitor;
+		internal static IModHelper SHelper;
+		internal static ModConfig Config;
 
-		public static IMonitor SMonitor;
-		public static IModHelper SHelper;
-		public static ModConfig Config;
-
-		public static ModEntry context;
-		public static string dictKey = "aedenthorn.BuffFramework/dictionary";
-		public static object hbAPI;
+		internal static ModEntry context;
+		internal const string BuffFrameworkKey = "aedenthorn.BuffFramework/dictionary";
+		internal static object HappyBirthdayAPI;
+		internal static IBuffFrameworkAPI BuffFrameworkAPI;
+		internal static bool cachedResult = false;
 
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
 		/// <param name="helper">Provides simplified APIs for writing mods.</param>
@@ -31,78 +29,67 @@ namespace BirthdayBuff
 			SHelper = helper;
 
 			Helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
-			Helper.Events.Content.AssetRequested += Content_AssetRequested;
-
-			var harmony = new Harmony(ModManifest.UniqueID);
-			harmony.PatchAll();
+			Helper.Events.GameLoop.UpdateTicked += GameLoop_UpdateTicked;
+			Helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
+			Helper.Events.GameLoop.DayEnding += GameLoop_DayEnding;
 		}
-
-		private void Content_AssetRequested(object sender, StardewModdingAPI.Events.AssetRequestedEventArgs e)
-		{
-			if (!Config.ModEnabled)
-				return;
-			if (e.NameWithoutLocale.IsEquivalentTo("aedenthorn.BirthdayBuff/icon"))
-			{
-				e.LoadFromModFile<Texture2D>("assets/icon.png", StardewModdingAPI.Events.AssetLoadPriority.Low);
-			}
-			if (e.NameWithoutLocale.IsEquivalentTo(dictKey))
-			{
-				e.Edit(delegate(IAssetData data)
-				{
-					if(Game1.player is not null)
-					{
-						var core = hbAPI.GetType().Assembly.GetType("Omegasis.HappyBirthday.HappyBirthdayModCore");
-						var instance = AccessTools.Field(core, "Instance").GetValue(null);
-						var bmgr = AccessTools.Field(instance.GetType(), "birthdayManager").GetValue(instance);
-						var bdc = (bool)AccessTools.Method(bmgr.GetType(), "hasChosenBirthday").Invoke(bmgr, new object[] { });
-						if (!bdc)
-							return;
-						var bdd = AccessTools.Field(bmgr.GetType(), "playerBirthdayData").GetValue(bmgr);
-						var bdday = (int)AccessTools.Field(bdd.GetType(), "BirthdayDay").GetValue(bdd);
-						var bds = (string)AccessTools.Field(bdd.GetType(), "BirthdaySeason").GetValue(bdd);
-						if(Game1.dayOfMonth == bdday && Game1.currentSeason == bds.ToLower())
-						{
-							data.AsDictionary<string, Dictionary<string, object>>().Data.Add("aedenthorn.BirthdayBuff", new Dictionary<string, object>()
-							{
-								{ "separate", Config.ShowSeparate },
-								{ "glow", Config.GlowColor },
-								{ "glowRate", Config.GlowRate },
-								{ "farming", Config.Farming },
-								{ "fishing", Config.Fishing },
-								{ "mining", Config.Mining },
-								{ "luck", Config.Luck },
-								{ "foraging", Config.Foraging },
-								{ "maxStamina", Config.MaxStamina },
-								{ "magneticRadius", Config.MagneticRadius },
-								{ "speed", Config.Speed },
-								{ "defense", Config.Defense },
-								{ "attack", Config.Attack },
-								{ "source", "aedenthorn.BirthdayBuff" },
-								{ "displaySource", SHelper.Translation.Get("birthday-buff").ToString() },
-								{ "texturePath", "aedenthorn.BirthdayBuff/icon" },
-								{ "description", GetBuffDescription() },
-								{ "sound", Config.Sound },
-								{ "buffId", 1890175411 }
-							});
-						}
-					}
-				});
-			}
-		}
-
 
 		private void GameLoop_DayStarted(object sender, StardewModdingAPI.Events.DayStartedEventArgs e)
 		{
-			throw new NotImplementedException();
+			if (!Config.ModEnabled)
+				return;
+
+			cachedResult = IsBirthdayDay();
+		}
+
+		private void GameLoop_DayEnding(object sender, StardewModdingAPI.Events.DayEndingEventArgs e)
+		{
+			cachedResult = false;
+		}
+
+		private void GameLoop_UpdateTicked(object sender, StardewModdingAPI.Events.UpdateTickedEventArgs e)
+		{
+			if (Game1.ticks <= 1)
+				return;
+
+			HappyBirthdayAPI = Helper.ModRegistry.GetApi("Omegasis.HappyBirthday");
+			BuffFrameworkAPI = Helper.ModRegistry.GetApi<IBuffFrameworkAPI>("aedenthorn.BuffFramework");
+
+			BuffFrameworkAPI.Add($"{ModManifest.UniqueID}/HappyBirthday", new Dictionary<string, object>()
+				{
+					{ "buffId", $"{ModManifest.UniqueID}/HappyBirthday" },
+					{ "description", SHelper.Translation.Get("birthday-buff-description") },
+					{ "source", ModManifest.UniqueID },
+					{ "displaySource", SHelper.Translation.Get("birthday-buff-displaySource") },
+					{ "texturePath", "Maps/springobjects" },
+					{ "textureX", "80" },
+					{ "textureY", "144" },
+					{ "textureWidth", "16" },
+					{ "textureHeight", "16" },
+					{ "farming", Config.Farming },
+					{ "mining", Config.Mining },
+					{ "foraging", Config.Foraging },
+					{ "fishing", Config.Fishing },
+					{ "attack", Config.Attack },
+					{ "defense", Config.Defense },
+					{ "speed", Config.Speed },
+					{ "magneticRadius", Config.MagneticRadius },
+					{ "luck", Config.Luck },
+					{ "maxStamina", Config.MaxStamina },
+					{ "sound", Config.Sound },
+					{ "glow", Config.GlowColor },
+					{ "glowRate", Config.GlowRate }
+				}, () => {
+					return cachedResult;
+				});
+			Helper.Events.GameLoop.UpdateTicked -= GameLoop_UpdateTicked;
 		}
 
 		private void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
 		{
-
-			hbAPI = Helper.ModRegistry.GetApi("Omegasis.HappyBirthday");
-			
 			// get Generic Mod Config Menu's API (if it's installed)
 			var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+
 			if (configMenu is not null)
 			{
 				// register mod
@@ -114,83 +101,75 @@ namespace BirthdayBuff
 
 				configMenu.AddBoolOption(
 					mod: ModManifest,
-					name: () => SHelper.Translation.Get("GMCM_Option_ModEnabled_Name"),
+					name: () => SHelper.Translation.Get("GMCM.ModEnabled.Name"),
 					getValue: () => Config.ModEnabled,
 					setValue: value => Config.ModEnabled = value
 				);
-				configMenu.AddBoolOption(
-					mod: ModManifest,
-					name: () => SHelper.Translation.Get("GMCM_Option_ShowSeparate_Name"),
-					getValue: () => Config.ShowSeparate,
-					setValue: value => Config.ShowSeparate = value
-				);
-
-				configMenu.AddTextOption(
-					mod: ModManifest,
-					name: () => SHelper.Translation.Get("GMCM_Option_Sound_Name"),
-					getValue: () => Config.Sound,
-					setValue: value => Config.Sound = value
-				);
-
 				configMenu.AddNumberOption(
 					mod: ModManifest,
-					name: () => SHelper.Translation.Get("GMCM_Option_Farming_Name"),
+					name: () => Game1.content.LoadString("Strings\\StringsFromCSFiles:Buff.cs.480").Trim(),
 					getValue: () => Config.Farming,
 					setValue: value => Config.Farming = value
 				);
 				configMenu.AddNumberOption(
 					mod: ModManifest,
-					name: () => SHelper.Translation.Get("GMCM_Option_Fishing_Name"),
-					getValue: () => Config.Fishing,
-					setValue: value => Config.Fishing = value
-				);
-				configMenu.AddNumberOption(
-					mod: ModManifest,
-					name: () => SHelper.Translation.Get("GMCM_Option_Mining_Name"),
+					name: () => Game1.content.LoadString("Strings\\StringsFromCSFiles:Buff.cs.486").Trim(),
 					getValue: () => Config.Mining,
 					setValue: value => Config.Mining = value
 				);
 				configMenu.AddNumberOption(
 					mod: ModManifest,
-					name: () => SHelper.Translation.Get("GMCM_Option_Luck_Name"),
-					getValue: () => Config.Luck,
-					setValue: value => Config.Luck = value
-				);
-				configMenu.AddNumberOption(
-					mod: ModManifest,
-					name: () => SHelper.Translation.Get("GMCM_Option_Foraging_Name"),
+					name: () => Game1.content.LoadString("Strings\\StringsFromCSFiles:Buff.cs.492").Trim(),
 					getValue: () => Config.Foraging,
 					setValue: value => Config.Foraging = value
 				);
 				configMenu.AddNumberOption(
 					mod: ModManifest,
-					name: () => SHelper.Translation.Get("GMCM_Option_MaxStamina_Name"),
-					getValue: () => Config.MaxStamina,
-					setValue: value => Config.MaxStamina = value
+					name: () => Game1.content.LoadString("Strings\\StringsFromCSFiles:Buff.cs.483").Trim(),
+					getValue: () => Config.Fishing,
+					setValue: value => Config.Fishing = value
 				);
 				configMenu.AddNumberOption(
 					mod: ModManifest,
-					name: () => SHelper.Translation.Get("GMCM_Option_MagneticRadius_Name"),
-					getValue: () => Config.MagneticRadius,
-					setValue: value => Config.MagneticRadius = value
+					name: () => Game1.content.LoadString("Strings\\StringsFromCSFiles:Buff.cs.504").Trim(),
+					getValue: () => Config.Attack,
+					setValue: value => Config.Attack = value
 				);
 				configMenu.AddNumberOption(
 					mod: ModManifest,
-					name: () => SHelper.Translation.Get("GMCM_Option_Speed_Name"),
-					getValue: () => Config.Speed,
-					setValue: value => Config.Speed = value
-				);
-				configMenu.AddNumberOption(
-					mod: ModManifest,
-					name: () => SHelper.Translation.Get("GMCM_Option_Defense_Name"),
+					name: () => Game1.content.LoadString("Strings\\StringsFromCSFiles:Buff.cs.501").Trim(),
 					getValue: () => Config.Defense,
 					setValue: value => Config.Defense = value
 				);
 				configMenu.AddNumberOption(
 					mod: ModManifest,
-					name: () => SHelper.Translation.Get("GMCM_Option_Attack_Name"),
-					getValue: () => Config.Attack,
-					setValue: value => Config.Attack = value
+					name: () => Game1.content.LoadString("Strings\\StringsFromCSFiles:Buff.cs.507").Trim(),
+					getValue: () => Config.Speed,
+					setValue: value => Config.Speed = value
+				);
+				configMenu.AddNumberOption(
+					mod: ModManifest,
+					name: () => Game1.content.LoadString("Strings\\StringsFromCSFiles:Buff.cs.498").Trim(),
+					getValue: () => Config.MagneticRadius,
+					setValue: value => Config.MagneticRadius = value
+				);
+				configMenu.AddNumberOption(
+					mod: ModManifest,
+					name: () => Game1.content.LoadString("Strings\\StringsFromCSFiles:Buff.cs.489").Trim(),
+					getValue: () => Config.Luck,
+					setValue: value => Config.Luck = value
+				);
+				configMenu.AddNumberOption(
+					mod: ModManifest,
+					name: () => Game1.content.LoadString("Strings\\StringsFromCSFiles:Buff.cs.495").Trim(),
+					getValue: () => Config.MaxStamina,
+					setValue: value => Config.MaxStamina = value
+				);
+				configMenu.AddTextOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.Sound.Name"),
+					getValue: () => Config.Sound,
+					setValue: value => Config.Sound = value
 				);
 			}
 		}
