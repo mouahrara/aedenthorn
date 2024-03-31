@@ -9,7 +9,7 @@ namespace AllChestsMenu
 		{
 			if (Config.ModEnabled && Context.IsPlayerFree)
 			{
-				Game1.activeClickableMenu = new StorageMenu();
+				Game1.activeClickableMenu = new AllChestsMenu();
 				Game1.playSound("bigSelect");
 			}
 		}

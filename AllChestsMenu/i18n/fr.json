@@ -20,6 +20,9 @@
 	// GMCM
 	"GMCM.ModEnabled.Name": "Activer le Mod",
 	"GMCM.LimitToCurrentLocation.Name": "Emplacement actuel uniquement",
+	"GMCM.ShippingBin.Name": "Inclure le bac d'expédition",
+	"GMCM.UnrestrictedShippingBin.Name": "Bac d'expédition non restreint",
+	"GMCM.UnrestrictedShippingBin.Tooltip": "Lorsque activé, les objets au-delà du dernier ajouté peuvent être récupérés.",
 	"GMCM.MenuKey.Name": "Touche pour ouvrir le menu",
 	"GMCM.ModToOpen.Name": "Nécessite la touche secondaire",
 	"GMCM.ModKey.Name": "Touche secondaire",

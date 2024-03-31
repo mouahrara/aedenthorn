@@ -20,12 +20,15 @@
 	// GMCM
 	"GMCM.ModEnabled.Name": "Mod Enabled",
 	"GMCM.LimitToCurrentLocation.Name": "Current Loc Only",
+	"GMCM.ShippingBin.Name": "Include Shipping Bin",
+	"GMCM.UnrestrictedShippingBin.Name": "Unrestricted Shipping Bin",
+	"GMCM.UnrestrictedShippingBin.Tooltip": "When enabled, items beyond the last one added can be retrieved.",
 	"GMCM.MenuKey.Name": "Menu Key",
 	"GMCM.ModToOpen.Name": "Req. Mod Key To Open",
 	"GMCM.ModKey.Name": "Mod Key",
-	"GMCM.ModKey.Tooltip": "Hold down to open menu and to transfer contents instead of swapping menus",
+	"GMCM.ModKey.Tooltip": "Hold down to open menu and to transfer contents instead of swapping menus.",
 	"GMCM.ModKey2.Name": "Mod Key 2",
-	"GMCM.ModKey2.Tooltip": "Hold down to transfer only same items when transfering all",
+	"GMCM.ModKey2.Tooltip": "Hold down to transfer only same items when transfering all.",
 	"GMCM.SwitchButton.Name": "Switch Button",
-	"GMCM.SwitchButton.Tooltip": "For controllers to switch between upper and lower interfaces"
+	"GMCM.SwitchButton.Tooltip": "For controllers to switch between upper and lower interfaces."
 }

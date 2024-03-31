@@ -1,10 +1,7 @@
-﻿using System;
-using System.IO;
-using HarmonyLib;
+﻿using System.IO;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
-using StardewValley.SpecialOrders.Objectives;
 
 namespace AllChestsMenu
 {
@@ -33,40 +30,25 @@ namespace AllChestsMenu
 
 			Helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
 			Helper.Events.Input.ButtonPressed += Input_ButtonPressed;
-
-			// Load Harmony patches
-			try
-			{
-				Harmony harmony = new(ModManifest.UniqueID);
-
-				harmony.Patch(
-					original: AccessTools.Method(typeof(ShipObjective), nameof(ShipObjective.OnItemShipped)),
-					prefix: new HarmonyMethod(typeof(ShipObjective_OnItemShipped_Patch), nameof(ShipObjective_OnItemShipped_Patch.Prefix))
-				);
-			}
-			catch (Exception e)
-			{
-				Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
-				return;
-			}
 		}
 
 		public void Input_ButtonPressed(object sender, StardewModdingAPI.Events.ButtonPressedEventArgs e)
 		{
 			if (!Config.ModEnabled)
 				return;
-			if (Game1.activeClickableMenu is StorageMenu)
+
+			if (Game1.activeClickableMenu is AllChestsMenu)
 			{
 				if (Game1.options.snappyMenus && Game1.options.gamepadControls && e.Button == Config.SwitchButton)
 				{
 					Game1.playSound("shwip");
-					if (!(Game1.activeClickableMenu as StorageMenu).focusBottom)
-						(Game1.activeClickableMenu as StorageMenu).lastTopSnappedCC = Game1.activeClickableMenu.currentlySnappedComponent;
-					(Game1.activeClickableMenu as StorageMenu).focusBottom = !(Game1.activeClickableMenu as StorageMenu).focusBottom;
+					if (!(Game1.activeClickableMenu as AllChestsMenu).focusBottom)
+						(Game1.activeClickableMenu as AllChestsMenu).lastTopSnappedCC = Game1.activeClickableMenu.currentlySnappedComponent;
+					(Game1.activeClickableMenu as AllChestsMenu).focusBottom = !(Game1.activeClickableMenu as AllChestsMenu).focusBottom;
 					Game1.activeClickableMenu.currentlySnappedComponent = null;
 					Game1.activeClickableMenu.snapToDefaultClickableComponent();
 				}
-				if (((Game1.activeClickableMenu as StorageMenu).locationText.Selected || (Game1.activeClickableMenu as StorageMenu).renameBox.Selected) && e.Button.ToString().Length == 1)
+				if (((Game1.activeClickableMenu as AllChestsMenu).locationText.Selected || (Game1.activeClickableMenu as AllChestsMenu).renameBox.Selected) && e.Button.ToString().Length == 1)
 				{
 					SHelper.Input.Suppress(e.Button);
 				}
@@ -81,7 +63,7 @@ namespace AllChestsMenu
 		{
 			var phoneAPI = Helper.ModRegistry.GetApi<IMobilePhoneApi>("aedenthorn.MobilePhone");
 
-			phoneAPI?.AddApp("aedenthorn.AllChestsMenu", "Mailbox", OpenMenu, Helper.ModContent.Load<Texture2D>(Path.Combine("assets", "icon.png")));
+			phoneAPI?.AddApp("aedenthorn.AllChestsMenu", "AllChestsMenu", OpenMenu, Helper.ModContent.Load<Texture2D>(Path.Combine("assets", "icon.png")));
 
 			// get Generic Mod Config Menu's API (if it's installed)
 			var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
@@ -106,6 +88,19 @@ namespace AllChestsMenu
 				name: () => SHelper.Translation.Get("GMCM.LimitToCurrentLocation.Name"),
 				getValue: () => Config.LimitToCurrentLocation,
 				setValue: value => Config.LimitToCurrentLocation = value
+			);
+			configMenu.AddBoolOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.ShippingBin.Name"),
+				getValue: () => Config.IncludeShippingBin,
+				setValue: value => Config.IncludeShippingBin = value
+			);
+			configMenu.AddBoolOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.UnrestrictedShippingBin.Name"),
+				tooltip: () => SHelper.Translation.Get("GMCM.UnrestrictedShippingBin.Tooltip"),
+				getValue: () => Config.UnrestrictedShippingBin,
+				setValue: value => Config.UnrestrictedShippingBin = value
 			);
 			configMenu.AddKeybind(
 				mod: ModManifest,
