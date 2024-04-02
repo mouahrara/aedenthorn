@@ -47,14 +47,14 @@
 			"Name": "All Chests Menu",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/releases",
 			"Versions": [
-				{ "Version": "0.3.2-unofficial.1-mouahrara" }
+				{ "Version": "0.3.2-unofficial.2-mouahrara" }
 			]
 		},
 		"BatForm": {
 			"Name": "Bat Form",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/releases",
 			"Versions": [
-				{ "Version": "0.3.4-unofficial.1-mouahrara" }
+				{ "Version": "0.3.4-unofficial.2-mouahrara" }
 			]
 		},
 		"BedTweaks": {

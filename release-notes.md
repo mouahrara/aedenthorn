@@ -2,6 +2,10 @@
 
 # Global release notes
 
+## 2 April 2024
+* Released All Chests Menu version [0.3.2-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AllChestsMenu/release-notes.md#032-unofficial2-mouahrara)
+* Released Bat Form version [0.3.4-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BatForm/release-notes.md#034-unofficial2-mouahrara)
+
 ## 30 March 2024
 * Released Birthday Buff version [0.1.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BirthdayBuff/release-notes.md#011-unofficial1-mouahrara)
 * Released Boss Creatures version [1.5.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BossCreatures/release-notes.md#151-unofficial1-mouahrara)
