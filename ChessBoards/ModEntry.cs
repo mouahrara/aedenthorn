@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using System;
+using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -12,44 +13,31 @@ namespace ChessBoards
 	/// <summary>The mod entry point.</summary>
 	public partial class ModEntry : Mod
 	{
-
-		public static IMonitor SMonitor;
-		public static IModHelper SHelper;
-		public static ModConfig Config;
-		public static ModEntry context;
-		public static Object heldPiece;
+		internal static IMonitor SMonitor;
+		internal static IModHelper SHelper;
+		internal static ModConfig Config;
+		internal static ModEntry context;
+		internal static Object heldPiece;
 
 		private static Texture2D piecesSheet;
 
-		private static int parentIndex = 0;
-		private static string pieceKey = "aedenthorn.ChessBoards/piece";
-		private static string movedKey = "aedenthorn.ChessBoards/moved";
-		private static string squareKey = "aedenthorn.ChessBoards/square";
-		private static string flippedKey = "aedenthorn.ChessBoards/flipped";
-		private static string lastKey = "aedenthorn.ChessBoards/lastPiece";
-		private static string pawnKey = "aedenthorn.ChessBoards/pawn";
-		private static string[][] startPieces = new string[][]
+		private const string ItemId = "0";
+		private const string pieceKey = "aedenthorn.ChessBoards/piece";
+		private const string movedKey = "aedenthorn.ChessBoards/moved";
+		private const string squareKey = "aedenthorn.ChessBoards/square";
+		private const string flippedKey = "aedenthorn.ChessBoards/flipped";
+		private const string lastKey = "aedenthorn.ChessBoards/lastPiece";
+		private const string pawnKey = "aedenthorn.ChessBoards/pawn";
+		private static readonly string[][] startPieces = new string[][]
 		{
-			new string[]
-			{
-				"wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr"
-			},
-			new string[]
-			{
-				"wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp"
-			},
-			new string[0],
-			new string[0],
-			new string[0],
-			new string[0],
-			new string[]
-			{
-				"bp", "bp", "bp", "bp", "bp", "bp", "bp", "bp"
-			},
-			new string[]
-			{
-				"br", "bn", "bb", "bq", "bk", "bb", "bn", "br"
-			}
+			new string[] { "wr", "wn", "wb", "wq", "wk", "wb", "wn", "wr" },
+			new string[] { "wp", "wp", "wp", "wp", "wp", "wp", "wp", "wp" },
+			System.Array.Empty<string>(),
+			System.Array.Empty<string>(),
+			System.Array.Empty<string>(),
+			System.Array.Empty<string>(),
+			new string[] { "bp", "bp", "bp", "bp", "bp", "bp", "bp", "bp" },
+			new string[] { "br", "bn", "bb", "bq", "bk", "bb", "bn", "br" }
 		};
 
 		public override void Entry(IModHelper helper)
@@ -65,19 +53,42 @@ namespace ChessBoards
 			helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
 			helper.Events.Input.ButtonPressed += Input_ButtonPressed;
 			helper.Events.Display.RenderedWorld += Display_RenderedWorld;
-			var harmony = new Harmony(ModManifest.UniqueID);
-			harmony.PatchAll();
+
+			// Load Harmony patches
+			try
+			{
+				Harmony harmony = new(ModManifest.UniqueID);
+
+				harmony.Patch(
+					original: AccessTools.Method(typeof(GameLocation), nameof(GameLocation.draw), new Type[] { typeof(SpriteBatch) }),
+					postfix: new HarmonyMethod(typeof(GameLocation_draw_Patch), nameof(GameLocation_draw_Patch.Postfix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Object), nameof(Object.draw), new Type[] { typeof(SpriteBatch), typeof(int), typeof(int), typeof(float) }),
+					prefix: new HarmonyMethod(typeof(Object_draw_Patch), nameof(Object_draw_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(GameLocation), nameof(GameLocation.answerDialogue)),
+					prefix: new HarmonyMethod(typeof(GameLocation_answerDialogue_Patch), nameof(GameLocation_answerDialogue_Patch.Prefix))
+				);
+			}
+			catch (Exception e)
+			{
+				Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
+				return;
+			}
 		}
 
 		private void Display_RenderedWorld(object sender, RenderedWorldEventArgs e)
 		{
 			if (!Config.EnableMod)
 				return;
+
 			if (heldPiece != null)
 			{
 				Vector2 scaleFactor = heldPiece.getScale();
 				Vector2 position = Game1.getMousePosition().ToVector2() - new Vector2(32, 92);
-				Rectangle destination = new Rectangle((int)(position.X - scaleFactor.X / 2f) + ((heldPiece.shakeTimer > 0) ? Game1.random.Next(-1, 2) : 0), (int)(position.Y - scaleFactor.Y / 2f) + ((heldPiece.shakeTimer > 0) ? Game1.random.Next(-1, 2) : 0), (int)(64f + scaleFactor.X), (int)(128f + scaleFactor.Y / 2f));
+				Rectangle destination = new((int)(position.X - scaleFactor.X / 2f) + ((heldPiece.shakeTimer > 0) ? Game1.random.Next(-1, 2) : 0), (int)(position.Y - scaleFactor.Y / 2f) + ((heldPiece.shakeTimer > 0) ? Game1.random.Next(-1, 2) : 0), (int)(64f + scaleFactor.X), (int)(128f + scaleFactor.Y / 2f));
 				float draw_layer = 1;
 				e.SpriteBatch.Draw(piecesSheet, destination, GetSourceRectForPiece(heldPiece.modData[pieceKey]), Color.White * Config.HeldPieceOpacity, 0f, Vector2.Zero, SpriteEffects.None, draw_layer);
 			}
@@ -104,7 +115,7 @@ namespace ChessBoards
 							Game1.currentLocation.objects.Remove(thisTile);
 							if (startPieces[y].Length == 0)
 								continue;
-							var obj = new Object(thisTile, parentIndex);
+							var obj = new Object(thisTile, ItemId);
 							obj.modData[pieceKey] = startPieces[y][x];
 							obj.modData[squareKey] = $"{x + 1},{y + 1}";
 							Game1.currentLocation.objects.Add(thisTile, obj);
@@ -166,7 +177,7 @@ namespace ChessBoards
 					}
 					else
 					{
-						var newObj = new Object(cursorTile, parentIndex);
+						var newObj = new Object(cursorTile, ItemId);
 						newObj.modData[pieceKey] = "wp";
 						newObj.modData[squareKey] = $"{cursorTile.X - cornerTile.X + 1},{cornerTile.Y - cursorTile.Y + 1}";
 						Game1.currentLocation.objects.Add(cursorTile, newObj);
@@ -219,7 +230,9 @@ namespace ChessBoards
 					}
 				}
 				else
+				{
 					return;
+				}
 				Helper.Input.Suppress(e.Button);
 			}
 			else if (e.Button == SButton.MouseLeft && heldPiece != null)
@@ -248,7 +261,6 @@ namespace ChessBoards
 
 		private void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
 		{
-
 			// get Generic Mod Config Menu's API (if it's installed)
 			var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
 			if (configMenu is null)
@@ -267,7 +279,6 @@ namespace ChessBoards
 				getValue: () => Config.EnableMod,
 				setValue: value => Config.EnableMod = value
 			);
-
 			configMenu.AddSectionTitle(
 				mod: ModManifest,
 				text: () => ModEntry.SHelper.Translation.Get("GMCM_Title_ChessPieces_Text")
@@ -293,7 +304,6 @@ namespace ChessBoards
 				getValue: () => Config.ClearKey,
 				setValue: value => Config.ClearKey = value
 			);
-
 			configMenu.AddSectionTitle(
 				mod: ModManifest,
 				text: () => ModEntry.SHelper.Translation.Get("GMCM_Title_FreeMode_Text")
@@ -330,7 +340,6 @@ namespace ChessBoards
 				getValue: () => Config.RemoveKey,
 				setValue: value => Config.RemoveKey = value
 			);
-
 			configMenu.AddSectionTitle(
 				mod: ModManifest,
 				text: () => ModEntry.SHelper.Translation.Get("GMCM_Title_SoundEffects_Text")

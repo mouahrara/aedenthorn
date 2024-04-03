@@ -1,10 +1,7 @@
-﻿using HarmonyLib;
+﻿using System;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.TerrainFeatures;
-using System;
-using System.Collections.Generic;
 using Object = StardewValley.Object;
 
 namespace ChessBoards
@@ -29,6 +26,7 @@ namespace ChessBoards
 			{
 				return false;
 			}
+
 			var startSquare = new Vector2(startTile.X + 1 - cornerTile.X, cornerTile.Y - startTile.Y + 1);
 			var endSquare = new Vector2(endTile.X + 1 - cornerTile.X, cornerTile.Y - endTile.Y + 1);
 
@@ -37,7 +35,7 @@ namespace ChessBoards
 				case "bp":
 					if (capture is not null)
 					{
-						return (Math.Abs(startSquare.X - endSquare.X) == 1 && startSquare.Y - endSquare.Y == 1);
+						return Math.Abs(startSquare.X - endSquare.X) == 1 && startSquare.Y - endSquare.Y == 1;
 					}
 					if (startSquare.Y == 4 && Math.Abs(startSquare.X - endSquare.X) == 1 && startSquare.Y - endSquare.Y == 1 && Game1.currentLocation.objects.TryGetValue(endTile - new Vector2(0, 1), out Object passed) && passed == lastMovedPiece && passed.modData[pieceKey] == "wp" && passed.modData.ContainsKey(pawnKey))
 					{
@@ -55,7 +53,7 @@ namespace ChessBoards
 				case "wp":
 					if (capture is not null)
 					{
-						return (Math.Abs(startSquare.X - endSquare.X) == 1 && endSquare.Y - startSquare.Y == 1);
+						return Math.Abs(startSquare.X - endSquare.X) == 1 && endSquare.Y - startSquare.Y == 1;
 					}
 					if (startSquare.Y == 5 && Math.Abs(startSquare.X - endSquare.X) == 1 && endSquare.Y - startSquare.Y == 1 && Game1.currentLocation.objects.TryGetValue(endTile + new Vector2(0, 1), out passed) && passed == lastMovedPiece && passed.modData[pieceKey] == "bp" && passed.modData.ContainsKey(pawnKey))
 					{
@@ -79,12 +77,12 @@ namespace ChessBoards
 					return (Math.Abs(startSquare.X - endSquare.X) == Math.Abs(startSquare.Y - endSquare.Y)) && NoDiagonalBlock(startTile, endTile);
 				case "wq":
 				case "bq":
-					return ((Math.Abs(startSquare.X - endSquare.X) == Math.Abs(startSquare.Y - endSquare.Y)) && NoDiagonalBlock(startTile, endTile)) 
-						|| (startSquare.Y == endSquare.Y && NoHorizontalBlock(startTile, endTile)) 
+					return ((Math.Abs(startSquare.X - endSquare.X) == Math.Abs(startSquare.Y - endSquare.Y)) && NoDiagonalBlock(startTile, endTile))
+						|| (startSquare.Y == endSquare.Y && NoHorizontalBlock(startTile, endTile))
 						|| ((startSquare.X == endSquare.X) && NoVerticalBlock(startTile, endTile));
 				case "wr":
 				case "br":
-					return (startSquare.Y == endSquare.Y && NoHorizontalBlock(startTile, endTile)) 
+					return (startSquare.Y == endSquare.Y && NoHorizontalBlock(startTile, endTile))
 						|| ((startSquare.X == endSquare.X) && NoVerticalBlock(startTile, endTile));
 				case "wk":
 				case "bk":
@@ -93,7 +91,7 @@ namespace ChessBoards
 						castle = true;
 						return true;
 					}
-					return (Math.Abs(startSquare.X - endSquare.X) <= 1 && Math.Abs(startSquare.Y - endSquare.Y) <= 1);
+					return Math.Abs(startSquare.X - endSquare.X) <= 1 && Math.Abs(startSquare.Y - endSquare.Y) <= 1;
 			}
 			return false;
 		}
@@ -128,7 +126,7 @@ namespace ChessBoards
 					var thisTile = new Vector2(cornerTile.X + x, cornerTile.Y - y);
 					if (Game1.currentLocation.objects.TryGetValue(thisTile, out Object obj) && obj.modData.TryGetValue(pieceKey, out string p))
 					{
-						if (p[0] != heldPiece.modData[pieceKey][0] && IsValidMove(obj, piece, null, cornerTile, obj.TileLocation, tile, out bool enPassant, out bool castle, out bool pawnAdvance))
+						if (p[0] != heldPiece.modData[pieceKey][0] && IsValidMove(obj, piece, null, cornerTile, obj.TileLocation, tile, out _, out _, out _))
 						{
 
 							return false;
@@ -217,10 +215,10 @@ namespace ChessBoards
 					SMonitor.Log("Showing promote menu");
 					Game1.currentLocation.createQuestionDialogue(SHelper.Translation.Get("which-promote"), new Response[]
 					{
-						new Response("rook",SHelper.Translation.Get("rook") ),
-						new Response("knight",SHelper.Translation.Get("knight") ),
-						new Response("bishop",SHelper.Translation.Get("bishop") ),
-						new Response("queen",SHelper.Translation.Get("queen") )
+						new("rook",SHelper.Translation.Get("rook") ),
+						new("knight",SHelper.Translation.Get("knight") ),
+						new("bishop",SHelper.Translation.Get("bishop") ),
+						new("queen",SHelper.Translation.Get("queen") )
 					}, "ChessBoards-mod-promote-question");
 				}
 				else
@@ -232,25 +230,21 @@ namespace ChessBoards
 
 		private static void PromotePiece(string whichAnswer)
 		{
-			var piece = GetPieceCode(heldPiece.modData[pieceKey].Substring(0,1), whichAnswer);
+			var piece = GetPieceCode(heldPiece.modData[pieceKey][..1], whichAnswer);
 			heldPiece.modData[pieceKey] = piece;
 			heldPiece = null;
 		}
 
 		private static string GetPieceCode(string color, string name)
 		{
-			switch (name)
+			return name switch
 			{
-				case "rook":
-					return (color + "r");
-				case "knight":
-					return (color + "n");
-				case "bishop":
-					return (color + "b");
-				case "queen":
-					return (color + "q");
-			}
-			return (color + "p");
+				"rook" => color + "r",
+				"knight" => color + "n",
+				"bishop" => color + "b",
+				"queen" => color + "q",
+				_ => color + "p",
+			};
 		}
 
 		private static void PlaySound(string sound)
@@ -261,7 +255,6 @@ namespace ChessBoards
 
 		private static bool IsInCheck(Object king, Vector2 cornerTile)
 		{
-			List<Object> enemies = new List<Object>();
 			for (int x = 0; x < 8; x++)
 			{
 				for (int y = 0; y < 8; y++)
@@ -269,7 +262,7 @@ namespace ChessBoards
 					var thisTile = new Vector2(cornerTile.X + x, cornerTile.Y - y);
 					if (Game1.currentLocation.objects.TryGetValue(thisTile, out Object obj) && obj.modData.TryGetValue(pieceKey, out string p))
 					{
-						if (p[0] != heldPiece.modData[pieceKey][0] && IsValidMove(obj, king.modData[pieceKey], null, cornerTile, obj.TileLocation, king.TileLocation, out bool enPassant, out bool castle, out bool pawnAdvance))
+						if (p[0] != heldPiece.modData[pieceKey][0] && IsValidMove(obj, king.modData[pieceKey], null, cornerTile, obj.TileLocation, king.TileLocation, out _, out _, out _))
 						{
 							return true;
 						}
@@ -295,6 +288,7 @@ namespace ChessBoards
 			}
 			return false;
 		}
+
 		private static bool NoHorizontalBlock(Vector2 startPos, Vector2 endPos)
 		{
 			Vector2 tile = startPos;
@@ -311,6 +305,7 @@ namespace ChessBoards
 			}
 			return false;
 		}
+
 		private static bool NoVerticalBlock(Vector2 startPos, Vector2 endPos)
 		{
 			Vector2 tile = startPos;
@@ -369,7 +364,6 @@ namespace ChessBoards
 			}
 			if (left + right != 7)
 			{
-				//SMonitor.Log($"Not on board! left {left}, right {right}", StardewModdingAPI.LogLevel.Warn);
 				return false;
 			}
 			for (int i = 1; i < 8; i++)
@@ -401,11 +395,9 @@ namespace ChessBoards
 			}
 			if (down + up != 7)
 			{
-				//Monitor.Log($"up {up}, down {down}");
 				return false;
 			}
 			ChessBoardsTile = new Point(left + 1, down + 1);
-			//Monitor.Log($"ChessBoards tile {ChessBoardsTile}");
 			return true;
 		}
 
@@ -417,6 +409,7 @@ namespace ChessBoards
 			int y = piece[0] == 'b' ? height : 0;
 			return new Rectangle(x, y, width, height);
 		}
+
 		private static void SetLastMovedPiece(Object heldPiece, Vector2 cornerTile)
 		{
 			for (int x = 0; x < 8; x++)
@@ -432,6 +425,7 @@ namespace ChessBoards
 			}
 			heldPiece.modData[lastKey] = "true";
 		}
+
 		private static Object GetLastMovedPiece(Vector2 cornerTile)
 		{
 			for (int x = 0; x < 8; x++)
@@ -450,7 +444,7 @@ namespace ChessBoards
 
 		private static Vector2 GetFlippedTile(Vector2 cornerTile, Point square)
 		{
-			Vector2 result = new Vector2(cornerTile.X + (8 - square.X), cornerTile.Y - (8 - square.Y));
+			Vector2 result = new(cornerTile.X + (8 - square.X), cornerTile.Y - (8 - square.Y));
 			return result;
 		}
 	}
