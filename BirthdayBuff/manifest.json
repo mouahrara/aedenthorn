@@ -18,6 +18,6 @@
 	],
 	"UpdateKeys": [
 		"Nexus:17747",
-		"UpdateManifest:https://github.com/mouahrara/aedenthorn/update-manifest.json@BirthdayBuff"
+		"UpdateManifest:https://raw.githubusercontent.com/mouahrara/aedenthorn/master/update-manifest.json@BirthdayBuff"
 	]
 }

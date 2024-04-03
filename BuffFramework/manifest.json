@@ -8,6 +8,6 @@
 	"MinimumApiVersion": "4.0.0",
 	"UpdateKeys": [
 		"Nexus:17746",
-		"UpdateManifest:https://github.com/mouahrara/aedenthorn/update-manifest.json@BuffFramework"
+		"UpdateManifest:https://raw.githubusercontent.com/mouahrara/aedenthorn/master/update-manifest.json@BuffFramework"
 	]
 }

@@ -8,6 +8,6 @@
 	"MinimumApiVersion": "4.0.0",
 	"UpdateKeys": [
 		"Nexus:10023",
-		"UpdateManifest:https://github.com/mouahrara/aedenthorn/update-manifest.json@BedTweaks"
+		"UpdateManifest:https://raw.githubusercontent.com/mouahrara/aedenthorn/master/update-manifest.json@BedTweaks"
 	]
 }

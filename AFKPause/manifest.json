@@ -8,6 +8,6 @@
 	"MinimumApiVersion": "4.0.0",
 	"UpdateKeys": [
 		"Nexus:14228",
-		"UpdateManifest:https://github.com/mouahrara/aedenthorn/update-manifest.json@AFKPause"
+		"UpdateManifest:https://raw.githubusercontent.com/mouahrara/aedenthorn/master/update-manifest.json@AFKPause"
 	]
 }

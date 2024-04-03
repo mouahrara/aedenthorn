@@ -8,6 +8,6 @@
 	"MinimumApiVersion": "4.0.0",
 	"UpdateKeys": [
 		"Nexus:11551",
-		"UpdateManifest:https://github.com/mouahrara/aedenthorn/update-manifest.json@LivestockChoices"
+		"UpdateManifest:https://raw.githubusercontent.com/mouahrara/aedenthorn/master/update-manifest.json@LivestockChoices"
 	]
 }
