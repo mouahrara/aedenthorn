@@ -1,29 +1,28 @@
-﻿using HarmonyLib;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using StardewValley;
-using StardewValley.BellsAndWhistles;
-using StardewValley.Menus;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using Object = StardewValley.Object;
+using HarmonyLib;
+using Microsoft.Xna.Framework;
+using StardewValley;
+using StardewValley.Extensions;
+using StardewValley.GameData.FarmAnimals;
+using StardewValley.Menus;
 
 namespace BulkAnimalPurchase
 {
-	/// <summary>The mod entry point.</summary>
 	public partial class ModEntry
 	{
-		[HarmonyPatch(typeof(PurchaseAnimalsMenu), new Type[] { typeof(List<Object>) })]
-		[HarmonyPatch(MethodType.Constructor)]
+		private static readonly List<string> alternatePurchaseTypes = new();
+
 		public class PurchaseAnimalsMenu_Patch
 		{
 			public static void Prefix()
 			{
 				if (!Config.EnableMod)
 					return;
+
 				animalsToBuy = 1;
 
 				Point start = new Point(Game1.uiViewport.Width / 2 + PurchaseAnimalsMenu.menuWidth / 2 - IClickableMenu.borderWidth * 2, (Game1.uiViewport.Height - PurchaseAnimalsMenu.menuHeight - IClickableMenu.borderWidth * 2) / 4) + new Point(-100, PurchaseAnimalsMenu.menuHeight + 120);
@@ -47,14 +46,16 @@ namespace BulkAnimalPurchase
 
 			}
 		}
+
 		private static bool skip = false;
-		[HarmonyPatch(typeof(Game1), nameof(Game1.drawDialogueBox), new Type[] { typeof(int), typeof(int), typeof(int), typeof(int), typeof(bool),typeof(bool), typeof(string), typeof(bool), typeof(bool), typeof(int), typeof(int), typeof(int) })]
+
 		public class Game1_drawDialogueBox_Patch
 		{
 			public static void Prefix()
 			{
 				if (!Config.EnableMod || Game1.activeClickableMenu is not PurchaseAnimalsMenu || Game1.IsFading() || skip || AccessTools.FieldRefAccess<PurchaseAnimalsMenu, bool>(Game1.activeClickableMenu as PurchaseAnimalsMenu, "onFarm") || AccessTools.FieldRefAccess<PurchaseAnimalsMenu, bool>(Game1.activeClickableMenu as PurchaseAnimalsMenu, "namingAnimal"))
 					return;
+
 				var menu = Game1.activeClickableMenu;
 				var b = Game1.spriteBatch;
 				skip = true;
@@ -66,7 +67,7 @@ namespace BulkAnimalPurchase
 				plusButton.draw(b);
 			}
 		}
-		[HarmonyPatch(typeof(PurchaseAnimalsMenu), nameof(PurchaseAnimalsMenu.draw), new Type[] { typeof(SpriteBatch) })]
+
 		public class PurchaseAnimalsMenu_draw_Patch
 		{
 			public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
@@ -92,13 +93,14 @@ namespace BulkAnimalPurchase
 				return codes.AsEnumerable();
 			}
 		}
-		[HarmonyPatch(typeof(PurchaseAnimalsMenu), nameof(PurchaseAnimalsMenu.performHoverAction))]
+
 		public class PurchaseAnimalsMenu_performHoverAction_Patch
 		{
 			public static bool Prefix(PurchaseAnimalsMenu __instance, int x, int y, bool ___freeze, bool ___onFarm, bool ___namingAnimal)
 			{
 				if (!Config.EnableMod || Game1.IsFading() || ___freeze || ___onFarm || ___namingAnimal)
 					return true;
+
 				if (minusButton != null && minusButton.containsPoint(x, y) && animalsToBuy > 1)
 				{
 					__instance.hovered = minusButton;
@@ -110,81 +112,119 @@ namespace BulkAnimalPurchase
 				return true;
 			}
 		}
-		[HarmonyPatch(typeof(PurchaseAnimalsMenu), nameof(PurchaseAnimalsMenu.setUpForReturnAfterPurchasingAnimal))]
+
 		public class PurchaseAnimalsMenu_setUpForReturnAfterPurchasingAnimal_Patch
 		{
-			public static bool Prefix(PurchaseAnimalsMenu __instance, ref FarmAnimal ___animalBeingPurchased, int ___priceOfAnimal)
+			public static bool Prefix(PurchaseAnimalsMenu __instance)
 			{
 				if (!Config.EnableMod || animalsToBuy <= 1)
 					return true;
-				animalsToBuy--;
-				Game1.addHUDMessage(new HUDMessage(___animalBeingPurchased.isMale() ? Game1.content.LoadString("Strings\\StringsFromCSFiles:PurchaseAnimalsMenu.cs.11311", ___animalBeingPurchased.displayName) : Game1.content.LoadString("Strings\\StringsFromCSFiles:PurchaseAnimalsMenu.cs.11314", ___animalBeingPurchased.displayName), 1));
 
-				string type = ___animalBeingPurchased.type.Value;
-				if (!SHelper.ModRegistry.IsLoaded("aedenthorn.LivestockChoices")) 
-				{
-					if (type.EndsWith(" Chicken") && !type.Equals("Void Chicken") && !type.Equals("Golden Chicken"))
-					{
-						type = "Chicken";
-					}
-					else if (type.EndsWith(" Cow"))
-					{
-						type = "Cow";
-					}
-				}
-				___animalBeingPurchased = new FarmAnimal(type, new Multiplayer().getNewID(), Game1.player.UniqueMultiplayerID);
-				SMonitor.Log($"next animal type: {___animalBeingPurchased.type}; price {___priceOfAnimal}, funds left {Game1.player.Money}");
+				animalsToBuy--;
+				Game1.addHUDMessage(new HUDMessage(__instance.animalBeingPurchased.isMale() ? Game1.content.LoadString("Strings\\StringsFromCSFiles:PurchaseAnimalsMenu.cs.11311", __instance.animalBeingPurchased.displayName) : Game1.content.LoadString("Strings\\StringsFromCSFiles:PurchaseAnimalsMenu.cs.11314", __instance.animalBeingPurchased.displayName), 1));
+				__instance.namingAnimal = false;
+				__instance.textBox.Selected = false;
+				__instance.textBox.OnEnterPressed -= __instance.textBoxEvent;
+				__instance.animalBeingPurchased = new FarmAnimal(alternatePurchaseTypes.Any() ? Game1.random.ChooseFrom(alternatePurchaseTypes) : __instance.animalBeingPurchased.type.Value, Game1.Multiplayer.getNewID(), __instance.animalBeingPurchased.ownerID.Value);
+				SMonitor.Log($"next animal type: {__instance.animalBeingPurchased.type}; price {__instance.priceOfAnimal}, funds left {Game1.player.Money}");
 				return false;
 			}
 		}
-		[HarmonyPatch(typeof(PurchaseAnimalsMenu), nameof(PurchaseAnimalsMenu.receiveLeftClick))]
+
 		public class PurchaseAnimalsMenu_receiveLeftClick_Patch
 		{
-			public static bool Prefix(PurchaseAnimalsMenu __instance, int x, int y, bool ___freeze, bool ___onFarm, bool ___namingAnimal, int ___priceOfAnimal, ref int __state)
+			public static bool Prefix(PurchaseAnimalsMenu __instance, int x, int y, ref int __state)
 			{
-				__state = ___priceOfAnimal;
-				if (!Config.EnableMod || Game1.IsFading() || ___freeze || ___onFarm || ___namingAnimal)
+				__state = __instance.priceOfAnimal;
+				if (!Config.EnableMod || Game1.IsFading() || __instance.freeze || __instance.namingAnimal)
 					return true;
-				if (minusButton != null && minusButton.containsPoint(x, y) && animalsToBuy > 1)
+
+				if (!__instance.onFarm)
 				{
-					Game1.playSound("smallSelect");
-					animalsToBuy--;
-					return false;
+					if (minusButton != null && minusButton.containsPoint(x, y) && animalsToBuy > 1)
+					{
+						Game1.playSound("smallSelect");
+						animalsToBuy--;
+						return false;
+					}
+					if (plusButton != null && plusButton.containsPoint(x, y))
+					{
+						Game1.playSound("smallSelect");
+						animalsToBuy++;
+						return false;
+					}
 				}
-				if (plusButton != null && plusButton.containsPoint(x, y))
+				else
 				{
-					Game1.playSound("smallSelect");
-					animalsToBuy++;
-					return false;
+					foreach (ClickableTextureComponent item in __instance.animalsToPurchase)
+					{
+						if (__instance.readOnly || !item.containsPoint(x, y) || (item.item as StardewValley.Object).Type != null)
+						{
+							continue;
+						}
+						if (Game1.player.Money >= item.item.salePrice())
+						{
+							if (!SHelper.ModRegistry.IsLoaded("aedenthorn.LivestockChoices"))
+							{
+								string type = __instance.animalBeingPurchased.type.Value;
+
+								if (type.EndsWith(" Chicken") && !type.Equals("Void Chicken") && !type.Equals("Golden Chicken"))
+								{
+									type = "Chicken";
+								}
+								else if (type.EndsWith(" Cow"))
+								{
+									type = "Cow";
+								}
+								alternatePurchaseTypes.Clear();
+								if (Game1.farmAnimalData.TryGetValue(__instance.animalBeingPurchased.type.Value, out FarmAnimalData value))
+								{
+									if (value.AlternatePurchaseTypes is not null)
+									{
+										foreach (AlternatePurchaseAnimals alternatePurchaseType in value.AlternatePurchaseTypes)
+										{
+											if (GameStateQuery.CheckConditions(alternatePurchaseType.Condition, null, null, null, null, null, new HashSet<string> { "RANDOM" }))
+											{
+												alternatePurchaseTypes.AddRange(alternatePurchaseType.AnimalIds);
+											}
+										}
+									}
+								}
+							}
+						}
+					}
 				}
 				return true;
 			}
-			public static void Postfix(int __state, ref int ___priceOfAnimal) 
+
+			public static void Postfix(int __state, ref int ___priceOfAnimal)
 			{
 				if (!Config.EnableMod || __state == ___priceOfAnimal)
 					return;
+
 				___priceOfAnimal /= animalsToBuy;
 				SMonitor.Log($"Price of animal: {___priceOfAnimal}x{animalsToBuy}");
 			}
-
 		}
-		[HarmonyPatch(typeof(Object), nameof(Object.salePrice))]
+
 		public class Item_salePrice_Patch
 		{
 			public static void Postfix(ref int __result)
 			{
 				if (!Config.EnableMod || Game1.activeClickableMenu is not PurchaseAnimalsMenu)
 					return;
+
 				__result *= animalsToBuy;
 			}
 		}
-		[HarmonyPatch(typeof(SpriteText), nameof(SpriteText.drawStringWithScrollBackground))]
+
 		public class SpriteText_drawStringWithScrollBackground_Patch
 		{
 			public static void Prefix(ref string s, ref string placeHolderWidthText)
 			{
 				if (!Config.EnableMod || Game1.activeClickableMenu is not PurchaseAnimalsMenu || animalsToBuy <= 1 || (placeHolderWidthText != "Golden Chicken" && placeHolderWidthText != "Truffle Pig"))
 					return;
+
 				s += " x" + animalsToBuy;
 				placeHolderWidthText += " x" + animalsToBuy;
 			}

@@ -1,11 +1,7 @@
-﻿
-using StardewModdingAPI;
-
-namespace BulkAnimalPurchase
+﻿namespace BulkAnimalPurchase
 {
 	public class ModConfig
 	{
 		public bool EnableMod { get; set; } = true;
-
 	}
 }

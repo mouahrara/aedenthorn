@@ -3,5 +3,5 @@
 	"x-left-to-add": "({0} restant à placer)",
 
 	// GMCM
-	"GMCM_Option_ModEnabled_Name": "Activer le Mod"
+	"GMCM.ModEnabled.Name": "Activer le Mod"
 }

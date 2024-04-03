@@ -1,22 +1,13 @@
 ﻿{
 	"Name": "Bulk Animal Purchase",
 	"Author": "aedenthorn",
-	"Version": "0.2.1",
-	"Description": "Bulk Animal Purchase.",
+	"Version": "0.2.2-unofficial.1-mouahrara",
+	"Description": "Lets you buy and place multiple farm animals without leaving the placement screen. ",
 	"UniqueID": "aedenthorn.BulkAnimalPurchase",
 	"EntryDll": "BulkAnimalPurchase.dll",
-	"MinimumApiVersion": "3.13.0",
-	"ModUpdater": {
-		"Repository": "StardewValleyMods",
-		"User": "aedenthorn",
-		"Directory": "_releases",
-		"ModFolder": "BulkAnimalPurchase"
-	},
-	"UpdateKeys": [ "Nexus:11539" ],
-	"Dependencies": [
-		{
-			"UniqueID": "Platonymous.ModUpdater",
-			"IsRequired": false
-		}
+	"MinimumApiVersion": "4.0.0",
+	"UpdateKeys": [
+		"Nexus:11539",
+		"UpdateManifest:https://github.com/mouahrara/aedenthorn/update-manifest.json@BulkAnimalPurchase"
 	]
 }
