@@ -1,5 +1,4 @@
-﻿using StardewModdingAPI;
-using System.Collections.Generic;
+﻿using Microsoft.Xna.Framework;
 
 namespace CatalogueFilter
 {
@@ -7,6 +6,6 @@ namespace CatalogueFilter
 	{
 		public bool ModEnabled { get; set; } = true;
 		public bool ShowLabel { get; set; } = true;
-		public int LabelColor { get; set; } = 4;
+		public Color LabelColor { get; set; } = Color.White;
 	}
 }

@@ -1,12 +1,9 @@
-﻿using HarmonyLib;
-using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewValley;
 using StardewValley.BellsAndWhistles;
 using StardewValley.Menus;
-using System;
-using System.Collections.Generic;
 
 namespace CatalogueFilter
 {
@@ -16,14 +13,13 @@ namespace CatalogueFilter
 		private static TextBox filterField;
 		private static List<ISalable> allItems;
 
-		[HarmonyPatch(typeof(ShopMenu), new Type[] { typeof(List<ISalable>), typeof(int), typeof(string), typeof(Func<ISalable, Farmer, int, bool>), typeof(Func<ISalable, bool>), typeof(string) })]
-		[HarmonyPatch(MethodType.Constructor)]
 		public class ShopMenu_Patch
 		{
-			public static void Postfix(ShopMenu __instance, List<ISalable> itemsForSale)
+			public static void Postfix(ShopMenu __instance)
 			{
 				if (!Config.ModEnabled)
 					return;
+
 				allItems = new List<ISalable>(__instance.forSale);
 				filterField = new TextBox(Game1.content.Load<Texture2D>("LooseSprites\\textBox"), null, Game1.smallFont, Game1.textColor)
 				{
@@ -33,15 +29,14 @@ namespace CatalogueFilter
 				};
 			}
 		}
-		
-		[HarmonyPatch(typeof(ShopMenu), nameof(ShopMenu.drawCurrency))]
+
 		public class ShopMenu_drawCurrency_Patch
 		{
-
 			public static void Postfix(ShopMenu __instance, SpriteBatch b)
 			{
 				if (!Config.ModEnabled)
 					return;
+
 				if(lastFilterString != filterField.Text)
 				{
 					lastFilterString = filterField.Text;
@@ -78,44 +73,38 @@ namespace CatalogueFilter
 				}
 			}
 		}
-		
-		[HarmonyPatch(typeof(ShopMenu), nameof(ShopMenu.receiveLeftClick))]
+
 		public class ShopMenu_receiveLeftClick_Patch
 		{
-
-			public static void Postfix(ShopMenu __instance)
+			public static void Postfix()
 			{
 				if (!Config.ModEnabled)
 					return;
+
 				filterField.Update();
 			}
 		}
-		[HarmonyPatch(typeof(ShopMenu), nameof(ShopMenu.receiveKeyPress))]
+
 		public class ShopMenu_receiveKeyPress_Patch
 		{
-
-			public static bool Prefix(ShopMenu __instance, Keys key)
+			public static bool Prefix(Keys key)
 			{
 				if (!Config.ModEnabled || !filterField.Selected || key == Keys.Escape)
 					return true;
+
 				return false;
 			}
 		}
-		[HarmonyPatch(typeof(ShopMenu), nameof(ShopMenu.performHoverAction))]
+
 		public class ShopMenu_performHoverAction_Patch
 		{
-
-			public static void Postfix(ShopMenu __instance, int x, int y)
+			public static void Postfix(int x, int y)
 			{
 				if (!Config.ModEnabled)
 					return;
+
 				filterField.Hover(x, y);
 			}
-		}
-
-		private static void ChangeItemList(ShopMenu shopMenu)
-		{
-
 		}
 	}
 }
