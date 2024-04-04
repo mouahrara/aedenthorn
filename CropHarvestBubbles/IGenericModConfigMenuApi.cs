@@ -7,6 +7,7 @@ using StardewValley;
 
 namespace CropHarvestBubbles
 {
+	/// <summary>The API which lets other mods add a config UI through Generic Mod Config Menu.</summary>
 	public interface IGenericModConfigMenuApi
 	{
 		/*********
@@ -22,7 +23,6 @@ namespace CropHarvestBubbles
 		/// <param name="titleScreenOnly">Whether the options can only be edited from the title screen.</param>
 		/// <remarks>Each mod can only be registered once, unless it's deleted via <see cref="Unregister"/> before calling this again.</remarks>
 		void Register(IManifest mod, Action reset, Action save, bool titleScreenOnly = false);
-
 
 		/****
 		** Basic options
@@ -109,7 +109,6 @@ namespace CropHarvestBubbles
 		/// <param name="fieldId">The unique field ID for use with <see cref="OnFieldChanged"/>, or <c>null</c> to auto-generate a randomized ID.</param>
 		void AddKeybindList(IManifest mod, Func<KeybindList> getValue, Action<KeybindList> setValue, Func<string> name, Func<string> tooltip = null, string fieldId = null);
 
-
 		/****
 		** Multi-page management
 		****/
@@ -126,7 +125,6 @@ namespace CropHarvestBubbles
 		/// <param name="text">The link text shown in the form.</param>
 		/// <param name="tooltip">The tooltip text shown when the cursor hovers on the link, or <c>null</c> to disable the tooltip.</param>
 		void AddPageLink(IManifest mod, string pageId, Func<string> text, Func<string> tooltip = null);
-
 
 		/****
 		** Advanced
