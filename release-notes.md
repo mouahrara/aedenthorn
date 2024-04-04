@@ -2,6 +2,18 @@
 
 # Global release notes
 
+## 4 April 2024
+* Released Bulk Animal Purchase version [0.2.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BulkAnimalPurchase/release-notes.md#022-unofficial1-mouahrara)
+* Released Catalogue Filter version [0.2.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CatalogueFilter/release-notes.md#021-unofficial1-mouahrara)
+* Released Chess Boards version [0.1.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/ChessBoards/release-notes.md#011-unofficial1-mouahrara)
+* Released Connected Garden Pots version [0.1.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/ConnectedGardenPots/release-notes.md#011-unofficial1-mouahrara)
+* Released Cooperative Egg Hunt version [0.1.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CooperativeEggHunt/release-notes.md#011-unofficial1-mouahrara)
+* Released Crop Growth Info version [0.1.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CropGrowthInfo/release-notes.md#011-unofficial1-mouahrara)
+* Released Crop Harvest Bubbles version [0.3.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CropHarvestBubbles/release-notes.md#031-unofficial1-mouahrara)
+* Released Livestock Choices version [0.2.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/LivestockChoices/release-notes.md#022-unofficial1-mouahrara)
+* Released Wall Planters version [0.1.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/WallPlanters/release-notes.md#012-unofficial1-mouahrara)
+* Fix update manifest url 🔧
+
 ## 2 April 2024
 * Released All Chests Menu version [0.3.2-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AllChestsMenu/release-notes.md#032-unofficial2-mouahrara)
 * Released Bat Form version [0.3.4-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BatForm/release-notes.md#034-unofficial2-mouahrara)
@@ -62,6 +74,7 @@
   * TileTransparency ➜ TransparentTiles
   * TreeTweaks ➜ CustomTreeTweaks 
   * TwoPlayerPrairieKing ➜ PlayPrairieKingWithNPCs
+  * WallPlanter ➜ WallPlanters
   * YAJM ➜ YetAnotherJumpMod
 * Removed release files
 * Removed incomplete mods:
