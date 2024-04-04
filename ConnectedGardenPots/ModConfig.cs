@@ -1,7 +1,4 @@
-﻿
-using StardewModdingAPI;
-
-namespace ConnectedGardenPots
+﻿namespace ConnectedGardenPots
 {
 	public class ModConfig
 	{
