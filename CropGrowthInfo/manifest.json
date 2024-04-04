@@ -1,22 +1,13 @@
 ﻿{
-	"Name": "Crop Growth Information",
+	"Name": "Crop Growth Info",
 	"Author": "aedenthorn",
-	"Version": "0.1.0",
-	"Description": "Crop Growth Information.",
-	"UniqueID": "aedenthorn.CropGrowthInformation",
-	"EntryDll": "CropGrowthInformation.dll",
-	"MinimumApiVersion": "3.13.0",
-	"ModUpdater": {
-		"Repository": "StardewValleyMods",
-		"User": "aedenthorn",
-		"Directory": "_releases",
-		"ModFolder": "CropGrowthInformation"
-	},
-	"UpdateKeys": [ "Nexus:12178" ],
-	"Dependencies": [
-		{
-			"UniqueID": "Platonymous.ModUpdater",
-			"IsRequired": false
-		}
+	"Version": "0.1.1-unofficial.1-mouahrara",
+	"Description": "Shows information about crop growth when hovering with the mouse and optionally holding down a toggle key.",
+	"UniqueID": "aedenthorn.CropGrowthInfo",
+	"EntryDll": "CropGrowthInfo.dll",
+	"MinimumApiVersion": "4.0.0",
+	"UpdateKeys": [
+		"Nexus:12178",
+		"UpdateManifest:https://raw.githubusercontent.com/mouahrara/aedenthorn/master/update-manifest.json@CropGrowthInfo"
 	]
 }

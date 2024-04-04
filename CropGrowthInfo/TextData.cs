@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
-using StardewModdingAPI;
 
-namespace CropGrowthInformation
+namespace CropGrowthInfo
 {
 	public class TextData
 	{
