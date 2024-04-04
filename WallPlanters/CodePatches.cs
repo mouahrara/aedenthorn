@@ -12,44 +12,46 @@ using System.Reflection;
 using System.Reflection.Emit;
 using Object = StardewValley.Object;
 
-namespace WallPlanter
+namespace WallPlanters
 {
 	public partial class ModEntry
 	{
-		public static bool drawingWallPot;
-		public static int drawingWallPotOffset;
-		public static int drawingWallPotInnerOffset;
+		internal static bool drawingWallPot;
+		internal static int drawingWallPotOffset;
+		internal static int drawingWallPotInnerOffset;
 
-		[HarmonyPatch(typeof(Utility), nameof(Utility.playerCanPlaceItemHere))]
-		public class playerCanPlaceItemHere_Patch
+		public class Utility_playerCanPlaceItemHere_Patch
 		{
 			public static bool Prefix(GameLocation location, Item item, int x, int y, Farmer f, ref bool __result)
 			{
 				if (!Config.EnableMod || item is not Object || !(item as Object).bigCraftable.Value || item.ParentSheetIndex != 62 || !typeof(DecoratableLocation).IsAssignableFrom(location.GetType()) || !(location as DecoratableLocation).isTileOnWall(x / 64, y / 64) || !Utility.isWithinTileWithLeeway(x, y, item, f))
 					return true;
+
 				__result = true;
 				return false;
 			}
 		}
-		[HarmonyPatch(typeof(IndoorPot), nameof(IndoorPot.draw), new Type[] { typeof(SpriteBatch), typeof(int), typeof(int), typeof(float) })]
+
 		public class IndoorPot_draw_Patch
 		{
 			public static void Prefix(IndoorPot __instance, int x, int y)
 			{
 				if (!Config.EnableMod || !typeof(DecoratableLocation).IsAssignableFrom(Game1.currentLocation.GetType()) || !(Game1.currentLocation as DecoratableLocation).isTileOnWall(x, y))
 					return;
-				if (!__instance.modData.TryGetValue("aedenthorn.WallPlanter/offset", out string offsetString))
+
+				if (!__instance.modData.TryGetValue("aedenthorn.WallPlanters/offset", out _))
 				{
-					__instance.modData["aedenthorn.WallPlanter/offset"] = Config.OffsetY + "";
+					__instance.modData["aedenthorn.WallPlanters/offset"] = Config.OffsetY + "";
 				}
-				if (!__instance.modData.TryGetValue("aedenthorn.WallPlanter/innerOffset", out string innerOffsetString))
+				if (!__instance.modData.TryGetValue("aedenthorn.WallPlanters/innerOffset", out _))
 				{
-					__instance.modData["aedenthorn.WallPlanter/innerOffset"] = Config.InnerOffsetY + "";
+					__instance.modData["aedenthorn.WallPlanters/innerOffset"] = Config.InnerOffsetY + "";
 				}
-				drawingWallPotOffset = int.Parse(__instance.modData["aedenthorn.WallPlanter/offset"]);
-				drawingWallPotInnerOffset = int.Parse(__instance.modData["aedenthorn.WallPlanter/innerOffset"]);
+				drawingWallPotOffset = int.Parse(__instance.modData["aedenthorn.WallPlanters/offset"]);
+				drawingWallPotInnerOffset = int.Parse(__instance.modData["aedenthorn.WallPlanters/innerOffset"]);
 				drawingWallPot = true;
 			}
+
 			public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 			{
 				SMonitor.Log($"Transpiling IndoorPot.draw");
@@ -59,13 +61,14 @@ namespace WallPlanter
 				bool found4 = false;
 				bool found5 = false;
 				var codes = new List<CodeInstruction>(instructions);
+
 				for (int i = 0; i < codes.Count; i++)
 				{
 					if (!found1 && codes[i].opcode == OpCodes.Callvirt && (MethodInfo)codes[i].operand == AccessTools.Method(typeof(SpriteBatch), nameof(SpriteBatch.Draw), new Type[] { typeof(Texture2D), typeof(Rectangle), typeof(Rectangle?), typeof(Color), typeof(float), typeof(Vector2), typeof(SpriteEffects), typeof(float) }))
 					{
 						SMonitor.Log("replacing first draw method");
 						codes[i].opcode = OpCodes.Call;
-						codes[i].operand = AccessTools.Method(typeof(ModEntry), nameof(ModEntry.DrawIndoorPot));
+						codes[i].operand = AccessTools.Method(typeof(ModEntry), nameof(DrawIndoorPot));
 						codes.Insert(i, new CodeInstruction(OpCodes.Ldarg_0));
 						found1 = true;
 					}
@@ -73,28 +76,28 @@ namespace WallPlanter
 					{
 						SMonitor.Log("replacing second draw method");
 						codes[i].opcode = OpCodes.Call;
-						codes[i].operand = AccessTools.Method(typeof(ModEntry), nameof(ModEntry.DrawIndoorPotFertilizer));
+						codes[i].operand = AccessTools.Method(typeof(ModEntry), nameof(DrawIndoorPotFertilizer));
 						found2 = true;
 					}
 					if (!found3 && codes[i].opcode == OpCodes.Callvirt && (MethodInfo)codes[i].operand == AccessTools.Method(typeof(Crop), nameof(Crop.drawWithOffset)))
 					{
 						SMonitor.Log("replacing third draw method");
 						codes[i].opcode = OpCodes.Call;
-						codes[i].operand = AccessTools.Method(typeof(ModEntry), nameof(ModEntry.DrawIndoorPotCrop));
+						codes[i].operand = AccessTools.Method(typeof(ModEntry), nameof(DrawIndoorPotCrop));
 						found3 = true;
 					}
 					if (!found4 && codes[i].opcode == OpCodes.Callvirt && (MethodInfo)codes[i].operand == AccessTools.Method(typeof(Object), nameof(Object.draw), new Type[] { typeof(SpriteBatch), typeof(int), typeof(int), typeof(float), typeof(float) }))
 					{
 						SMonitor.Log("replacing fourth draw method");
 						codes[i].opcode = OpCodes.Call;
-						codes[i].operand = AccessTools.Method(typeof(ModEntry), nameof(ModEntry.DrawIndoorPotObject));
+						codes[i].operand = AccessTools.Method(typeof(ModEntry), nameof(DrawIndoorPotObject));
 						found4 = true;
 					}
 					if (!found5 && codes[i].opcode == OpCodes.Callvirt && (MethodInfo)codes[i].operand == AccessTools.Method(typeof(Bush), nameof(Bush.draw), new Type[] { typeof(SpriteBatch), typeof(Vector2), typeof(float) }))
 					{
 						SMonitor.Log("replacing fifth draw method");
 						codes[i].opcode = OpCodes.Call;
-						codes[i].operand = AccessTools.Method(typeof(ModEntry), nameof(ModEntry.DrawIndoorPotBush));
+						codes[i].operand = AccessTools.Method(typeof(ModEntry), nameof(DrawIndoorPotBush));
 						found5 = true;
 					}
 					if (found1 && found2 && found3 && found4 && found5)
@@ -103,6 +106,7 @@ namespace WallPlanter
 
 				return codes.AsEnumerable();
 			}
+
 			public static void Postfix()
 			{
 				drawingWallPot = false;
@@ -113,8 +117,7 @@ namespace WallPlanter
 		{
 			if (texture is null || pot is null)
 				return;
-			int x = (destinationRectangle.X + Game1.viewport.X) / 64;
-			int y = (destinationRectangle.Y + Game1.viewport.Y) / 64 + 1;
+
 			if (!Config.EnableMod || !drawingWallPot)
 			{
 				spriteBatch.Draw(texture, destinationRectangle, sourceRectangle, color, rotation, origin, effects, layerDepth);
@@ -128,6 +131,7 @@ namespace WallPlanter
 				spriteBatch.Draw(texture, destinationRectangle, null, color, rotation, origin, effects, layerDepth);
 			}
 		}
+
 		private static void DrawIndoorPotFertilizer(SpriteBatch spriteBatch, Texture2D texture, Vector2 position, Rectangle? sourceRectangle, Color color, float rotation, Vector2 origin, float scale, SpriteEffects effects, float layerDepth)
 		{
 			if (drawingWallPot)
@@ -137,6 +141,7 @@ namespace WallPlanter
 			}
 			spriteBatch.Draw(texture, position, sourceRectangle, color, rotation, origin, scale, effects, layerDepth);
 		}
+
 		private static void DrawIndoorPotCrop(Crop crop, SpriteBatch spriteBatch, Vector2 tileLocation, Color color, float rotation, Vector2 offset)
 		{
 			if (drawingWallPot)
@@ -145,6 +150,7 @@ namespace WallPlanter
 			}
 			crop.drawWithOffset(spriteBatch, tileLocation, color, rotation, offset);
 		}
+
 		private static void DrawIndoorPotObject(Object obj, SpriteBatch spriteBatch, int xNonTile, int yNonTile, float layerDepth, float alpha)
 		{
 			if (drawingWallPot)
@@ -153,13 +159,14 @@ namespace WallPlanter
 			}
 			obj.draw(spriteBatch, xNonTile, yNonTile, layerDepth, alpha);
 		}
-		private static void DrawIndoorPotBush(Bush bush, SpriteBatch spriteBatch, Vector2 tileLocation, float yDrawOffset)
+
+		private static void DrawIndoorPotBush(Bush bush, SpriteBatch spriteBatch, float yDrawOffset)
 		{
 			if (drawingWallPot)
 			{
 				yDrawOffset -= drawingWallPotOffset + drawingWallPotInnerOffset;
 			}
-			bush.draw(spriteBatch, tileLocation, yDrawOffset);
+			bush.draw(spriteBatch, yDrawOffset);
 		}
 	}
 }
