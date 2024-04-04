@@ -1,7 +1,4 @@
-﻿using StardewModdingAPI;
-using StardewModdingAPI.Utilities;
-
-namespace CooperativeEggHunt
+﻿namespace CooperativeEggHunt
 {
 	public class ModConfig
 	{

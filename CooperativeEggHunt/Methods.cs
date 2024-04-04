@@ -1,6 +1,4 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using StardewValley;
-using System;
+﻿using StardewValley;
 
 namespace CooperativeEggHunt
 {
@@ -8,9 +6,11 @@ namespace CooperativeEggHunt
 	{
 		private static int GetEggs(NPC npc)
 		{
-			if(npc == null) 
+			if(npc == null)
 				return -1;
+
 			int eggs = Game1.random.Next(Config.NPCMinEggs, Config.NPCMaxEggs + 1);
+
 			if(Config.PointsPerEgg > 0)
 			{
 				foreach (Farmer temp in Game1.getOnlineFarmers())

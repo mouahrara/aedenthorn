@@ -1,25 +1,21 @@
-﻿using HarmonyLib;
-using Microsoft.Xna.Framework;
+﻿using System;
+using HarmonyLib;
 using StardewModdingAPI;
-using StardewModdingAPI.Utilities;
 using StardewValley;
-using System;
-using System.Globalization;
 
 namespace CooperativeEggHunt
 {
 	/// <summary>The mod entry point.</summary>
 	public partial class ModEntry : Mod
 	{
+		internal static IMonitor SMonitor;
+		internal static IModHelper SHelper;
+		internal static ModConfig Config;
 
-		public static IMonitor SMonitor;
-		public static IModHelper SHelper;
-		public static ModConfig Config;
+		internal static ModEntry context;
 
-		public static ModEntry context;
-		
-		public static string talkedKey = "aedenthorn.CooperativeEggHunt/talked";
-		
+		public const string talkedKey = "aedenthorn.CooperativeEggHunt/talked";
+
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
 		/// <param name="helper">Provides simplified APIs for writing mods.</param>
 		public override void Entry(IModHelper helper)
@@ -34,15 +30,32 @@ namespace CooperativeEggHunt
 			helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
 			helper.Events.Content.AssetRequested += Content_AssetRequested;
 
-			var harmony = new Harmony(ModManifest.UniqueID);
-			harmony.PatchAll();
+			// Load Harmony patches
+			try
+			{
+				Harmony harmony = new(ModManifest.UniqueID);
 
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Event), "eggHuntWinner"),
+					prefix: new HarmonyMethod(typeof(Event_eggHuntWinner_Patch), nameof(Event_eggHuntWinner_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Game1), nameof(Game1.drawDialogue), new Type[] { typeof(NPC) }),
+					postfix: new HarmonyMethod(typeof(Game1_drawDialogue_Patch), nameof(Game1_drawDialogue_Patch.Postfix))
+				);
+			}
+			catch (Exception e)
+			{
+				Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
+				return;
+			}
 		}
 
 		private void Content_AssetRequested(object sender, StardewModdingAPI.Events.AssetRequestedEventArgs e)
 		{
 			if (!Config.ModEnabled)
 				return;
+
 			if (e.NameWithoutLocale.IsEquivalentTo("Characters/Dialogue/Abigail"))
 			{
 				e.Edit(delegate (IAssetData assetData)
@@ -51,7 +64,6 @@ namespace CooperativeEggHunt
 					dict["spring_12"] = Helper.Translation.Get("Abigail_spring_12");
 				});
 			}
-
 			else if (e.NameWithoutLocale.IsEquivalentTo("Characters/Dialogue/MarriageDialogueAbigail"))
 			{
 				e.Edit(delegate (IAssetData assetData)
@@ -60,7 +72,6 @@ namespace CooperativeEggHunt
 					dict["spring_12"] = Helper.Translation.Get("MarriageDialogueAbigail_spring_12");
 				});
 			}
-
 			else if (e.NameWithoutLocale.IsEquivalentTo("Data/Festivals/spring13"))
 			{
 				e.Edit(delegate (IAssetData assetData)
@@ -78,8 +89,6 @@ namespace CooperativeEggHunt
 
 		private void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
 		{
-
-
 			// get Generic Mod Config Menu's API (if it's installed)
 			var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
 			if (configMenu is null)
@@ -94,41 +103,40 @@ namespace CooperativeEggHunt
 
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_ModEnabled_Name"),
+				name: () => SHelper.Translation.Get("GMCM.ModEnabled.Name"),
 				getValue: () => Config.ModEnabled,
 				setValue: value => Config.ModEnabled = value
 			);
 			configMenu.AddNumberOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_EggsToWin_Name"),
+				name: () => SHelper.Translation.Get("GMCM.EggsToWin.Name"),
 				getValue: () => Config.EggsToWin,
 				setValue: value => Config.EggsToWin = value
 			);
 			configMenu.AddNumberOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_NPCMinEggs_Name"),
+				name: () => SHelper.Translation.Get("GMCM.NPCMinEggs.Name"),
 				getValue: () => Config.NPCMinEggs,
 				setValue: value => Config.NPCMinEggs = value
 			);
 			configMenu.AddNumberOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_NPCMaxEggs_Name"),
+				name: () => SHelper.Translation.Get("GMCM.NPCMaxEggs.Name"),
 				getValue: () => Config.NPCMaxEggs,
 				setValue: value => Config.NPCMaxEggs = value
 			);
 			configMenu.AddNumberOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_PointsPerEgg_Name"),
+				name: () => SHelper.Translation.Get("GMCM.PointsPerEgg.Name"),
 				getValue: () => Config.PointsPerEgg,
 				setValue: value => Config.PointsPerEgg = value
 			);
 			configMenu.AddNumberOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_EggsPerTalk_Name"),
+				name: () => SHelper.Translation.Get("GMCM.EggsPerTalk.Name"),
 				getValue: () => Config.EggsPerTalk,
 				setValue: value => Config.EggsPerTalk = value
 			);
-
 		}
 	}
 }

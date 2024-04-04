@@ -14,10 +14,10 @@
 	"results-not-enough": "Je suis désolé de vous annoncer que vous n'avez pas trouvé assez d'oeufs. Vous aurez peut-être plus de chance l'année prochaine !",
 
 	// GMCM
-	"GMCM_Option_ModEnabled_Name": "Activer le Mod",
-	"GMCM_Option_EggsToWin_Name": "Œufs nécessaires pour gagner",
-	"GMCM_Option_NPCMinEggs_Name": "Œufs minimum par PNJ",
-	"GMCM_Option_NPCMaxEggs_Name": "Œufs maximum par PNJ",
-	"GMCM_Option_PointsPerEgg_Name": "Amitié nécessaire pour un œuf",
-	"GMCM_Option_EggsPerTalk_Name": "Œufs par discussion"
+	"GMCM.ModEnabled.Name": "Activer le Mod",
+	"GMCM.EggsToWin.Name": "Œufs nécessaires pour gagner",
+	"GMCM.NPCMinEggs.Name": "Œufs minimum par PNJ",
+	"GMCM.NPCMaxEggs.Name": "Œufs maximum par PNJ",
+	"GMCM.PointsPerEgg.Name": "Amitié nécessaire pour un œuf",
+	"GMCM.EggsPerTalk.Name": "Œufs par discussion"
 }

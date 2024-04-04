@@ -21,10 +21,10 @@
 	"MarriageDialogueAbigail_spring_12": "Hey, the egg festival is tomorrow. I know it's a cooperative effort, but I won't go easy on you because we're married!$h#$e#I plan on getting the most eggs! Go ahead and try to beat me!",
 
 	// GMCM
-	"GMCM_Option_ModEnabled_Name": "Mod Enabled",
-	"GMCM_Option_EggsToWin_Name": "Eggs To Win",
-	"GMCM_Option_NPCMinEggs_Name": "NPC Min Eggs",
-	"GMCM_Option_NPCMaxEggs_Name": "NPC Max Eggs",
-	"GMCM_Option_PointsPerEgg_Name": "Points Per Egg",
-	"GMCM_Option_EggsPerTalk_Name": "Eggs Per Talk"
+	"GMCM.ModEnabled.Name": "Mod Enabled",
+	"GMCM.EggsToWin.Name": "Eggs To Win",
+	"GMCM.NPCMinEggs.Name": "NPC Min Eggs",
+	"GMCM.NPCMaxEggs.Name": "NPC Max Eggs",
+	"GMCM.PointsPerEgg.Name": "Points Per Egg",
+	"GMCM.EggsPerTalk.Name": "Eggs Per Talk"
 }
