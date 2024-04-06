@@ -13,6 +13,13 @@
 	"results-enough": "Félicitations à tous, vous avez trouvé suffisamment d'œufs ! Tout le monde reçoit un prix !$h",
 	"results-not-enough": "Je suis désolé de vous annoncer que vous n'avez pas trouvé assez d'oeufs. Vous aurez peut-être plus de chance l'année prochaine !",
 
+	"Maru_y2": "Penses-tu que l'on va gagner la chasse aux œufs cette année ?",
+	"Sebastian_spouse": "Je vais tous vous encourager pendant la chasse aux œufs.$h",
+	"Jas_y2": "Je vais faire de mon mieux pour nous assurer la victoire cette année !",
+
+	"Abigail_spring_12": "Je vais participer à la chasse aux œufs demain. Et toi ?",
+	"MarriageDialogueAbigail_spring_12": "Hé, le festival des œufs a lieu demain. Je sais que c'est un effort coopératif, mais je ne vais pas te ménager !$h#$e#J'ai l'intention d'obtenir le plus d'œufs ! Allez, essaie de me battre !",
+
 	// GMCM
 	"GMCM.ModEnabled.Name": "Activer le Mod",
 	"GMCM.EggsToWin.Name": "Œufs nécessaires pour gagner",
