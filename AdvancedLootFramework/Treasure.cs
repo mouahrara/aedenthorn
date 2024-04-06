@@ -2,13 +2,13 @@
 {
 	public class Treasure
 	{
-		public int index;
+		public string id;
 		public int value;
 		public string type;
 
-		public Treasure(int index, int value, string type)
+		public Treasure(string id, int value, string type)
 		{
-			this.index = index;
+			this.id = id;
 			this.value = value;
 			this.type = type;
 		}
