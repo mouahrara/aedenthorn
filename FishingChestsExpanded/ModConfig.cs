@@ -6,7 +6,7 @@ namespace FishingChestsExpanded
 	{
 		public bool EnableMod { get; set; } = true;
 		public int VanillaLootChance { get; set; } = 0;
-		public int ChanceForTreasureChest { get; set; } = -1;
+		public int ChanceForTreasureChest { get; set; } = 15;
 		public int MaxItems { get; set; } = 5;
 		public int ItemsBaseMaxValue { get; set; } = 100;
 		public int MinItemValue { get; set; } = 20;
@@ -21,7 +21,7 @@ namespace FishingChestsExpanded
 			{"Pants", 0},
 			{"Hat", 0},
 			{"Boots", 100},
-			{"BigCraftable", 100},
+			{"BigCraftable", 50},
 			{"Ring", 100},
 			{"Seed", 100},
 			{"Mineral", 100},
