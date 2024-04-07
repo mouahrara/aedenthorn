@@ -3,6 +3,5 @@
 	internal class LastOverWorldChestSpawn
 	{
 		public int lastOverworldChestSpawn;
-
 	}
 }

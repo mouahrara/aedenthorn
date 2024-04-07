@@ -27,7 +27,7 @@ namespace OverworldChests
 			{"Pants", 0},
 			{"Hat", 0},
 			{"Boots", 100},
-			{"BigCraftable", 100},
+			{"BigCraftable", 50},
 			{"Ring", 100},
 			{"Seed", 100},
 			{"Mineral", 100},
