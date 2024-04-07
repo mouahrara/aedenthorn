@@ -2,6 +2,13 @@
 
 # Global release notes
 
+## 7 April 2024
+* Released Advanced Loot Framework version [0.4.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AdvancedLootFramework/release-notes.md#042-unofficial1-mouahrara)
+* Released Cooperative Egg Hunt version [0.1.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CooperativeEggHunt/release-notes.md#011-unofficial2-mouahrara)
+* Released Fishing Chests Expanded version [0.4.3-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/FishingChestsExpanded/release-notes.md#043-unofficial1-mouahrara)
+* Released Overworld Chests version [0.5.4-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/OverworldChests/release-notes.md#054-unofficial1-mouahrara)
+* Released Treasure Chests Expanded version [0.3.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/TreasureChestsExpanded/release-notes.md#031-unofficial1-mouahrara)
+
 ## 4 April 2024
 * Released Bulk Animal Purchase version [0.2.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BulkAnimalPurchase/release-notes.md#022-unofficial1-mouahrara)
 * Released Catalogue Filter version [0.2.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CatalogueFilter/release-notes.md#021-unofficial1-mouahrara)

@@ -22,6 +22,13 @@
 				{ "Version": "0.2.1-unofficial.1-mouahrara" }
 			]
 		},
+		"AdvancedLootFramework": {
+			"Name": "Advanced Loot Framework",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#AdvancedLootFramework",
+			"Versions": [
+				{ "Version": "0.4.2-unofficial.1-mouahrara" }
+			]
+		},
 		"AdvancedMenuPositioning": {
 			"Name": "Advanced Menu Positioning",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#AdvancedMenuPositioning",
@@ -138,7 +145,7 @@
 			"Name": "Cooperative Egg Hunt",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#CooperativeEggHunt",
 			"Versions": [
-				{ "Version": "0.1.1-unofficial.1-mouahrara" }
+				{ "Version": "0.1.1-unofficial.2-mouahrara" }
 			]
 		},
 		"CropGrowthInfo": {
@@ -162,11 +169,32 @@
 				{ "Version": "0.9.7-unofficial.1-mouahrara" }
 			]
 		},
+		"FishingChestsExpanded": {
+			"Name": "Fishing Chests Expanded",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#FishingChestsExpanded",
+			"Versions": [
+				{ "Version": "0.4.3-unofficial.1-mouahrara" }
+			]
+		},
 		"LivestockChoices": {
 			"Name": "Livestock Choices",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#LivestockChoices",
 			"Versions": [
 				{ "Version": "0.2.2-unofficial.1-mouahrara" }
+			]
+		},
+		"OverworldChests": {
+			"Name": "Overworld Chests",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#OverworldChests",
+			"Versions": [
+				{ "Version": "0.5.4-unofficial.1-mouahrara" }
+			]
+		},
+		"TreasureChestsExpanded": {
+			"Name": "Treasure Chests Expanded",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#TreasureChestsExpanded",
+			"Versions": [
+				{ "Version": "0.3.1-unofficial.1-mouahrara" }
 			]
 		},
 		"WallPlanters": {
