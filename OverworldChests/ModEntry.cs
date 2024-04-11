@@ -21,6 +21,7 @@ namespace OverworldChests
 		private static IAdvancedLootFrameworkApi advancedLootFrameworkApi = null;
 		private static List<object> treasuresList = new();
 		private static Random myRand;
+		private static int daysSinceLastSpawn;
 		private static readonly Color[] tintColors = new Color[]
 		{
 			Color.DarkGray,
@@ -42,6 +43,7 @@ namespace OverworldChests
 			myRand = new Random();
 
 			helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
+			helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
 			helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
 
 			// Load Harmony patches
@@ -67,6 +69,8 @@ namespace OverworldChests
 
 		private void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
 		{
+			RegisterConsoleCommands();
+
 			advancedLootFrameworkApi = Helper.ModRegistry.GetApi<IAdvancedLootFrameworkApi>("aedenthorn.AdvancedLootFramework");
 			if (advancedLootFrameworkApi != null)
 			{
@@ -116,7 +120,9 @@ namespace OverworldChests
 				mod: ModManifest,
 				name: () => SHelper.Translation.Get("GMCM.RespawnInterval.Name"),
 				getValue: () => Config.RespawnInterval,
-				setValue: value => Config.RespawnInterval = value
+				setValue: value => {
+					Config.RespawnInterval = Math.Max(1, value);
+				}
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
@@ -356,23 +362,25 @@ namespace OverworldChests
 			treasuresList = advancedLootFrameworkApi.LoadPossibleTreasures(Config.ItemListChances.Where(p => p.Value > 0).ToDictionary(s => s.Key, s => s.Value).Keys.ToArray(), Config.MinItemValue, Config.MaxItemValue);
 		}
 
+		private void GameLoop_SaveLoaded(object sender, StardewModdingAPI.Events.SaveLoadedEventArgs e)
+		{
+			RespawnChests();
+			daysSinceLastSpawn = 0;
+		}
+
 		private void GameLoop_DayStarted(object sender, StardewModdingAPI.Events.DayStartedEventArgs e)
 		{
-			var spawn = Helper.Data.ReadSaveData<LastOverWorldChestSpawn>("lastOverworldChestSpawn") ?? new LastOverWorldChestSpawn();
-			int days = Game1.Date.TotalDays - spawn.lastOverworldChestSpawn;
-			Monitor.Log($"Last spawn: {days} days ago");
-
-			if (spawn.lastOverworldChestSpawn < 1 || Game1.Date.TotalDays < 2 || (Config.RespawnInterval > 0 && days >= Config.RespawnInterval))
+			if (daysSinceLastSpawn >= Config.RespawnInterval)
 			{
-				Monitor.Log($"Respawning chests", LogLevel.Debug);
-				spawn.lastOverworldChestSpawn = Game1.Date.TotalDays;
-				Helper.Data.WriteSaveData("lastOverworldChestSpawn", spawn);
 				RespawnChests();
+				daysSinceLastSpawn = 0;
 			}
+			daysSinceLastSpawn++;
 		}
 
 		private void RespawnChests()
 		{
+			Monitor.Log($"Respawning chests", LogLevel.Debug);
 			RemoveChests();
 			SpawnChests();
 		}

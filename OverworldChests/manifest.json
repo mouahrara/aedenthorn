@@ -1,7 +1,7 @@
 ﻿{
 	"Name": "Overworld Chests",
 	"Author": "aedenthorn",
-	"Version": "0.5.4-unofficial.1-mouahrara",
+	"Version": "0.5.4-unofficial.2-mouahrara",
 	"Description": "Spawns random treasure chests throughout the Stardew Valley world every set number of days.",
 	"UniqueID": "aedenthorn.OverworldChests",
 	"EntryDll": "OverworldChests.dll",
