@@ -1,7 +1,4 @@
-﻿using StardewModdingAPI;
-using StardewModdingAPI.Utilities;
-
-namespace CropsSurviveSeasonChange
+﻿namespace CropsSurviveSeasonChange
 {
 	public class ModConfig
 	{

@@ -1,19 +1,19 @@
-﻿using HarmonyLib;
+﻿using System;
+using HarmonyLib;
 using StardewModdingAPI;
+using StardewValley;
+using StardewValley.TerrainFeatures;
 
 namespace CropsSurviveSeasonChange
 {
 	/// <summary>The mod entry point.</summary>
 	public partial class ModEntry : Mod
 	{
+		internal static IMonitor SMonitor;
+		internal static IModHelper SHelper;
+		internal static ModConfig Config;
 
-		public static IMonitor SMonitor;
-		public static IModHelper SHelper;
-		public static ModConfig Config;
-
-		public static ModEntry context;
-
-
+		internal static ModEntry context;
 
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
 		/// <param name="helper">Provides simplified APIs for writing mods.</param>
@@ -28,8 +28,25 @@ namespace CropsSurviveSeasonChange
 
 			Helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
 
-			var harmony = new Harmony(ModManifest.UniqueID);
-			harmony.PatchAll();
+			// Load Harmony patches
+			try
+			{
+				Harmony harmony = new(ModManifest.UniqueID);
+
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Crop), nameof(Crop.newDay)),
+					transpiler: new HarmonyMethod(typeof(Crop_newDay_Patch), nameof(Crop_newDay_Patch.Transpiler))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(HoeDirt), nameof(HoeDirt.dayUpdate)),
+					transpiler: new HarmonyMethod(typeof(HoeDirt_dayUpdate_Patch), nameof(HoeDirt_dayUpdate_Patch.Transpiler))
+				);
+			}
+			catch (Exception e)
+			{
+				Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
+				return;
+			}
 		}
 		public void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
 		{
@@ -50,21 +67,18 @@ namespace CropsSurviveSeasonChange
 					getValue: () => Config.ModEnabled,
 					setValue: value => Config.ModEnabled = value
 				);
-
 				configMenu.AddBoolOption(
 					mod: ModManifest,
 					name: () => SHelper.Translation.Get("GMCM_Option_IncludeRegrowables_Name"),
 					getValue: () => Config.IncludeRegrowables,
 					setValue: value => Config.IncludeRegrowables = value
 				);
-
 				configMenu.AddBoolOption(
 					mod: ModManifest,
 					name: () => SHelper.Translation.Get("GMCM_Option_IncludeWinter_Name"),
 					getValue: () => Config.IncludeWinter,
 					setValue: value => Config.IncludeWinter = value
 				);
-				
 			}
 		}
 	}
