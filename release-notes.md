@@ -2,6 +2,12 @@
 
 # Global release notes
 
+## 11 April 2024
+* Released Crop Hat version [0.1.4-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CropHat/release-notes.md#014-unofficial1-mouahrara)
+* Released Crop Markers version [0.2.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CropMarkers/release-notes.md#021-unofficial1-mouahrara)
+* Released Crops Survive Season Change version [0.1.3-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CropsSurviveSeasonChange/release-notes.md#013-unofficial1-mouahrara)
+* Released Overworld Chests version [0.5.4-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/OverworldChests/release-notes.md#054-unofficial2-mouahrara)
+
 ## 7 April 2024
 * Released Advanced Loot Framework version [0.4.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AdvancedLootFramework/release-notes.md#042-unofficial1-mouahrara)
 * Released Cooperative Egg Hunt version [0.1.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CooperativeEggHunt/release-notes.md#011-unofficial2-mouahrara)

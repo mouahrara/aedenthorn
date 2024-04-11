@@ -162,6 +162,27 @@
 				{ "Version": "0.3.1-unofficial.1-mouahrara" }
 			]
 		},
+		"CropHat": {
+			"Name": "Crop Hat",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#CropHat",
+			"Versions": [
+				{ "Version": "0.1.4-unofficial.1-mouahrara" }
+			]
+		},
+		"CropMarkers": {
+			"Name": "Crop Markers",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#CropMarkers",
+			"Versions": [
+				{ "Version": "0.2.1-unofficial.1-mouahrara" }
+			]
+		},
+		"CropsSurviveSeasonChange": {
+			"Name": "Crops Survive Season Change",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#CropsSurviveSeasonChange",
+			"Versions": [
+				{ "Version": "0.1.3-unofficial.1-mouahrara" }
+			]
+		},
 		"DynamicMapTiles": {
 			"Name": "Dynamic Map Tiles",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#DynamicMapTiles",
@@ -187,7 +208,7 @@
 			"Name": "Overworld Chests",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#OverworldChests",
 			"Versions": [
-				{ "Version": "0.5.4-unofficial.1-mouahrara" }
+				{ "Version": "0.5.4-unofficial.2-mouahrara" }
 			]
 		},
 		"TreasureChestsExpanded": {
