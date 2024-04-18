@@ -1,6 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using StardewModdingAPI;
-using System.Collections.Generic;
+﻿using StardewModdingAPI;
 
 namespace GalaxyWeaponChoice
 {
@@ -20,6 +18,5 @@ namespace GalaxyWeaponChoice
 		public int EnvelopeHeight { get; set; } = 192;
 		public int SideWidth { get; set; } = 194;
 		public int GridSpace { get; set; } = 64;
-
 	}
 }
