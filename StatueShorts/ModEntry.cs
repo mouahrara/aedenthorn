@@ -1,27 +1,20 @@
-﻿using HarmonyLib;
-using Microsoft.Xna.Framework;
+﻿using System;
+using HarmonyLib;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
-using StardewValley;
-using StardewValley.Quests;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using Rectangle = Microsoft.Xna.Framework.Rectangle;
+using Object = StardewValley.Object;
 
 namespace StatueShorts
 {
 	/// <summary>The mod entry point.</summary>
 	public partial class ModEntry : Mod
 	{
+		internal static IMonitor SMonitor;
+		internal static IModHelper SHelper;
+		internal static ModConfig Config;
 
-		public static IMonitor SMonitor;
-		public static IModHelper SHelper;
-		public static ModConfig Config;
-
-		public static ModEntry context;
-		public static string modKey = "aedenthorn.StatueShorts";
+		internal static ModEntry context;
+		public const string modKey = "aedenthorn.StatueShorts";
 
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
 		/// <param name="helper">Provides simplified APIs for writing mods.</param>
@@ -35,11 +28,39 @@ namespace StatueShorts
 			SHelper = helper;
 
 			Helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
-			//Helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
 			Helper.Events.Content.AssetRequested += Content_AssetRequested;
 
-			var harmony = new Harmony(ModManifest.UniqueID);
-			harmony.PatchAll();
+			// Load Harmony patches
+			try
+			{
+				Harmony harmony = new(ModManifest.UniqueID);
+
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Object), nameof(Object.draw), new Type[] { typeof(SpriteBatch), typeof(int), typeof(int), typeof(float) }),
+					prefix: new HarmonyMethod(typeof(Object_draw_Patch_1), nameof(Object_draw_Patch_1.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Object), nameof(Object.draw), new Type[] { typeof(SpriteBatch), typeof(int), typeof(int), typeof(float), typeof(float) }),
+					prefix: new HarmonyMethod(typeof(Object_draw_Patch_2), nameof(Object_draw_Patch_2.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Object), nameof(Object.DayUpdate)),
+					prefix: new HarmonyMethod(typeof(Object_DayUpdate_Patch), nameof(Object_DayUpdate_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Object), nameof(Object.checkForAction)),
+					prefix: new HarmonyMethod(typeof(Object_checkForAction_Patch), nameof(Object_checkForAction_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Object), nameof(Object.performRemoveAction)),
+					prefix: new HarmonyMethod(typeof(Object_performRemoveAction_Patch), nameof(Object_performRemoveAction_Patch.Prefix))
+				);
+			}
+			catch (Exception e)
+			{
+				Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
+				return;
+			}
 		}
 
 		private void Content_AssetRequested(object sender, StardewModdingAPI.Events.AssetRequestedEventArgs e)
@@ -53,13 +74,8 @@ namespace StatueShorts
 			}
 		}
 
-		private void GameLoop_SaveLoaded(object sender, StardewModdingAPI.Events.SaveLoadedEventArgs e)
-		{
-		}
-
 		private void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
 		{
-
 			// get Generic Mod Config Menu's API (if it's installed)
 			var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
 			if (configMenu is null)
@@ -74,11 +90,10 @@ namespace StatueShorts
 
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM_Option_ModEnabled_Name"),
+				name: () => SHelper.Translation.Get("GMCM.ModEnabled.Name"),
 				getValue: () => Config.ModEnabled,
 				setValue: value => Config.ModEnabled = value
 			);
-
 		}
 	}
 }
