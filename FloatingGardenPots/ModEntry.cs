@@ -1,28 +1,26 @@
-﻿using HarmonyLib;
+﻿using System;
+using System.Collections.Generic;
+using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
-using StardewValley.Quests;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using Rectangle = Microsoft.Xna.Framework.Rectangle;
+using StardewValley.Objects;
+using Object = StardewValley.Object;
 
 namespace FloatingGardenPots
 {
 	/// <summary>The mod entry point.</summary>
 	public partial class ModEntry : Mod
 	{
+		internal static IMonitor SMonitor;
+		internal static IModHelper SHelper;
+		internal static ModConfig Config;
 
-		public static IMonitor SMonitor;
-		public static IModHelper SHelper;
-		public static ModConfig Config;
+		internal static ModEntry context;
 
-		public static ModEntry context;
-		public static string modKey = "aedenthorn.FloatingGardenPots";
-		public static Dictionary<GameLocation, Dictionary<Vector2, Vector2>> offsetDict = new();
+		public const string modKey = "aedenthorn.FloatingGardenPots";
+		internal static Dictionary<GameLocation, Dictionary<Vector2, Vector2>> offsetDict = new();
 
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
 		/// <param name="helper">Provides simplified APIs for writing mods.</param>
@@ -38,8 +36,33 @@ namespace FloatingGardenPots
 			Helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
 			Helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
 
-			var harmony = new Harmony(ModManifest.UniqueID);
-			harmony.PatchAll();
+			// Load Harmony patches
+			try
+			{
+				Harmony harmony = new(ModManifest.UniqueID);
+
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Object), nameof(Object.canBePlacedHere)),
+					postfix: new HarmonyMethod(typeof(Object_canBePlacedHere_Patch), nameof(Object_canBePlacedHere_Patch.Postfix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(GameLocation), nameof(GameLocation.checkAction)),
+					prefix: new HarmonyMethod(typeof(GameLocation_checkAction_Patch), nameof(GameLocation_checkAction_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(IndoorPot), nameof(IndoorPot.DayUpdate)),
+					postfix: new HarmonyMethod(typeof(IndoorPot_DayUpdate_Patch), nameof(IndoorPot_DayUpdate_Patch.Postfix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(IndoorPot), nameof(IndoorPot.draw), new Type[] { typeof(SpriteBatch), typeof(int), typeof(int), typeof(float) }),
+					prefix: new HarmonyMethod(typeof(IndoorPot_draw_Patch), nameof(IndoorPot_draw_Patch.Prefix))
+				);
+			}
+			catch (Exception e)
+			{
+				Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
+				return;
+			}
 		}
 
 		private void GameLoop_SaveLoaded(object sender, StardewModdingAPI.Events.SaveLoadedEventArgs e)
@@ -49,7 +72,6 @@ namespace FloatingGardenPots
 
 		private void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
 		{
-
 			// get Generic Mod Config Menu's API (if it's installed)
 			var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
 			if (configMenu is null)
@@ -64,11 +86,10 @@ namespace FloatingGardenPots
 
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM_Option_ModEnabled_Name"),
+				name: () => SHelper.Translation.Get("GMCM.ModEnabled.Name"),
 				getValue: () => Config.ModEnabled,
 				setValue: value => Config.ModEnabled = value
 			);
-
 		}
 	}
 }
