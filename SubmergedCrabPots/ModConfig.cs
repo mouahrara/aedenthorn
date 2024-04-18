@@ -1,6 +1,4 @@
-﻿
-using Microsoft.Xna.Framework;
-using StardewModdingAPI;
+﻿using Microsoft.Xna.Framework;
 
 namespace SubmergedCrabPots
 {
