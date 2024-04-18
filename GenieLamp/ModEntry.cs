@@ -1,9 +1,7 @@
-﻿using HarmonyLib;
-using Microsoft.Xna.Framework;
+﻿using System;
+using HarmonyLib;
 using StardewModdingAPI;
 using StardewValley;
-using StardewValley.ItemTypeDefinitions;
-using StardewValley.Objects;
 using Object = StardewValley.Object;
 
 namespace GenieLamp
@@ -11,15 +9,13 @@ namespace GenieLamp
 	/// <summary>The mod entry point.</summary>
 	public partial class ModEntry : Mod
 	{
+		internal static IMonitor SMonitor;
+		internal static IModHelper SHelper;
+		internal static ModConfig Config;
 
-		public static IMonitor SMonitor;
-		public static IModHelper SHelper;
-		public static ModConfig Config;
+		internal static ModEntry context;
 
-		public static ModEntry context;
-
-		public static string modKey = "aedenthorn.GenieLamp";
-
+		public const string modKey = "aedenthorn.GenieLamp";
 
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
 		/// <param name="helper">Provides simplified APIs for writing mods.</param>
@@ -35,9 +31,21 @@ namespace GenieLamp
 			helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
 			helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
 
-			var harmony = new Harmony(ModManifest.UniqueID);
-			harmony.PatchAll();
+			// Load Harmony patches
+			try
+			{
+				Harmony harmony = new(ModManifest.UniqueID);
 
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Object), nameof(Object.performUseAction)),
+					prefix: new HarmonyMethod(typeof(Object_performUseAction_Patch), nameof(Object_performUseAction_Patch.Prefix))
+				);
+			}
+			catch (Exception e)
+			{
+				Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
+				return;
+			}
 		}
 
 		private void GameLoop_DayStarted(object sender, StardewModdingAPI.Events.DayStartedEventArgs e)
@@ -47,12 +55,10 @@ namespace GenieLamp
 
 		private void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
 		{
-
 			// get Generic Mod Config Menu's API (if it's installed)
 			var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
 			if (configMenu is not null)
 			{
-
 				// register mod
 				configMenu.Register(
 					mod: ModManifest,
@@ -62,38 +68,34 @@ namespace GenieLamp
 
 				configMenu.AddBoolOption(
 					mod: ModManifest,
-					name: () => Helper.Translation.Get("GMCM_Option_ModEnabled_Name"),
+					name: () => Helper.Translation.Get("GMCM.ModEnabled.Name"),
 					getValue: () => Config.ModEnabled,
 					setValue: value => Config.ModEnabled = value
 				);
-				
 				configMenu.AddTextOption(
 					mod: ModManifest,
-					name: () => Helper.Translation.Get("GMCM_Option_LampItem_Name"),
+					name: () => Helper.Translation.Get("GMCM.LampItem.Name"),
 					getValue: () => Config.LampItem,
 					setValue: value => Config.LampItem = value
 				);
-
 				configMenu.AddNumberOption(
 					mod: ModManifest,
-					name: () => Helper.Translation.Get("GMCM_Option_WishesPerItem_Name"),
+					name: () => Helper.Translation.Get("GMCM.WishesPerItem.Name"),
 					getValue: () => Config.WishesPerItem,
 					setValue: value => Config.WishesPerItem = value
 				);
-
 				configMenu.AddTextOption(
 					mod: ModManifest,
-					name: () => Helper.Translation.Get("GMCM_Option_MenuSound_Name"),
+					name: () => Helper.Translation.Get("GMCM.MenuSound.Name"),
 					getValue: () => Config.MenuSound,
 					setValue: value => Config.MenuSound = value
 				);
 				configMenu.AddTextOption(
 					mod: ModManifest,
-					name: () => Helper.Translation.Get("GMCM_Option_WishSound_Name"),
+					name: () => Helper.Translation.Get("GMCM.WishSound.Name"),
 					getValue: () => Config.WishSound,
 					setValue: value => Config.WishSound = value
 				);
-
 			}
 		}
 	}

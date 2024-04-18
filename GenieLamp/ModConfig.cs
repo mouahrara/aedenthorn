@@ -1,7 +1,4 @@
-﻿using StardewModdingAPI;
-using StardewModdingAPI.Utilities;
-
-namespace GenieLamp
+﻿namespace GenieLamp
 {
 	public class ModConfig
 	{
