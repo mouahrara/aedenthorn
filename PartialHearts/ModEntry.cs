@@ -1,18 +1,18 @@
-﻿using HarmonyLib;
+﻿using System;
+using HarmonyLib;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
-using System;
+using StardewValley.Menus;
 
 namespace PartialHearts
 {
 	/// <summary>The mod entry point.</summary>
 	public partial class ModEntry : Mod
 	{
-
-		public static IMonitor SMonitor;
-		public static IModHelper SHelper;
-		public static ModConfig Config;
-		public static ModEntry context;
+		internal static IMonitor SMonitor;
+		internal static IModHelper SHelper;
+		internal static ModConfig Config;
+		internal static ModEntry context;
 		private static Texture2D heartTexture;
 		private static Harmony harmony;
 
@@ -29,10 +29,23 @@ namespace PartialHearts
 
 			Helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
 
-			heartTexture = Helper.Content.Load<Texture2D>("assets/heart.png");
+			harmony = new(ModManifest.UniqueID);
 
-			harmony = new Harmony(ModManifest.UniqueID);
-			harmony.PatchAll();
+			// Load Harmony patches
+			try
+			{
+				harmony.Patch(
+					original: AccessTools.Method(typeof(SocialPage), "drawNPCSlot"),
+					postfix: new HarmonyMethod(typeof(SocialPage_drawNPCSlot_Patch), nameof(SocialPage_drawNPCSlot_Patch.Postfix))
+				);
+			}
+			catch (Exception e)
+			{
+				Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
+				return;
+			}
+
+			heartTexture = Helper.ModContent.Load<Texture2D>("assets/heart.png");
 		}
 
 		public void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
@@ -43,8 +56,8 @@ namespace PartialHearts
 				{
 					Monitor.Log($"patching CJBok.CheatsMenu");
 					harmony.Patch(
-					   original: AccessTools.Method(Type.GetType("CJBCheatsMenu.Framework.Components.CheatsOptionsNpcSlider, CJBCheatsMenu"), "draw"),
-					   postfix: new HarmonyMethod(typeof(ModEntry), nameof(ModEntry.CheatsOptionsNpcSlider_draw_Postfix))
+						original: AccessTools.Method(Type.GetType("CJBCheatsMenu.Framework.Components.CheatsOptionsNpcSlider, CJBCheatsMenu"), "draw"),
+						postfix: new HarmonyMethod(typeof(CheatsOptionsNpcSlider_draw_Patch), nameof(CheatsOptionsNpcSlider_draw_Patch.Postfix))
 					);
 				}
 				catch
@@ -66,18 +79,17 @@ namespace PartialHearts
 
 				configMenu.AddBoolOption(
 					mod: ModManifest,
-					name: () => "Mod Enabled?",
+					name: () => SHelper.Translation.Get("GMCM.ModEnabled.Name"),
 					getValue: () => Config.EnableMod,
 					setValue: value => Config.EnableMod = value
 				);
-				
 				configMenu.AddBoolOption(
 					mod: ModManifest,
-					name: () => "Granular?",
+					name: () => SHelper.Translation.Get("GMCM.Granular.Name"),
+					tooltip: () => SHelper.Translation.Get("GMCM.Granular.Tooltip"),
 					getValue: () => Config.Granular,
 					setValue: value => Config.Granular = value
 				);
-
 			}
 		}
 	}

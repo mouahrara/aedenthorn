@@ -1,7 +1,4 @@
-﻿
-using StardewModdingAPI;
-
-namespace PartialHearts
+﻿namespace PartialHearts
 {
 	public class ModConfig
 	{
