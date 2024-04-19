@@ -2,6 +2,15 @@
 
 # Global release notes
 
+## 19 April 2024
+* Released Crop Watering Bubbles version [0.2.5-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CropWateringBubbles/release-notes.md#025-unofficial1-mouahrara)
+* Released Floating Garden Pots version [0.1.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/FloatingGardenPots/release-notes.md#011-unofficial1-mouahrara)
+* Released Galaxy Weapon Choice version [0.1.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/GalaxyWeaponChoice/release-notes.md#011-unofficial1-mouahrara)
+* Released Genie Lamp version [0.1.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/GenieLamp/release-notes.md#012-unofficial1-mouahrara)
+* Released Partial Hearts version [0.2.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/PartialHearts/release-notes.md#022-unofficial1-mouahrara)
+* Released Statue Shorts version [0.1.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/StatueShorts/release-notes.md#011-unofficial1-mouahrara)
+* Released Submerged Crab Pots version [0.2.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/SubmergedCrabPots/release-notes.md#022-unofficial1-mouahrara)
+
 ## 11 April 2024
 * Released Crop Hat version [0.1.4-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CropHat/release-notes.md#014-unofficial1-mouahrara)
 * Released Crop Markers version [0.2.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CropMarkers/release-notes.md#021-unofficial1-mouahrara)
