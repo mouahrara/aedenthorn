@@ -19,7 +19,7 @@
 			"Name": "Advanced Flute Blocks",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#AdvancedFluteBlocks",
 			"Versions": [
-				{ "Version": "0.2.1-unofficial.1-mouahrara" }
+				{ "Version": "0.2.1-unofficial.2-mouahrara" }
 			]
 		},
 		"AdvancedLootFramework": {
@@ -55,6 +55,13 @@
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#AllChestsMenu",
 			"Versions": [
 				{ "Version": "0.3.2-unofficial.2-mouahrara" }
+			]
+		},
+		"AnimatedParrotAndPerch": {
+			"Name": "Animated Parrot and Perch",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#AnimatedParrotAndPerch",
+			"Versions": [
+				{ "Version": "0.1.1-unofficial.1-mouahrara" }
 			]
 		},
 		"BatForm": {
@@ -173,7 +180,7 @@
 			"Name": "Crop Markers",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#CropMarkers",
 			"Versions": [
-				{ "Version": "0.2.1-unofficial.1-mouahrara" }
+				{ "Version": "0.2.1-unofficial.2-mouahrara" }
 			]
 		},
 		"CropsSurviveSeasonChange": {

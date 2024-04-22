@@ -2,6 +2,11 @@
 
 # Global release notes
 
+## 22 April 2024
+* Released Advanced Flute Blocks version [0.2.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AdvancedFluteBlocks/release-notes.md#021-unofficial2-mouahrara)
+* Released Animated Parrot and Perch version [0.1.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AnimatedParrotAndPerch/release-notes.md#011-unofficial1-mouahrara)
+* Released Crop Markers version [0.2.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CropMarkers/release-notes.md#021-unofficial2-mouahrara)
+
 ## 19 April 2024
 * Released Crop Watering Bubbles version [0.2.5-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CropWateringBubbles/release-notes.md#025-unofficial1-mouahrara)
 * Released Floating Garden Pots version [0.1.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/FloatingGardenPots/release-notes.md#011-unofficial1-mouahrara)
