@@ -1,8 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
-using StardewValley;
 using StardewValley.BellsAndWhistles;
 
-namespace ParrotPerch
+namespace AnimatedParrotAndPerch
 {
 	internal class PerchParrot : EmilysParrot
 	{

@@ -1,25 +1,25 @@
-﻿using Harmony;
-using Microsoft.Xna.Framework;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using HarmonyLib;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+using StardewValley.GameData.BigCraftables;
 using Object = StardewValley.Object;
 
-namespace ParrotPerch
+namespace AnimatedParrotAndPerch
 {
-	public class ModEntry : Mod
+	public partial class ModEntry : Mod
 	{
-		public static ModEntry context;
+		internal static ModEntry context;
 
-		public static ModConfig Config;
-		public static IJsonAssetsApi JsonAssets = null;
-		private static Vector2 parrotOffset = new Vector2(4, -26) * 4;
+		internal static ModConfig Config;
+		internal static IMonitor SMonitor;
+		internal static IModHelper SHelper;
 		private static IAdvancedLootFrameworkApi advancedLootFrameworkApi = null;
-		private static List<object> giftList = new List<object>();
-		private static Dictionary<string, int> possibleGifts = new Dictionary<string, int>()
+		private static List<object> giftList = new();
+		private static readonly Dictionary<string, int> possibleGifts = new()
 		{
 			{ "Seed", 100 },
 			{ "BasicObject", 50 },
@@ -27,7 +27,12 @@ namespace ParrotPerch
 			{ "Cooking", 20 },
 			{ "Relic", 5 }
 		};
-		private static int[] fertilizers = new int[] { 368, 369, 919 };
+		private static readonly string[] fertilizers = new string[]
+		{
+			"368",
+			"369",
+			"919"
+		};
 
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
 		/// <param name="helper">Provides simplified APIs for writing mods.</param>
@@ -35,28 +40,82 @@ namespace ParrotPerch
 		{
 			context = this;
 			Config = Helper.ReadConfig<ModConfig>();
-			if (!Config.EnableMod)
-				return;
+
+			SMonitor = Monitor;
+			SHelper = Helper;
+
 			helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
 			helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
 			helper.Events.Player.Warped += Player_Warped;
+			helper.Events.Content.AssetRequested += Content_AssetRequested;
 
-			var harmony = HarmonyInstance.Create(ModManifest.UniqueID);
+			// Load Harmony patches
+			try
+			{
+				Harmony harmony = new(ModManifest.UniqueID);
 
-			harmony.Patch(
-			   original: AccessTools.Method(typeof(Object), nameof(Object.placementAction)),
-			   postfix: new HarmonyMethod(typeof(ModEntry), nameof(placementAction_Postfix))
-			);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Object), nameof(Object.placementAction)),
+					postfix: new HarmonyMethod(typeof(Object_placementAction_Patch), nameof(Object_placementAction_Patch.Postfix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Object), nameof(Object.performRemoveAction)),
+					postfix: new HarmonyMethod(typeof(Object_performRemoveAction_Patch), nameof(Object_performRemoveAction_Patch.Postfix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Object), nameof(Object.checkForAction)),
+					prefix: new HarmonyMethod(typeof(Object_checkForAction_Patch), nameof(Object_checkForAction_Patch.Prefix))
+				);
+			}
+			catch (Exception e)
+			{
+				Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
+				return;
+			}
+		}
 
-			harmony.Patch(
-			   original: AccessTools.Method(typeof(Object), nameof(Object.performRemoveAction)),
-			   postfix: new HarmonyMethod(typeof(ModEntry), nameof(performRemoveAction_Postfix))
-			);
-			harmony.Patch(
-			   original: AccessTools.Method(typeof(Object), nameof(Object.checkForAction)),
-			   prefix: new HarmonyMethod(typeof(ModEntry), nameof(checkForAction_Prefix))
-			);
+		private void Content_AssetRequested(object sender, AssetRequestedEventArgs e)
+		{
+			if (e.Name.IsEquivalentTo("Data/CraftingRecipes"))
+			{
+				e.Edit(asset =>
+				{
+					IDictionary<string, string> data = asset.AsDictionary<string, string>().Data;
 
+					data.Add("aedenthorn.AnimatedParrotAndPerch_JungleParrotPerch", "388 20 771 20/Home/aedenthorn.AnimatedParrotAndPerch_JungleParrotPerch/true/default/");
+					data.Add("aedenthorn.AnimatedParrotAndPerch_StoneParrotPerch", "390 20/Home/aedenthorn.AnimatedParrotAndPerch_StoneParrotPerch/true/default/");
+					data.Add("aedenthorn.AnimatedParrotAndPerch_WoodenParrotPerch", "388 20/Home/aedenthorn.AnimatedParrotAndPerch_WoodenParrotPerch/true/default/");
+				});
+			}
+			if (e.Name.IsEquivalentTo("Data/BigCraftables"))
+			{
+				e.Edit(asset =>
+				{
+					IDictionary<string, BigCraftableData> data = asset.AsDictionary<string, BigCraftableData>().Data;
+
+					data.Add("aedenthorn.AnimatedParrotAndPerch_JungleParrotPerch", new BigCraftableData()
+					{
+						Name = "Jungle Parrot Perch",
+						DisplayName = "[aedenthorn.AnimatedParrotAndPerch_i18n item.jungle-parrot-perch.name]",
+						Description = "[aedenthorn.AnimatedParrotAndPerch_i18n item.jungle-parrot-perch.description]",
+						Texture = SHelper.ModContent.GetInternalAssetName("assets/jungleParrotPerch").Name,
+					});
+					data.Add("aedenthorn.AnimatedParrotAndPerch_StoneParrotPerch", new BigCraftableData()
+					{
+						Name = "Stone Parrot Perch",
+						DisplayName = "[aedenthorn.AnimatedParrotAndPerch_i18n item.stone-parrot-perch.name]",
+						Description = "[aedenthorn.AnimatedParrotAndPerch_i18n item.stone-parrot-perch.description]",
+						Texture = SHelper.ModContent.GetInternalAssetName("assets/stoneParrotPerch").Name,
+					});
+					data.Add("aedenthorn.AnimatedParrotAndPerch_WoodenParrotPerch", new BigCraftableData()
+					{
+						Name = "Wooden Parrot Perch",
+						DisplayName = "[aedenthorn.AnimatedParrotAndPerch_i18n item.wooden-parrot-perch.name]",
+						Description = "[aedenthorn.AnimatedParrotAndPerch_i18n item.wooden-parrot-perch.description]",
+						Texture = SHelper.ModContent.GetInternalAssetName("assets/woodenParrotPerch").Name,
+					});
+				});
+			}
 		}
 
 		private void GameLoop_DayStarted(object sender, DayStartedEventArgs e)
@@ -66,15 +125,7 @@ namespace ParrotPerch
 
 		public void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
 		{
-			JsonAssets = Helper.ModRegistry.GetApi<IJsonAssetsApi>("spacechase0.JsonAssets");
-			if (JsonAssets == null)
-			{
-				Monitor.Log("Can't load Json Assets API for Parrot Perch");
-			}
-			else
-			{
-				JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, "json-assets"));
-			}
+			TokensUtility.Register();
 			advancedLootFrameworkApi = context.Helper.ModRegistry.GetApi<IAdvancedLootFrameworkApi>("aedenthorn.AdvancedLootFramework");
 			if (advancedLootFrameworkApi != null)
 			{
@@ -83,80 +134,33 @@ namespace ParrotPerch
 				Monitor.Log($"Got {giftList.Count} possible treasures");
 			}
 
+			// get Generic Mod Config Menu's API (if it's installed)
+			var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+			if (configMenu is null)
+				return;
+
+			// register mod
+			configMenu.Register(
+				mod: ModManifest,
+				reset: () => Config = new ModConfig(),
+				save: () => Helper.WriteConfig(Config)
+			);
+
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.DropGiftChance.Name"),
+				tooltip: () => SHelper.Translation.Get("GMCM.DropGiftChance.Tooltip"),
+				getValue: () => Config.DropGiftChance * 100,
+				setValue: value => Config.DropGiftChance = value / 100,
+				min: 0,
+				max: 100,
+				interval: 1
+			);
 		}
 
 		private void Player_Warped(object sender, WarpedEventArgs e)
 		{
 			ShowParrots(e.NewLocation);
 		}
-
-		private static void placementAction_Postfix(Object __instance, GameLocation location)
-		{
-			if(__instance.bigCraftable && IsPerch(__instance))
-			{
-				ShowParrots(location);
-			}
-		}
-		private static void performRemoveAction_Postfix(Object __instance, GameLocation environment)
-		{
-			if (__instance.bigCraftable && IsPerch(__instance))
-			{
-				Game1.playSound("parrot");
-				ShowParrots(environment, __instance);
-			}
-		}
-		private static void checkForAction_Prefix(Object __instance, Farmer who, bool justCheckingForActivity)
-		{
-			if (__instance.bigCraftable && IsPerch(__instance) && !justCheckingForActivity)
-			{
-				var sprite = who.currentLocation.temporarySprites.FirstOrDefault(s => s is PerchParrot && (s as PerchParrot).tile == __instance.tileLocation.Value);
-				if(sprite is PerchParrot)
-				{
-					context.Monitor.Log($"Animating perch parrot for tile {__instance.TileLocation}");
-					(sprite as PerchParrot).doAction();
-					if(who.CurrentItem is Object && (who.CurrentItem as Object).type.Value.Contains("Seed"))
-					{
-						if (Game1.random.NextDouble() < Config.DropGiftChance)
-						{
-							if (advancedLootFrameworkApi != null)
-								who.currentLocation.debris.Add(new Debris(GetRandomParrotGift(who.CurrentItem as Object), __instance.tileLocation.Value * 64f + new Vector2(32f, -32f)));
-							else
-							{
-								Object obj = new Object(fertilizers[Game1.random.Next(fertilizers.Length)], 1);
-							}
-						}
-						context.Monitor.Log($"giving seed to {__instance.TileLocation}");
-						who.CurrentItem.Stack--;
-					}
-				}
-			}
-		}
-
-		private static bool IsPerch(Object obj)
-		{
-			return obj.name.EndsWith("Parrot Perch");
-		}
-
-		private static Item GetRandomParrotGift(Object obj)
-		{
-			return advancedLootFrameworkApi.GetChestItems(giftList, possibleGifts, 1, 1, 100, obj.Price > 0 ? obj.Price : 1, 0.2f, 100)[0];
-		}
-
-		private static void ShowParrots(GameLocation location, Object excluded = null)
-		{
-			if (JsonAssets == null)
-				return;
-			//context.Monitor.Log($"Showing perch parrots for {location.Name}");
-			location.temporarySprites.RemoveAll((s) => s is PerchParrot);
-			foreach (KeyValuePair<Vector2, Object> kvp in location.objects.Pairs)
-			{
-				if (IsPerch(kvp.Value) && kvp.Value != excluded)
-				{
-					context.Monitor.Log($"Showing parrot for tile {kvp.Key}");
-					location.temporarySprites.Add(new PerchParrot(kvp.Key * 64 + parrotOffset, kvp.Value.tileLocation));
-				}
-			}
-		}
-
 	}
 }

@@ -1,26 +1,13 @@
 ﻿{
 	"Name": "Animated Parrot and Perch",
 	"Author": "aedenthorn",
-	"Version": "0.1.0",
-	"Description": "Adds three parrot perches and an animated parrot.",
-	"UniqueID": "aedenthorn.ParrotPerch",
-	"EntryDll": "ParrotPerch.dll",
-	"MinimumApiVersion": "3.8.0",
-	"UpdateKeys": ["Nexus:7960"],
-	"ModUpdater": {
-		"Repository": "StardewValleyMods",
-		"User": "aedenthorn",
-		"Directory": "_releases",
-		"ModFolder": "ParrotPerch"
-	},
-	"Dependencies": [
-			{
-				"UniqueID": "Platonymous.ModUpdater",
-				"IsRequired": false
-			},
-			{
-			"UniqueID": "spacechase0.JsonAssets",
-				"IsRequired": true
-			},
+	"Version": "0.1.1-unofficial.1-mouahrara",
+	"Description": "Adds three craftable parrot perches with an animated interactive parrot.",
+	"UniqueID": "aedenthorn.AnimatedParrotAndPerch",
+	"EntryDll": "AnimatedParrotAndPerch.dll",
+	"MinimumApiVersion": "4.0.0",
+	"UpdateKeys": [
+		"Nexus:7960",
+		"UpdateManifest:https://raw.githubusercontent.com/mouahrara/aedenthorn/master/update-manifest.json@AnimatedParrotAndPerch"
 	]
 }
