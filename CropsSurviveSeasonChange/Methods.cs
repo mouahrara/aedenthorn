@@ -1,4 +1,5 @@
 ﻿using StardewValley;
+using StardewValley.GameData.Crops;
 using StardewValley.TerrainFeatures;
 
 namespace CropsSurviveSeasonChange
@@ -12,7 +13,9 @@ namespace CropsSurviveSeasonChange
 
 		private static bool ShouldKillCrop(bool outdoors, Crop crop, GameLocation environment)
 		{
-			if (!Config.ModEnabled || crop.forageCrop.Value || crop.dead.Value || (!Config.IncludeRegrowables && crop.GetData().RegrowDays != -1) || (environment.GetSeason() == Season.Winter && !Config.IncludeWinter))
+			CropData cropData = crop.GetData();
+
+			if (!Config.ModEnabled || crop.forageCrop.Value || crop.dead.Value || (!Config.IncludeRegrowables && cropData is not null && cropData.RegrowDays != -1) || (environment.GetSeason() == Season.Winter && !Config.IncludeWinter))
 			{
 				return outdoors;
 			}
