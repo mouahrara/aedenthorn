@@ -2,6 +2,11 @@
 
 # Global release notes
 
+## 28 April 2024
+* Released Buff Framework version [0.6.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BuffFramework/release-notes.md#061-unofficial2-mouahrara)
+* Released Crops Survive Season Change version [0.1.3-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CropsSurviveSeasonChange/release-notes.md#013-unofficial2-mouahrara)
+* Released Napalm Mummies version [0.1.4-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/NapalmMummies/release-notes.md#014-unofficial1-mouahrara)
+
 ## 22 April 2024
 * Released Advanced Flute Blocks version [0.2.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AdvancedFluteBlocks/release-notes.md#021-unofficial2-mouahrara)
 * Released Animated Parrot and Perch version [0.1.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AnimatedParrotAndPerch/release-notes.md#011-unofficial1-mouahrara)
