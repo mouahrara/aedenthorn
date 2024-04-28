@@ -24,7 +24,7 @@ namespace BuffFramework
 			Game1.currentLocation.checkForEvents();
 			if (Game1.eventUp || Game1.isFestival())
 			{
-				if (Game1.eventUp)
+				if (Game1.eventUp && Game1.CurrentEvent is not null)
 				{
 					Game1.CurrentEvent.onEventFinished += HandleEventAndFestival;
 				}
