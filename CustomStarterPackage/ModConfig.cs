@@ -1,7 +1,4 @@
-﻿using StardewModdingAPI;
-using System.Collections.Generic;
-
-namespace CustomStarterPackage
+﻿namespace CustomStarterPackage
 {
 	public class ModConfig
 	{
