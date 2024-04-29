@@ -1,33 +1,19 @@
-﻿using HarmonyLib;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Newtonsoft.Json;
+﻿using System;
+using HarmonyLib;
 using StardewModdingAPI;
-using StardewValley;
-using StardewValley.Objects;
 using StardewValley.TerrainFeatures;
-using StardewValley.Tools;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Object = StardewValley.Object;
 
 namespace CustomHay
 {
 	/// <summary>The mod entry point.</summary>
 	public partial class ModEntry : Mod
 	{
+		internal static IMonitor SMonitor;
+		internal static IModHelper SHelper;
+		internal static ModConfig Config;
 
-		public static IMonitor SMonitor;
-		public static IModHelper SHelper;
-		public static ModConfig Config;
+		internal static ModEntry context;
 
-		public static ModEntry context;
-
-		//public static string dictPath = "aedenthorn.CustomHay/dictionary";
-		//public static Dictionary<string, CustomHayData> dataDict = new();
-		
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
 		/// <param name="helper">Provides simplified APIs for writing mods.</param>
 		public override void Entry(IModHelper helper)
@@ -43,26 +29,24 @@ namespace CustomHay
 			SHelper = helper;
 
 			helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
-			//helper.Events.Content.AssetRequested += Content_AssetRequested;
 
-			var harmony = new Harmony(ModManifest.UniqueID);
-			harmony.PatchAll();
-
-		}
-		/*
-		private void Content_AssetRequested(object sender, StardewModdingAPI.Events.AssetRequestedEventArgs e)
-		{
-			if (e.NameWithoutLocale.IsEquivalentTo(dictPath))
+			// Load Harmony patches
+			try
 			{
-				e.LoadFrom(() => new Dictionary<string, StarterFurnitureData>(), StardewModdingAPI.Events.AssetLoadPriority.Exclusive);
+				Harmony harmony = new(ModManifest.UniqueID);
+
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Grass), nameof(Grass.TryDropItemsOnCut)),
+					transpiler: new HarmonyMethod(typeof(Grass_TryDropItemsOnCut_Patch), nameof(Grass_TryDropItemsOnCut_Patch.Transpiler))
+				);
+			}
+			catch (Exception e)
+			{
+				Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
+				return;
 			}
 		}
 
-		private void GameLoop_SaveLoaded(object sender, StardewModdingAPI.Events.SaveLoadedEventArgs e)
-		{
-			dataDict = Game1.content.Load<Dictionary<string, StarterFurnitureData>>(dictPath);
-		}
-		*/
 		private void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
 		{
 			//MakeHatData();
@@ -81,25 +65,34 @@ namespace CustomHay
 
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_ModEnabled_Name"),
+				name: () => SHelper.Translation.Get("GMCM.ModEnabled.Name"),
 				getValue: () => Config.ModEnabled,
 				setValue: value => Config.ModEnabled = value
 			);
 
 			configMenu.AddNumberOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_OrdinaryHayChance_Name"),
+				name: () => SHelper.Translation.Get("GMCM.OrdinaryHayChance.Name"),
 				getValue: () => Config.OrdinaryHayChance * 100f,
-				setValue: delegate(float value) { Config.OrdinaryHayChance = value / 100f; },
+				setValue: value => Config.OrdinaryHayChance = value / 100f,
 				min: 0f,
 				max: 100f,
 				interval: 1f
 			);
 			configMenu.AddNumberOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_GoldHayChance_Name"),
+				name: () => SHelper.Translation.Get("GMCM.GoldHayChance.Name"),
 				getValue: () => Config.GoldHayChance * 100f,
-				setValue: delegate(float value) { Config.GoldHayChance = value / 100f; },
+				setValue: value => Config.GoldHayChance = value / 100f,
+				min: 0f,
+				max: 100f,
+				interval: 1f
+			);
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.IridiumHayChance.Name"),
+				getValue: () => Config.IridiumHayChance * 100f,
+				setValue: value => Config.IridiumHayChance = value / 100f,
 				min: 0f,
 				max: 100f,
 				interval: 1f
