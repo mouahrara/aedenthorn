@@ -22,6 +22,7 @@ namespace AdvancedMenuPositioning
 			}
 			if (menu is null || adjustedMenus.Contains(menu))
 				return;
+			adjustedMenus.Add(menu);
 			menu.xPositionOnScreen += delta.X;
 			menu.yPositionOnScreen += delta.Y;
 			var types = menu.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static).ToList();
@@ -157,7 +158,6 @@ namespace AdvancedMenuPositioning
 				}
 			}
 			AdjustComponent(menu.upperRightCloseButton, delta);
-			adjustedMenus.Add(menu);
 		}
 
 		private static void AdjustComponent(ClickableComponent c, Point delta)
