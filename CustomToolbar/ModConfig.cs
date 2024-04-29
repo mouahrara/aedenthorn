@@ -1,6 +1,5 @@
 ﻿
 using StardewModdingAPI;
-using StardewModdingAPI.Utilities;
 
 namespace CustomToolbar
 {
@@ -14,9 +13,9 @@ namespace CustomToolbar
 		public string PinnedPosition { get; set; } = "bottom";
 		public int PositionX { get; set; } = -1;
 		public int PositionY { get; set; } = -1;
-		public int MarginX { get; set; } = 64;
-		public int MarginY { get; set; } = 64;
+		public int MarginX { get; set; } = 8;
+		public int MarginY { get; set; } = 8;
 		public int OffsetX { get; set; } = 0;
-		public int OffsetY { get; set; } = 50;
+		public int OffsetY { get; set; } = 0;
 	}
 }
