@@ -33,7 +33,7 @@
 			"Name": "Advanced Menu Positioning",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#AdvancedMenuPositioning",
 			"Versions": [
-				{ "Version": "0.2.1-unofficial.1-mouahrara" }
+				{ "Version": "0.2.1-unofficial.2-mouahrara" }
 			]
 		},
 		"AFKPause": {
@@ -187,7 +187,7 @@
 			"Name": "Crops Survive Season Change",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#CropsSurviveSeasonChange",
 			"Versions": [
-				{ "Version": "0.1.3-unofficial.2-mouahrara" }
+				{ "Version": "0.1.3-unofficial.3-mouahrara" }
 			]
 		},
 		"CropWateringBubbles": {
@@ -195,6 +195,27 @@
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#CropWateringBubbles",
 			"Versions": [
 				{ "Version": "0.2.5-unofficial.1-mouahrara" }
+			]
+		},
+		"CustomHay": {
+			"Name": "Custom Hay",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#CustomHay",
+			"Versions": [
+				{ "Version": "0.1.1-unofficial.1-mouahrara" }
+			]
+		},
+		"CustomStarterPackage": {
+			"Name": "Custom Starter Package",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#CustomStarterPackage",
+			"Versions": [
+				{ "Version": "0.2.1-unofficial.1-mouahrara" }
+			]
+		},
+		"CustomToolbar": {
+			"Name": "Custom Toolbar",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#CustomToolbar",
+			"Versions": [
+				{ "Version": "0.1.2-unofficial.1-mouahrara" }
 			]
 		},
 		"DynamicMapTiles": {
