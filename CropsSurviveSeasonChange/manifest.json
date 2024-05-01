@@ -1,7 +1,7 @@
 ﻿{
 	"Name": "Crops Survive Season Change",
 	"Author": "aedenthorn",
-	"Version": "0.1.3-unofficial.2-mouahrara",
+	"Version": "0.1.3-unofficial.3-mouahrara",
 	"Description": "Lets planted crops survive the change of seasons (except winter, by default) so you don't get punished for calculation mistakes when planting crops.",
 	"UniqueID": "aedenthorn.CropsSurviveSeasonChange",
 	"EntryDll": "CropsSurviveSeasonChange.dll",
