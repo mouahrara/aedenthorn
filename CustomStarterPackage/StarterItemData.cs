@@ -2,6 +2,7 @@
 {
 	public class StarterItemData
 	{
+		public string[] FarmTypes = null;
 		public string NameOrIndex;
 		public string Type = "Object";
 		public int MinAmount = 1;

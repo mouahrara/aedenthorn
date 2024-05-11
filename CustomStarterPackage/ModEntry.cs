@@ -66,13 +66,26 @@ namespace CustomStarterPackage
 			SMonitor.Log($"Loaded {dataDict.Count} items from content patcher");
 			foreach (var o in Game1.player.currentLocation.objects.Pairs)
 			{
-				if (o.Value is Chest && (o.Value as Chest).giftbox.Value && (o.Value as Chest).Items.Count == 1 && (o.Value as Chest).Items[0].ParentSheetIndex == 472 && (o.Value as Chest).Items[0].Stack == 15)
+				if (o.Value is Chest && (o.Value as Chest).giftbox.Value && (o.Value as Chest).Items.Count == 1 && (((o.Value as Chest).Items[0].QualifiedItemId.Equals("(O)472") && (o.Value as Chest).Items[0].Stack == 15) || ((o.Value as Chest).Items[0].QualifiedItemId.Equals("(O)178") && (o.Value as Chest).Items[0].Stack == 15)))
 				{
 					SMonitor.Log($"Found starter chest at {o.Key}; replacing");
 					Inventory items = new();
 
 					foreach (var d in dataDict)
 					{
+						if (d.Value.FarmTypes is not null)
+						{
+							if (d.Value.FarmTypes.All(farmType => farmType.StartsWith('!')))
+							{
+								if (d.Value.FarmTypes.Any(farmType => farmType[1..].Equals(Game1.GetFarmTypeKey())))
+									continue;
+							}
+							else
+							{
+								if (!d.Value.FarmTypes.Contains(Game1.GetFarmTypeKey()))
+									continue;
+							}
+						}
 						if (d.Value.ChancePercent < Game1.random.Next(100))
 							continue;
 						SMonitor.Log($"Adding {d.Key}");
