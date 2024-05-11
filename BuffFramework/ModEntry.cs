@@ -24,21 +24,21 @@ namespace BuffFramework
 		internal const string healthRegenKey = "aedenthorn.BuffFramework.healthRegen";
 		internal const string staminaRegenKey = "aedenthorn.BuffFramework.staminaRegen";
 		internal const string soundKey = "aedenthorn.BuffFramework.sound";
-		internal static PerScreen<Dictionary<string, string>> healthRegenBuffs = new(() => new());
-		internal static PerScreen<Dictionary<string, string>> staminaRegenBuffs = new(() => new());
+		internal static PerScreen<Dictionary<string, string>> healthRegenerationBuffs = new(() => new());
+		internal static PerScreen<Dictionary<string, string>> staminaRegenerationBuffs = new(() => new());
 		internal static PerScreen<Dictionary<string, string>> glowRateBuffs = new(() => new());
 		internal static Dictionary<string, (string, ICue)> soundBuffs = new();
 
-		internal static Dictionary<string, string> HealthRegenBuffs
+		internal static Dictionary<string, string> HealthRegenerationBuffs
 		{
-			get => healthRegenBuffs.Value;
-			set => healthRegenBuffs.Value = value;
+			get => healthRegenerationBuffs.Value;
+			set => healthRegenerationBuffs.Value = value;
 		}
 
-		internal static Dictionary<string, string> StaminaRegenBuffs
+		internal static Dictionary<string, string> StaminaRegenerationBuffs
 		{
-			get => staminaRegenBuffs.Value;
-			set => staminaRegenBuffs.Value = value;
+			get => staminaRegenerationBuffs.Value;
+			set => staminaRegenerationBuffs.Value = value;
 		}
 
 		internal static Dictionary<string, string> GlowRateBuffs
@@ -113,11 +113,11 @@ namespace BuffFramework
 			if(!Config.ModEnabled || !Game1.shouldTimePass())
 				return;
 
-			foreach (string healthRegen in HealthRegenBuffs.Values)
+			foreach (string healthRegen in HealthRegenerationBuffs.Values)
 			{
 				Game1.player.health = Math.Clamp(Game1.player.health + GetInt(healthRegen), 0, Game1.player.maxHealth);
 			}
-			foreach (string staminaRegen in StaminaRegenBuffs.Values)
+			foreach (string staminaRegen in StaminaRegenerationBuffs.Values)
 			{
 				Game1.player.Stamina = Math.Clamp(Game1.player.Stamina + GetInt(staminaRegen), 0, Game1.player.MaxStamina);
 			}

@@ -2,6 +2,61 @@
 
 # Release notes
 
+## 0.6.1-unofficial.3-mouahrara
+Released on 12 May, 2024, for SMAPI 4.0.0 or later.
+* Added the following fields:
+  * DisplayName
+  * AdditionalBuffs
+* Added the following aliases:
+  * DisplayName ↔ Name
+  * Description ↔ DisplayDescription
+  * IconSheetIndex ↔ SheetIndex ↔ IconSpriteIndex
+  * IconTexture ↔ TexturePath
+  * Visible ↔ Visibility
+  * MaxStamina ↔ MaxEnergy
+  * StaminaRegeneration ↔ StaminaRegen ↔ EnergyRegeneration ↔ EnergyRegen
+  * Glow ↔ GlowColor
+* Fixed an issue where the buff icon was not displayed for base game buffs 🔧
+* Fixed an issue where if multiple entries specified the same buff with equipment-based conditions, the buff would only apply if all equipment-based conditions from all entries for that specific buff were met 🔧
+
+The new **AdditionalBuffs** field allows you to specify a list of buffs to apply in addition to the current custom buff. It's important to note that you cannot define another custom buff added via the framework as an additional buff. The **duration**, **source**, and **visibility** of buffs added in this way match those of the custom buff in which they are defined. However, you can modify the visibility by explicitly defining the **Visible** field.
+
+For example, the following content pack adds a buff that grants +1 attack and +5 magnetism, while also applying the **Monster Musk** buff (Id: 24) invisibly when the Soul Sapper Ring is equipped:
+
+```json
+{
+	"Format": "2.0.0",
+	"Changes": [
+		{
+			"Action": "EditData",
+			"Target": "aedenthorn.BuffFramework/dictionary",
+			"Entries": {
+				"YourName.YourModName/SoulSapperRing": {
+					"Id": "YourName.YourModName/SoulSapperRing",
+					"Name": "{{i18n:SoulSapperRing.Name}}",
+					"Description": "{{i18n:SoulSapperRing.Description}}",
+					"Source": "TheInternalNameOfYourBuffSource",
+					"DisplaySource": "{{i18n:SoulSapperRing.Source}}",
+					"IconSheetIndex": 14,
+					"Ring": "Soul Sapper Ring",
+					"Attack": "1",
+					"MagneticRadius": "5",
+					"AdditionalBuffs": [
+						{
+							"Id": "24",
+							"Visible": false
+						}
+					],
+					"Sound": "cowboy_powerup"
+				}
+			}
+		}
+	]
+}
+```
+
+It is now **strongly recommended** to use this field if you intend to create a custom buff based on a base game buff to avoid potential conflicts with other mods.
+
 ## 0.6.1-unofficial.2-mouahrara
 Released on 28 April, 2024, for SMAPI 4.0.0 or later.
 * Fixed a minor bug 🔧

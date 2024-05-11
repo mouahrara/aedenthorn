@@ -50,8 +50,8 @@ namespace BuffFramework
 						}
 					};
 				}
-				HealthRegenBuffs.Remove(__instance.id);
-				StaminaRegenBuffs.Remove(__instance.id);
+				HealthRegenerationBuffs.Remove(__instance.id);
+				StaminaRegenerationBuffs.Remove(__instance.id);
 				GlowRateBuffs.Remove(__instance.id);
 				soundBuffs.Remove(__instance.id);
 			}

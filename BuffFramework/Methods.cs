@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json.Linq;
@@ -80,7 +81,7 @@ namespace BuffFramework
 
 				int duration = new Buff(id).millisecondsDuration;
 
-				CreateOrUpdateBuff(who, id, key, value, duration > 0 ? duration : Buff.ENDLESS);
+				CreateOrUpdateBuff(who, id, value, duration > 0 ? duration : Buff.ENDLESS);
 			}
 		}
 
@@ -88,6 +89,9 @@ namespace BuffFramework
 		{
 			if (!Config.ModEnabled)
 				return;
+
+			Dictionary<string, (Dictionary<string, object>, string)> buffsToAdd = new();
+			Dictionary<string, (string, List<string>)> buffsToRemove = new();
 
 			foreach(var kvp in buffDict)
 			{
@@ -163,12 +167,30 @@ namespace BuffFramework
 					isValid = false;
 				if (isValid)
 				{
-					CreateOrUpdateBuff(Game1.player, id, key, value);
+					buffsToAdd[key] = new (value, id);
 				}
-				else
+				buffsToRemove[key] = (id, GetAdditionalBuffsAsTupleList(value)?.Select(t => t.Item1).ToList());
+			}
+			foreach (var kvp in buffsToRemove)
+			{
+				if (!buffsToAdd.ContainsKey(kvp.Key))
 				{
+					string id = kvp.Value.Item1;
+					List<string> additionalBuffsIds = kvp.Value.Item2;
+
 					Game1.player.buffs.Remove(id);
+					if (additionalBuffsIds is not null)
+					{
+						foreach (string additionalBuffsId in additionalBuffsIds)
+						{
+							Game1.player.buffs.Remove(additionalBuffsId);
+						}
+					}
 				}
+			}
+			foreach (var kvp in buffsToAdd)
+			{
+				CreateOrUpdateBuff(Game1.player, kvp.Value.Item2, kvp.Value.Item1);
 			}
 		}
 
@@ -220,7 +242,7 @@ namespace BuffFramework
 				if (consume is not null || hat is not null || shirt is not null || pants is not null || boots is not null || ring is not null)
 					continue;
 
-				CreateOrUpdateBuff(Game1.player, id, key, value);
+				CreateOrUpdateBuff(Game1.player, id, value);
 			}
 		}
 
@@ -254,7 +276,17 @@ namespace BuffFramework
 
 					if (id is null)
 						continue;
+
+					List<string> additionalBuffsIds = GetAdditionalBuffsAsTupleList(value)?.Select(t => t.Item1).ToList();
+
 					Game1.player.buffs.Remove(id);
+					if (additionalBuffsIds is not null)
+					{
+						foreach (string additionalBuffsId in additionalBuffsIds)
+						{
+							Game1.player.buffs.Remove(additionalBuffsId);
+						}
+					}
 				}
 			}
 			ApplyBuffsOnEquip();
@@ -294,28 +326,53 @@ namespace BuffFramework
 				else
 				{
 					buffDict.Remove(key);
-					SMonitor.Log("Which and Id (or BuffId) fields are both missing", LogLevel.Error);
+					SMonitor.Log($"{key}: Which and Id (or BuffId) fields are both missing", LogLevel.Error);
 					return null;
 				}
 			}
 			return id;
 		}
 
-		public static void CreateOrUpdateBuff(Farmer who, string id, string key, Dictionary<string, object> value, int defaultDuration = Buff.ENDLESS)
+		public static void CreateOrUpdateBuff(Farmer who, string id, Dictionary<string, object> value, int defaultDuration = Buff.ENDLESS)
 		{
-			if (who.buffs.IsApplied(id))
+			Buff buff = CreateBuff(id, value, defaultDuration);
+			List<Buff> additionalBuffs = CreateAdditionalBuffs(buff, value);
+
+			if (who.buffs.IsApplied(buff.id))
 			{
-				who.buffs.AppliedBuffs[id].millisecondsDuration = who.buffs.AppliedBuffs[id].totalMillisecondsDuration;
+				who.buffs.AppliedBuffs[buff.id].millisecondsDuration = who.buffs.AppliedBuffs[buff.id].totalMillisecondsDuration;
 			}
 			else
 			{
-				who.buffs.Apply(CreateBuff(id, key, value, defaultDuration));
+				who.buffs.Apply(buff);
+			}
+			if (additionalBuffs is not null)
+			{
+				foreach (Buff additionalBuff in additionalBuffs)
+				{
+					if (who.buffs.IsApplied(additionalBuff.id))
+					{
+						if (additionalBuff.totalMillisecondsDuration == Buff.ENDLESS)
+						{
+							who.buffs.AppliedBuffs[additionalBuff.id].millisecondsDuration = additionalBuff.totalMillisecondsDuration;
+						}
+						else if (who.buffs.AppliedBuffs[additionalBuff.id].totalMillisecondsDuration != Buff.ENDLESS)
+						{
+							who.buffs.AppliedBuffs[additionalBuff.id].millisecondsDuration = Math.Max(additionalBuff.totalMillisecondsDuration, who.buffs.AppliedBuffs[additionalBuff.id].totalMillisecondsDuration);
+						}
+						who.buffs.AppliedBuffs[additionalBuff.id].visible = who.buffs.AppliedBuffs[additionalBuff.id].visible && additionalBuff.visible;
+					}
+					else
+					{
+						who.buffs.Apply(additionalBuff);
+					}
+				}
 			}
 		}
 
-		private static Buff CreateBuff(string id, string key, Dictionary<string, object> value, int defaultDuration = Buff.ENDLESS)
+		private static Buff CreateBuff(string id, Dictionary<string, object> value, int defaultDuration = Buff.ENDLESS)
 		{
-			string texturePath = null;
+			string iconTexture = null;
 			int duration = defaultDuration;
 			int maxDuration = defaultDuration;
 
@@ -324,7 +381,8 @@ namespace BuffFramework
 				switch (p.Key.ToLower())
 				{
 					case "texturepath":
-						texturePath = GetString(p.Value);
+					case "icontexture":
+						iconTexture = GetString(p.Value);
 						break;
 					case "duration":
 						duration = GetInt(p.Value) * 1000;
@@ -343,9 +401,9 @@ namespace BuffFramework
 				totalMillisecondsDuration = millisecondsDuration
 			};
 
-			if (!string.IsNullOrEmpty(texturePath))
+			if (!string.IsNullOrEmpty(iconTexture))
 			{
-				Texture2D texture = SHelper.GameContent.Load<Texture2D>(texturePath);
+				Texture2D texture = SHelper.GameContent.Load<Texture2D>(iconTexture);
 				int textureX = 0;
 				int textureY = 0;
 				int textureWidth = texture.Width;
@@ -373,21 +431,27 @@ namespace BuffFramework
 			}
 			else
 			{
-				buff.iconTexture = ExtractTexture(Game1.mouseCursors, 320, 496, 16, 16);
+				buff.iconTexture ??= ExtractTexture(Game1.mouseCursors, 320, 496, 16, 16);
 			}
 
 			foreach (var p in value)
 			{
 				switch (p.Key.ToLower())
 				{
+					case "iconspriteindex":
 					case "sheetindex":
 					case "iconsheetindex":
 						buff.iconSheetIndex = Math.Max(0, GetInt(p.Value));
-						if (string.IsNullOrEmpty(texturePath))
+						if (string.IsNullOrEmpty(iconTexture))
 						{
 							buff.iconTexture = Game1.buffsIcons;
 						}
 						break;
+					case "name":
+					case "displayname":
+						buff.displayName = GetString(p.Value, true);
+						break;
+					case "displaydescription":
 					case "description":
 						buff.description = GetString(p.Value, true);
 						break;
@@ -397,6 +461,7 @@ namespace BuffFramework
 					case "displaysource":
 						buff.displaySource = GetString(p.Value, true);
 						break;
+					case "visibility":
 					case "visible":
 						buff.visible = GetBool(p.Value);
 						break;
@@ -448,6 +513,7 @@ namespace BuffFramework
 					case "immunity":
 						buff.effects.Immunity.Value = GetFloat(p.Value);
 						break;
+					case "maxenergy":
 					case "maxstamina":
 						buff.effects.MaxStamina.Value = GetFloat(p.Value);
 						break;
@@ -460,6 +526,7 @@ namespace BuffFramework
 					case "speed":
 						buff.effects.Speed.Value = GetFloat(p.Value);
 						break;
+					case "glowcolor":
 					case "glow":
 						if (p.Value is JObject j)
 						{
@@ -477,11 +544,13 @@ namespace BuffFramework
 						break;
 					case "healthregen":
 					case "healthregeneration":
-						HealthRegenBuffs.TryAdd(id, GetIntAsString(p.Value));
+						HealthRegenerationBuffs.TryAdd(id, GetIntAsString(p.Value));
 						break;
+					case "energyregen":
+					case "energyregeneration":
 					case "staminaregen":
 					case "staminaregeneration":
-						StaminaRegenBuffs.TryAdd(id, GetIntAsString(p.Value));
+						StaminaRegenerationBuffs.TryAdd(id, GetIntAsString(p.Value));
 						break;
 					case "glowrate":
 						GlowRateBuffs.TryAdd(id, GetFloatAsString(p.Value));
@@ -492,6 +561,104 @@ namespace BuffFramework
 				}
 			}
 			return buff;
+		}
+
+		public static List<Buff> CreateAdditionalBuffs(Buff buff, Dictionary<string, object> value)
+		{
+			List<(string, bool)> additionalBuffsAsTupleList = GetAdditionalBuffsAsTupleList(buff, value);
+
+			if (additionalBuffsAsTupleList is not null)
+			{
+				List<Buff> additionalBuffs = new();
+
+				foreach ((string id, bool visible) in additionalBuffsAsTupleList)
+				{
+					additionalBuffs.Add(new Buff(id)
+					{
+						millisecondsDuration = buff.millisecondsDuration,
+						totalMillisecondsDuration = buff.totalMillisecondsDuration,
+						visible = visible,
+						source = buff.source,
+						displaySource = buff.displaySource
+					});
+				}
+				return additionalBuffs;
+			}
+			return null;
+		}
+
+		public static List<(string, bool)> GetAdditionalBuffsAsTupleList(Buff buff, Dictionary<string, object> value)
+		{
+			return GetAdditionalBuffsAsTupleList(value, buff.visible);
+		}
+
+		public static List<(string, bool)> GetAdditionalBuffsAsTupleList(Dictionary<string, object> value, bool visibility = true)
+		{
+			foreach (var p in value)
+			{
+				switch (p.Key.ToLower())
+				{
+					case "additionalbuffs":
+						return GetAdditionalBuffsAsTupleListInternal(p.Value, visibility);
+				}
+			}
+
+			static List<(string, bool)> GetAdditionalBuffsAsTupleListInternal(object value, bool defaultVisibility)
+			{
+				List<object> additionalBuffsList = (value as JArray)?.ToObject<List<object>>();
+
+				if (additionalBuffsList is not null)
+				{
+					List<(string, bool)> additionalBuffsAsTupleList = new();
+
+					foreach (object additionalBuff in additionalBuffsList)
+					{
+						Dictionary<string, object> additionalBuffDictionary = (additionalBuff as JObject)?.ToObject<Dictionary<string, object>>();
+
+						if (additionalBuffDictionary is not null)
+						{
+							string which = null;
+							string buffId = null;
+							bool visible = defaultVisibility;
+							string id = null;
+
+							foreach (var p in additionalBuffDictionary)
+							{
+								switch (p.Key.ToLower())
+								{
+									case "which":
+										which = GetIntAsString(p.Value);
+										break;
+									case "id":
+									case "buffid":
+										buffId = GetString(p.Value);
+										break;
+									case "visibility":
+									case "visible":
+										visible = GetBool(p.Value);
+										break;
+								}
+							}
+							if (which is not null && int.Parse(which) >= 0)
+							{
+								id = which;
+							}
+							else if (buffId is not null)
+							{
+								id = buffId;
+							}
+							if (id is not null)
+							{
+								additionalBuffsAsTupleList.Add((id, visible));
+							}
+						}
+					}
+					return additionalBuffsAsTupleList;
+				}
+				return null;
+			}
+
+			return null;
 		}
 
 		public static bool InsensitiveTryGetValue<TKey, TValue>(Dictionary<TKey, TValue> dictionary, TKey key, out TValue value)
@@ -716,8 +883,8 @@ namespace BuffFramework
 		public static void ClearAll()
 		{
 			Game1.player.buffs.Clear();
-			HealthRegenBuffs.Clear();
-			StaminaRegenBuffs.Clear();
+			HealthRegenerationBuffs.Clear();
+			StaminaRegenerationBuffs.Clear();
 			GlowRateBuffs.Clear();
 			soundBuffs.Clear();
 		}
