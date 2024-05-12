@@ -2,6 +2,10 @@
 
 # Global release notes
 
+## 12 May 2024
+* Released Buff Framework version [0.6.1-unofficial.3-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BuffFramework/release-notes.md#061-unofficial3-mouahrara)
+* Released Custom Starter Package version [0.2.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CustomStarterPackage/release-notes.md#021-unofficial2-mouahrara)
+
 ## 1 May 2024
 * Released Advanced Menu Positioning version [0.2.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AdvancedMenuPositioning/release-notes.md#021-unofficial2-mouahrara)
 * Released Crops Survive Season Change version [0.1.3-unofficial.3-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CropsSurviveSeasonChange/release-notes.md#013-unofficial3-mouahrara)
