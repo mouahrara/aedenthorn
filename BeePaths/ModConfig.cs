@@ -10,11 +10,11 @@ namespace BeePaths
 		public int NumberBees { get; set; } = 5;
 		public int BeeRange { get; set; } = 5;
 		public Color BeeColor { get; set; } = new Color(155, 85, 0, 255);
-		public float BeeScale { get; set; } = 4;
-		public float BeeSpeed { get; set; } = 4;
+		public float BeeScale { get; set; } = 4f;
+		public float BeeSpeed { get; set; } = 4f;
 		public int BeeDamage { get; set; } = 4;
 		public int BeeStingChance { get; set; } = 0;
 		public string BeeSound { get; set; } = "flybuzzing";
-		public float MaxSoundDistance { get; set; } = 0;
+		public float MaxSoundDistance { get; set; } = 0f;
 	}
 }
