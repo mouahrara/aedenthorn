@@ -1,22 +1,13 @@
 ﻿{
-	"Name": "April Fools",
+	"Name": "April Bug Fix Suite",
 	"Author": "aedenthorn",
-	"Version": "0.1.6",
-	"Description": "April Fools.",
-	"UniqueID": "aedenthorn.AprilFools",
-	"EntryDll": "AprilFools.dll",
-	"MinimumApiVersion": "3.13.0",
-	"ModUpdater": {
-		"Repository": "StardewValleyMods",
-		"User": "aedenthorn",
-		"Directory": "_releases",
-		"ModFolder": "AprilFools"
-	},
-	"UpdateKeys": [ "Nexus:11496" ],
-	"Dependencies": [
-		{
-			"UniqueID": "Platonymous.ModUpdater",
-			"IsRequired": false
-		}
+	"Version": "0.1.7-unofficial.1-mouahrara",
+	"Description": "Completely routine, yet absolutely critical suite of bug fixes in advance of April, 2022.",
+	"UniqueID": "aedenthorn.AprilBugFixSuite",
+	"EntryDll": "AprilBugFixSuite.dll",
+	"MinimumApiVersion": "4.0.0",
+	"UpdateKeys": [
+		"Nexus:11496",
+		"UpdateManifest:https://raw.githubusercontent.com/mouahrara/aedenthorn/master/update-manifest.json@AprilBugFixSuite"
 	]
 }

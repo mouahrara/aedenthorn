@@ -35,17 +35,17 @@
 	"animal-speech-10-2": "Yeah, the whole alphabet scares me.",
 
 	// GMCM
-	"GMCM_Option_ModEnabled_Name": "Mod Enabled?",
-	"GMCM_Option_OnlyAprilFirst_Name": "Only April 1st?",
-	"GMCM_Option_EnableBees_Name": "Enable Bees?",
-	"GMCM_Option_EnableBackwards_Name": "Enable Backwards?",
-	"GMCM_Option_EnableAscii_Name": "Enable Ascii?",
-	"GMCM_Option_EnablePixelate_Name": "Enable Pixelate?",
-	"GMCM_Option_EnableTreeScreams_Name": "Enable Tree Screams?",
-	"GMCM_Option_EnableInventoryAvoid_Name": "Enable Inventory Avoid?",
-	"GMCM_Option_EnableSlime_Name": "Enable Slime?",
-	"GMCM_Option_EnableRaven_Name": "Enable Raven?",
-	"GMCM_Option_EnableGiants_Name": "Enable Giants?",
-	"GMCM_Option_EnableBuildingSwitch_Name": "Enable Building Switch?",
-	"GMCM_Option_EnableAnimalGreeting_Name": "Enable Animal Greeting?"
+	"GMCM.ModEnabled.Name": "Mod Enabled?",
+	"GMCM.OnlyAprilFirst.Name": "Only April 1st?",
+	"GMCM.EnableBees.Name": "Enable Bees?",
+	"GMCM.EnableBackwards.Name": "Enable Backwards?",
+	"GMCM.EnableAscii.Name": "Enable Ascii?",
+	"GMCM.EnablePixelate.Name": "Enable Pixelate?",
+	"GMCM.EnableTreeScreams.Name": "Enable Tree Screams?",
+	"GMCM.EnableInventoryAvoid.Name": "Enable Inventory Avoid?",
+	"GMCM.EnableSlime.Name": "Enable Slime?",
+	"GMCM.EnableRaven.Name": "Enable Raven?",
+	"GMCM.EnableGiants.Name": "Enable Giants?",
+	"GMCM.EnableBuildingSwitch.Name": "Enable Building Switch?",
+	"GMCM.EnableAnimalGreeting.Name": "Enable Animal Greeting?"
 }

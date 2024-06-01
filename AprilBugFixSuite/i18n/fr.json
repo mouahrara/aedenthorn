@@ -35,17 +35,17 @@
 	"animal-speech-10-2": "Les noisettes.",
 
 	// GMCM
-	"GMCM_Option_ModEnabled_Name": "Activer le Mod",
-	"GMCM_Option_OnlyAprilFirst_Name": "Seulement le 1er avril",
-	"GMCM_Option_EnableBees_Name": "Activer les abeilles",
-	"GMCM_Option_EnableBackwards_Name": "Activer la marche inversée",
-	"GMCM_Option_EnableAscii_Name": "Activer l'ASCII",
-	"GMCM_Option_EnablePixelate_Name": "Activer la pixellisation",
-	"GMCM_Option_EnableTreeScreams_Name": "Activer les cris des arbres",
-	"GMCM_Option_EnableInventoryAvoid_Name": "Activer l'évitement d'inventaire",
-	"GMCM_Option_EnableSlime_Name": "Activer le slime prismatique",
-	"GMCM_Option_EnableRaven_Name": "Activer les corbeaux",
-	"GMCM_Option_EnableGiants_Name": "Activer les géants",
-	"GMCM_Option_EnableBuildingSwitch_Name": "Activer le changement d'emplacement des bâtiments",
-	"GMCM_Option_EnableAnimalGreeting_Name": "Activer les salutations des animaux"
+	"GMCM.ModEnabled.Name": "Activer le Mod",
+	"GMCM.OnlyAprilFirst.Name": "Seulement le 1er avril",
+	"GMCM.EnableBees.Name": "Activer les abeilles",
+	"GMCM.EnableBackwards.Name": "Activer la marche inversée",
+	"GMCM.EnableAscii.Name": "Activer l'ASCII",
+	"GMCM.EnablePixelate.Name": "Activer la pixellisation",
+	"GMCM.EnableTreeScreams.Name": "Activer les cris des arbres",
+	"GMCM.EnableInventoryAvoid.Name": "Activer l'évitement d'inventaire",
+	"GMCM.EnableSlime.Name": "Activer le slime prismatique",
+	"GMCM.EnableRaven.Name": "Activer les corbeaux",
+	"GMCM.EnableGiants.Name": "Activer les géants",
+	"GMCM.EnableBuildingSwitch.Name": "Activer le changement d'emplacement des bâtiments",
+	"GMCM.EnableAnimalGreeting.Name": "Activer les salutations des animaux"
 }

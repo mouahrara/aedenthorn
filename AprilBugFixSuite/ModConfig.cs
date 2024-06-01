@@ -1,7 +1,4 @@
-﻿
-using StardewModdingAPI;
-
-namespace AprilFools
+﻿namespace AprilBugFixSuite
 {
 	public class ModConfig
 	{

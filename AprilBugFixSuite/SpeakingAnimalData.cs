@@ -1,28 +1,26 @@
 ﻿using Microsoft.Xna.Framework;
 using StardewValley;
-using System;
-using System.Collections.Generic;
 
-namespace AprilFools
+namespace AprilBugFixSuite
 {
 	public class SpeakingAnimalData
 	{
-		public float textAboveHeadAlpha;
-		public string textAboveHead;
-		public float textAboveHeadPreTimer;
-		public int textAboveHeadTimer;
-		public int textAboveHeadStyle;
-		public int textAboveHeadColor;
+		public float atextAboveHeadAlpha;
+		public string atextAboveHead;
+		public float atextAboveHeadPreTimer;
+		public int atextAboveHeadTimer;
+		public int atextAboveHeadStyle;
+		public Color atextAboveHeadColor;
 		public float bTextAboveHeadAlpha;
 		public string bTextAboveHead;
 		public float bTextAboveHeadPreTimer;
 		public int bTextAboveHeadTimer;
 		public int bTextAboveHeadStyle;
-		public int bTextAboveHeadColor;
+		public Color bTextAboveHeadColor;
 		public long aID;
 		public long bID;
 
-		public static string[][] animalSpeech = new string[][]
+		internal static string[][] animalSpeech = new string[][]
 		{
 			new string[]
 			{
@@ -78,21 +76,21 @@ namespace AprilFools
 
 		public SpeakingAnimalData(FarmAnimal a, FarmAnimal b)
 		{
-			aID = a.myID.Value;
-			textAboveHeadAlpha = 0f;
-			textAboveHeadPreTimer = 0;
-			textAboveHeadTimer = 3000;
-			textAboveHeadStyle = -1;
-			textAboveHeadColor = -1;
+			string[] strings = animalSpeech[Game1.random.Next(animalSpeech.Length)];
 
+			aID = a.myID.Value;
+			atextAboveHeadAlpha = 0f;
+			atextAboveHeadPreTimer = 0;
+			atextAboveHeadTimer = 3000;
+			atextAboveHeadStyle = -1;
+			atextAboveHeadColor = Color.Black;
+			atextAboveHead = strings[0];
 			bID = b.myID.Value;
 			bTextAboveHeadAlpha = 0f;
 			bTextAboveHeadPreTimer = 2000 + Game1.random.Next(500);
 			bTextAboveHeadTimer = 3000;
 			bTextAboveHeadStyle = -1;
-			bTextAboveHeadColor = -1;
-			var strings = animalSpeech[Game1.random.Next(animalSpeech.Length)];
-			textAboveHead = strings[0];
+			bTextAboveHeadColor = Color.Black;
 			bTextAboveHead = strings[1];
 		}
 	}

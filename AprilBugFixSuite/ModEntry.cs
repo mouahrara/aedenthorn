@@ -1,46 +1,44 @@
-﻿using HarmonyLib;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
+using xTile;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Monsters;
-using StardewValley.Network;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using xTile;
+using StardewValley.Menus;
+using StardewValley.TerrainFeatures;
 
-namespace AprilFools
+namespace AprilBugFixSuite
 {
 	/// <summary>The mod entry point.</summary>
 	public partial class ModEntry : Mod
 	{
+		internal static IMonitor SMonitor;
+		internal static IModHelper SHelper;
+		internal static ModConfig Config;
 
-		public static IMonitor SMonitor;
-		public static IModHelper SHelper;
-		public static ModConfig Config;
+		internal static ModEntry context;
+		internal static string[] ravenText;
+		internal static Texture2D blackTexture;
+		internal static Texture2D beeTexture;
+		internal static bool asciifying;
+		internal static bool pixelating;
+		internal static bool slimeFarmer;
+		internal static BigSlime slime;
+		internal static bool backwardsFarmer;
+		internal static bool gianting;
+		internal static List<BeeData> beeDataList = new();
+		internal static int ravenTicks;
+		internal static SpriteFont font;
+		internal static SpriteBatch screenBatch;
+		internal static Texture2D screenTexture;
 
-		public static ModEntry context;
-		public static string[] ravenText;
-		public static Texture2D blackTexture;
-		public static Texture2D beeTexture;
-		public static bool asciifying;
-		public static bool pixelating;
-		public static bool slimeFarmer;
-		public static BigSlime slime;
-		public static bool beeing;
-		public static bool backwardsFarmer;
-		public static bool gianting;
-		public static List<BeeData> beeDataList = new List<BeeData>();
-		public static int ravenTicks;
-		public static SpriteFont font;
-		public static SpriteBatch screenBatch;
-		public static Texture2D screenTexture;
-
-		public static SpeakingAnimalData speakingAnimals;
+		internal static SpeakingAnimalData speakingAnimals;
 
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
 		/// <param name="helper">Provides simplified APIs for writing mods.</param>
@@ -54,6 +52,7 @@ namespace AprilFools
 			SHelper = helper;
 
 			helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
+			helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
 			helper.Events.GameLoop.OneSecondUpdateTicked += GameLoop_OneSecondUpdateTicked;
 			helper.Events.GameLoop.TimeChanged += GameLoop_TimeChanged;
 			helper.Events.Player.Warped += Player_Warped;
@@ -61,20 +60,76 @@ namespace AprilFools
 			helper.Events.Display.Rendered += Display_Rendered;
 			helper.Events.Content.AssetRequested += Content_AssetRequested;
 
-			ravenText = File.ReadAllLines(Path.Combine(Helper.DirectoryPath, "assets", "raven.txt"));
+			// Load Harmony patches
+			try
+			{
+				Harmony harmony = new(ModManifest.UniqueID);
+
+				harmony.Patch(
+					original: AccessTools.Method(typeof(InventoryMenu), nameof(InventoryMenu.draw), new Type[] { typeof(SpriteBatch), typeof(int), typeof(int), typeof(int) }),
+					prefix: new HarmonyMethod(typeof(InventoryMenu_draw), nameof(InventoryMenu_draw.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Tree), nameof(Tree.performToolAction)),
+					prefix: new HarmonyMethod(typeof(Tree_performToolAction), nameof(Tree_performToolAction.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Tree), nameof(Tree.performToolAction)),
+					postfix: new HarmonyMethod(typeof(Tree_performToolAction), nameof(Tree_performToolAction.Postfix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Tree), nameof(Tree.draw), new Type[] { typeof(SpriteBatch) }),
+					postfix: new HarmonyMethod(typeof(Tree_draw), nameof(Tree_draw.Postfix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Farmer), nameof(Farmer.MovePosition)),
+					prefix: new HarmonyMethod(typeof(Farmer_MovePosition_Patch), nameof(Farmer_MovePosition_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Farmer), nameof(Farmer.MovePosition)),
+					postfix: new HarmonyMethod(typeof(Farmer_MovePosition_Patch), nameof(Farmer_MovePosition_Patch.Postfix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(NPC), nameof(NPC.draw), new Type[] { typeof(SpriteBatch), typeof(float) }),
+					prefix: new HarmonyMethod(typeof(NPC_draw_Patch), nameof(NPC_draw_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Farmer), nameof(Farmer.Update)),
+					prefix: new HarmonyMethod(typeof(Farmer_Update_Patch), nameof(Farmer_Update_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Farmer), nameof(Farmer.draw), new Type[] { typeof(SpriteBatch) }),
+					prefix: new HarmonyMethod(typeof(Farmer_draw_Patch), nameof(Farmer_draw_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Character), nameof(Character.update), new Type[] { typeof(GameTime), typeof(GameLocation), typeof(long), typeof(bool) }),
+					postfix: new HarmonyMethod(typeof(Character_update_Patch), nameof(Character_update_Patch.Postfix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(GameLocation), nameof(GameLocation.drawAboveAlwaysFrontLayer), new Type[] { typeof(SpriteBatch) }),
+					postfix: new HarmonyMethod(typeof(GameLocation_drawAboveAlwaysFrontLayer_Patch), nameof(GameLocation_drawAboveAlwaysFrontLayer_Patch.Postfix))
+				);
+			}
+			catch (Exception e)
+			{
+				Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
+				return;
+			}
+
 			blackTexture = new Texture2D(Game1.graphics.GraphicsDevice, 1, 1);
 			blackTexture.SetData(new Color[] { Color.Black });
-
 			font = helper.ModContent.Load<SpriteFont>("assets/Fira_Code.xnb");
 			beeTexture = helper.ModContent.Load<Texture2D>("assets/bee.png");
-
-			var screenWidth = Game1.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth;
-			var screenHeight = Game1.graphics.GraphicsDevice.PresentationParameters.BackBufferHeight;
-			screenTexture = new Texture2D(Game1.graphics.GraphicsDevice, screenWidth, screenHeight);
+			screenTexture = new Texture2D(Game1.graphics.GraphicsDevice, Game1.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth, Game1.graphics.GraphicsDevice.PresentationParameters.BackBufferHeight);
 			screenBatch = new SpriteBatch(Game1.graphics.GraphicsDevice);
+		}
 
-			var harmony = new Harmony(ModManifest.UniqueID);
-			harmony.PatchAll();
+		private void GameLoop_SaveLoaded(object sender, StardewModdingAPI.Events.SaveLoadedEventArgs e)
+		{
+			if (SHelper.Translation.Locale.Equals("fr-FR", StringComparison.OrdinalIgnoreCase))
+				ravenText = File.ReadAllLines(Path.Combine(Helper.DirectoryPath, "assets", "raven.fr-FR.txt"));
+			else
+				ravenText = File.ReadAllLines(Path.Combine(Helper.DirectoryPath, "assets", "raven.txt"));
 		}
 
 		private void Content_AssetRequested(object sender, StardewModdingAPI.Events.AssetRequestedEventArgs e)
@@ -86,6 +141,7 @@ namespace AprilFools
 					SMonitor.Log($"Patching Maps/Town");
 					Map pierre = Helper.ModContent.Load<Map>("assets/pierrebuilding.tmx");
 					Map joja = Helper.ModContent.Load<Map>("assets/jojabuilding.tmx");
+
 					data.AsMap().PatchMap(pierre, null, new Rectangle(90, 41, 12, 13), PatchMapMode.Replace);
 					data.AsMap().PatchMap(joja, null, new Rectangle(38, 47, 12, 11), PatchMapMode.Replace);
 				});
@@ -102,20 +158,22 @@ namespace AprilFools
 			if(Config.EnableMod && Config.EnableAnimalTalk && speakingAnimals is null && (Game1.currentLocation is Farm || Game1.currentLocation is AnimalHouse || Game1.currentLocation is Forest))
 			{
 				FarmAnimal[] animals;
+
 				if (Game1.currentLocation is AnimalHouse)
 					animals = (Game1.currentLocation as AnimalHouse).animals.Values.ToArray();
 				else if (Game1.currentLocation is Farm)
 					animals = (Game1.currentLocation as Farm).animals.Values.ToArray();
 				else if (Game1.currentLocation is Forest)
 					animals = (Game1.currentLocation as Forest).marniesLivestock.ToArray();
-				else return;
-				foreach (var a in animals)
+				else
+					return;
+				foreach (FarmAnimal a in animals)
 				{
-					foreach (var b in animals)
+					foreach (FarmAnimal b in animals)
 					{
 						if (a.myID.Value == b.myID.Value)
 							continue;
-						if (Vector2.Distance(a.getTileLocation(), b.getTileLocation()) <= 10 && Game1.random.NextDouble() < 0.3)
+						if (Vector2.Distance(a.Tile, b.Tile) <= 10 && Game1.random.NextDouble() < 0.3)
 						{
 							speakingAnimals = new SpeakingAnimalData(a, b);
 							return;
@@ -125,26 +183,24 @@ namespace AprilFools
 			}
 		}
 
-
 		private void GameLoop_OneSecondUpdateTicked(object sender, StardewModdingAPI.Events.OneSecondUpdateTickedEventArgs e)
 		{
 			if (!IsModEnabled())
 				return;
+
 			if (slimeFarmer)
 			{
 				if(!Config.SlimeEnabled || Game1.random.NextDouble() < 0.1)
 				{
 					slimeFarmer = false;
 				}
-				
 			}
 			else if(Config.SlimeEnabled)
 			{
 				slimeFarmer = Game1.random.NextDouble() < 0.01;
 				if (slimeFarmer)
 				{
-					if (slime == null)
-						slime = new BigSlime(Game1.player.Position, 121);
+					slime ??= new BigSlime(Game1.player.Position, 121);
 				}
 			}
 			if (backwardsFarmer)
@@ -153,7 +209,6 @@ namespace AprilFools
 				{
 					backwardsFarmer = false;
 				}
-				
 			}
 			else if (Config.BackwardsEnabled)
 			{
@@ -165,7 +220,6 @@ namespace AprilFools
 				{
 					gianting = false;
 				}
-				
 			}
 			else if (Config.GiantEnabled)
 			{
@@ -177,7 +231,6 @@ namespace AprilFools
 				{
 					asciifying = false;
 				}
-
 			}
 			else if(pixelating)
 			{
@@ -185,19 +238,26 @@ namespace AprilFools
 				{
 					pixelating = false;
 				}
-
 			}
 			else
 			{
 				if (Config.PixelateEnabled)
+				{
 					pixelating = Game1.random.NextDouble() < 0.01;
+				}
 				if (!pixelating && Config.AsciiEnabled)
+				{
 					asciifying = Game1.random.NextDouble() < 0.008;
+				}
 				else
+				{
 					asciifying = false;
+				}
 			}
 			if (!Config.BeesEnabled || beeDataList.Count > 30)
+			{
 				beeDataList.Clear();
+			}
 			else if (Game1.random.NextDouble() < (beeDataList.Count + 1) / 30f)
 			{
 				beeDataList.Add(new BeeData()
@@ -216,19 +276,24 @@ namespace AprilFools
 			{
 				for (int i = beeDataList.Count - 1; i >= 0; i--)
 				{
-					var beeDirection = beeDataList[i].dir;
-					var beeAngle = beeDataList[i].angle;
-					var beePos = beeDataList[i].pos;
+					Vector2 beeDirection = beeDataList[i].dir;
+					double beeAngle = beeDataList[i].angle;
+					Vector2 beePos = beeDataList[i].pos;
 
 					int size = 64;
 					if (beeDirection != Vector2.Zero)
 					{
 						int period = 36;
+
 						if (Game1.random.NextDouble() < 0.01)
+						{
 							beeDirection = Vector2.Zero;
+						}
 						beeDataList[i].ticks++;
-						var which = beeDataList[i].ticks % period;
-						beeDataList[i].currentSprite = which < period / 4 ? 0 : ((which < period  * 3 / 4 && which >= period / 2) ? 2 : 1);
+
+						int which = beeDataList[i].ticks % period;
+
+						beeDataList[i].currentSprite = which < period / 4 ? 0 : ((which < period * 3 / 4 && which >= period / 2) ? 2 : 1);
 					}
 					else
 					{
@@ -251,10 +316,8 @@ namespace AprilFools
 					beeDataList[i].angle = beeAngle;
 					beeDataList[i].pos = beePos;
 				}
-
 			}
 		}
-
 
 		private void Display_RenderedWorld(object sender, StardewModdingAPI.Events.RenderedWorldEventArgs e)
 		{
@@ -263,12 +326,18 @@ namespace AprilFools
 
 			if (Config.AsciiEnabled && asciifying)
 			{
-				int scale = 16;
-				var lines = ConvertToAscii(ScaleScreen(scale, out int w, out int h), Game1.graphics.GraphicsDevice.PresentationParameters.BackBufferWidth / scale);
+				Texture2D downScaledScreen = Shader.DownScale((RenderTarget2D)Game1.graphics.GraphicsDevice.GetRenderTargets()[0].RenderTarget, 16);
+				Color [] data = new Color[downScaledScreen.Width * downScaledScreen.Height];
+
+				downScaledScreen.GetData(data);
+
+				List<string> lines = ConvertToAscii(data, downScaledScreen.Width);
+
 				if (lines.Count > 0)
 				{
-					e.SpriteBatch.Draw(blackTexture, new Rectangle(0, 0, Game1.viewport.Width, Game1.viewport.Height), Color.White);
 					int height = Game1.viewport.Height / lines.Count;
+
+					e.SpriteBatch.Draw(blackTexture, new Rectangle(0, 0, Game1.viewport.Width, Game1.viewport.Height), Color.White);
 					for (int i = 0; i < lines.Count; i++)
 					{
 						e.SpriteBatch.DrawString(font, lines[i], new Vector2(0, height * i), Color.White, 0, Vector2.Zero, 0.8f, SpriteEffects.None, 1);
@@ -277,22 +346,21 @@ namespace AprilFools
 			}
 			else if (Config.PixelateEnabled && pixelating)
 			{
-				Color[] data = ScaleScreen(16, out int width, out int height);
-				Texture2D pixelScreen = new Texture2D(Game1.graphics.GraphicsDevice, width, height);
-				pixelScreen.SetData(data);
+				Texture2D pixelScreen = Shader.DownScale((RenderTarget2D)Game1.graphics.GraphicsDevice.GetRenderTargets()[0].RenderTarget, 8);
 				e.SpriteBatch.Draw(pixelScreen, new Rectangle(0, 0, Game1.viewport.Width, Game1.viewport.Height), Color.White);
 			}
-			if (Config.RavenEnabled && (Game1.timeOfDay >= 2100 || Game1.timeOfDay <= 200))
+			if (Config.RavenEnabled && (Game1.timeOfDay >= 2300 || Game1.timeOfDay <= 200))
 			{
 				for(int i = 0; i < ravenText.Length; i++)
 				{
-					var y = Game1.viewport.Height - ravenTicks / 2 + i * 48;
+					int y = Game1.viewport.Height - ravenTicks + i * 48;
+
 					if (y < -48)
 						continue;
 					if (y > Game1.viewport.Height)
 						break;
-					e.SpriteBatch.DrawString(Game1.dialogueFont, ravenText[i],new Vector2(0, y), Color.DarkGray * 0.75f);
-					e.SpriteBatch.DrawString(Game1.dialogueFont, ravenText[i],new Vector2(2, y + 2), Color.Black * 0.75f);
+					e.SpriteBatch.DrawString(Game1.dialogueFont, ravenText[i], new Vector2(0, y), Color.DarkGray * 0.75f);
+					e.SpriteBatch.DrawString(Game1.dialogueFont, ravenText[i], new Vector2(2, y + 2), Color.Black * 0.75f);
 				}
 				ravenTicks++;
 			}
@@ -318,85 +386,82 @@ namespace AprilFools
 
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_ModEnabled_Name"),
+				name: () => SHelper.Translation.Get("GMCM.ModEnabled.Name"),
 				getValue: () => Config.EnableMod,
 				setValue: value => Config.EnableMod = value
 			);
-
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_OnlyAprilFirst_Name"),
+				name: () => SHelper.Translation.Get("GMCM.OnlyAprilFirst.Name"),
 				getValue: () => Config.RestrictToAprilFirst,
 				setValue: value => Config.RestrictToAprilFirst = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_EnableBees_Name"),
+				name: () => SHelper.Translation.Get("GMCM.EnableBees.Name"),
 				getValue: () => Config.BeesEnabled,
 				setValue: value => Config.BeesEnabled = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_EnableBackwards_Name"),
+				name: () => SHelper.Translation.Get("GMCM.EnableBackwards.Name"),
 				getValue: () => Config.BackwardsEnabled,
 				setValue: value => Config.BackwardsEnabled = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_EnableAscii_Name"),
+				name: () => SHelper.Translation.Get("GMCM.EnableAscii.Name"),
 				getValue: () => Config.AsciiEnabled,
 				setValue: value => Config.AsciiEnabled = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_EnablePixelate_Name"),
+				name: () => SHelper.Translation.Get("GMCM.EnablePixelate.Name"),
 				getValue: () => Config.PixelateEnabled,
 				setValue: value => Config.PixelateEnabled = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_EnableTreeScreams_Name"),
+				name: () => SHelper.Translation.Get("GMCM.EnableTreeScreams.Name"),
 				getValue: () => Config.TreeScreamEnabled,
 				setValue: value => Config.TreeScreamEnabled = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_EnableInventoryAvoid_Name"),
+				name: () => SHelper.Translation.Get("GMCM.EnableInventoryAvoid.Name"),
 				getValue: () => Config.InventoryEnabled,
 				setValue: value => Config.InventoryEnabled = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_EnableSlime_Name"),
+				name: () => SHelper.Translation.Get("GMCM.EnableSlime.Name"),
 				getValue: () => Config.SlimeEnabled,
 				setValue: value => Config.SlimeEnabled = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_EnableRaven_Name"),
+				name: () => SHelper.Translation.Get("GMCM.EnableRaven.Name"),
 				getValue: () => Config.RavenEnabled,
 				setValue: value => Config.RavenEnabled = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_EnableGiants_Name"),
+				name: () => SHelper.Translation.Get("GMCM.EnableGiants.Name"),
 				getValue: () => Config.GiantEnabled,
 				setValue: value => Config.GiantEnabled = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_EnableBuildingSwitch_Name"),
+				name: () => SHelper.Translation.Get("GMCM.EnableBuildingSwitch.Name"),
 				getValue: () => Config.BuildingsEnabled,
 				setValue: value => Config.BuildingsEnabled = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => ModEntry.SHelper.Translation.Get("GMCM_Option_EnableAnimalGreeting_Name"),
+				name: () => SHelper.Translation.Get("GMCM.EnableAnimalGreeting.Name"),
 				getValue: () => Config.EnableAnimalTalk,
 				setValue: value => Config.EnableAnimalTalk = value
 			);
 		}
-
-
 	}
 }

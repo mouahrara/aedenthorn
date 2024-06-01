@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 
-namespace AprilFools
+namespace AprilBugFixSuite
 {
 	public class BeeData
 	{

@@ -35,17 +35,17 @@
 	"animal-speech-10-2": "Тела - продолжения злых лиц. А лица наполнены злобой.",
 
 	// GMCM
-	"GMCM_Option_ModEnabled_Name": "Включить мод?",
-	"GMCM_Option_OnlyAprilFirst_Name": "Только на первое апреля?",
-	"GMCM_Option_EnableBees_Name": "Включить пчёл?",
-	"GMCM_Option_EnableBackwards_Name": "Включить обратный режим?",
-	"GMCM_Option_EnableAscii_Name": "Включить ASCii?",
-	"GMCM_Option_EnablePixelate_Name": "Включить пикселизацию?",
-	"GMCM_Option_EnableTreeScreams_Name": "Включить крики деревьев?",
-	"GMCM_Option_EnableInventoryAvoid_Name": "Включить избегание инвентаря?",
-	"GMCM_Option_EnableSlime_Name": "Включить слаймов?",
-	"GMCM_Option_EnableRaven_Name": "Включить ворон?",
-	"GMCM_Option_EnableGiants_Name": "Включить гигантов?",
-	"GMCM_Option_EnableBuildingSwitch_Name": "Включить переключение построек?",
-	"GMCM_Option_EnableAnimalGreeting_Name": "Включить приветствие животных?"
+	"GMCM.ModEnabled.Name": "Включить мод?",
+	"GMCM.OnlyAprilFirst.Name": "Только на первое апреля?",
+	"GMCM.EnableBees.Name": "Включить пчёл?",
+	"GMCM.EnableBackwards.Name": "Включить обратный режим?",
+	"GMCM.EnableAscii.Name": "Включить ASCii?",
+	"GMCM.EnablePixelate.Name": "Включить пикселизацию?",
+	"GMCM.EnableTreeScreams.Name": "Включить крики деревьев?",
+	"GMCM.EnableInventoryAvoid.Name": "Включить избегание инвентаря?",
+	"GMCM.EnableSlime.Name": "Включить слаймов?",
+	"GMCM.EnableRaven.Name": "Включить ворон?",
+	"GMCM.EnableGiants.Name": "Включить гигантов?",
+	"GMCM.EnableBuildingSwitch.Name": "Включить переключение построек?",
+	"GMCM.EnableAnimalGreeting.Name": "Включить приветствие животных?"
 }
