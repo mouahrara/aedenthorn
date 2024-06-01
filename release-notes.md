@@ -2,6 +2,11 @@
 
 # Global release notes
 
+## 1 June 2024
+* Released April Bug Fix Suite version [0.1.7-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AprilBugFixSuite/release-notes.md#017-unofficial1-mouahrara)
+* Released Bee Paths version [0.2.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BeePaths/release-notes.md#021-unofficial2-mouahrara)
+* Released Like a Duck to Water version [0.4.5-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/LikeADuckToWater/release-notes.md#045-unofficial1-mouahrara)
+
 ## 12 May 2024
 * Released Buff Framework version [0.6.1-unofficial.3-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BuffFramework/release-notes.md#061-unofficial3-mouahrara)
 * Released Custom Starter Package version [0.2.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CustomStarterPackage/release-notes.md#021-unofficial2-mouahrara)
