@@ -2,7 +2,7 @@
 using StardewValley;
 using StardewValley.BellsAndWhistles;
 
-namespace Terrarium
+namespace CraftableTerrarium
 {
 	public class TerrariumFrogs : SebsFrogs
 	{
@@ -13,10 +13,12 @@ namespace Terrarium
 			this.tile = tile;
 		}
 
-		public void doAction()
+		public static void DoAction()
 		{
-			if(ModEntry.Config.PlaySound != null && ModEntry.Config.PlaySound.Length > 0)
-			   DelayedAction.playSoundAfterDelay(ModEntry.Config.PlaySound, Game1.random.Next(1000, 3000), null, -1);
+			if(!string.IsNullOrEmpty(ModEntry.Config.Sound))
+			{
+				DelayedAction.playSoundAfterDelay(ModEntry.Config.Sound, Game1.random.Next(1000, 3000));
+			}
 		}
 	}
 }

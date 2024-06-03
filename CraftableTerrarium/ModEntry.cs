@@ -1,93 +1,121 @@
-﻿using Harmony;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using HarmonyLib;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.BellsAndWhistles;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+using StardewValley.Menus;
+using StardewValley.Objects;
 using Object = StardewValley.Object;
 
-namespace Terrarium
+namespace CraftableTerrarium
 {
-	public class ModEntry : Mod
+	public partial class ModEntry : Mod
 	{
-		public static ModEntry context;
+		internal static ModEntry context;
 
-		public static ModConfig Config;
-		public static IJsonAssetsApi JsonAssets = null;
+		internal static ModConfig Config;
+		internal static IMonitor SMonitor;
+		internal static IModHelper SHelper;
+
+		private static string assetDirectory;
+		private static string textureFile;
 
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
 		/// <param name="helper">Provides simplified APIs for writing mods.</param>
 		public override void Entry(IModHelper helper)
 		{
-			context = this;
 			Config = Helper.ReadConfig<ModConfig>();
-			if (!Config.EnableMod)
-				return;
+
+			SMonitor = Monitor;
+			SHelper = Helper;
+			context = this;
+
 			helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
 			helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
 			helper.Events.Player.Warped += Player_Warped;
+			helper.Events.Content.AssetRequested += Content_AssetRequested;
 
-			var harmony = HarmonyInstance.Create(ModManifest.UniqueID);
+			assetDirectory = Path.Combine(SHelper.DirectoryPath, "assets");
+			textureFile = Path.Combine(assetDirectory, "terrarium.png");
 
-			harmony.Patch(
-			   original: AccessTools.Method(typeof(Object), nameof(Object.placementAction)),
-			   postfix: new HarmonyMethod(typeof(ModEntry), nameof(placementAction_Postfix))
-			);
-
-			harmony.Patch(
-			   original: AccessTools.Method(typeof(Object), nameof(Object.performRemoveAction)),
-			   postfix: new HarmonyMethod(typeof(ModEntry), nameof(performRemoveAction_Postfix))
-			);
-			harmony.Patch(
-			   original: AccessTools.Method(typeof(Object), nameof(Object.checkForAction)),
-			   prefix: new HarmonyMethod(typeof(ModEntry), nameof(checkForAction_Prefix))
-			);
-			harmony.Patch(
-			   original: AccessTools.Method(typeof(Object), nameof(Object.isPassable)),
-			   prefix: new HarmonyMethod(typeof(ModEntry), nameof(Object_isPassable_Prefix))
-			);
-
-			if (Config.LoadCustomTerrarium)
+			// Load Harmony patches
+			try
 			{
-				try
-				{
-					string path = Directory.GetParent(helper.DirectoryPath).GetDirectories().Where(f => f.FullName.EndsWith("[CP] Lively Frog Sanctuary")).FirstOrDefault()?.FullName;
-					if (path != null)
-					{
-						Texture2D tex = new Texture2D(Game1.graphics.GraphicsDevice, 48, 48);
-						Color[] data = new Color[tex.Width * tex.Height];
-						tex.GetData(data);
+				Harmony harmony = new(ModManifest.UniqueID);
 
-						FileStream setStream = File.Open(Path.Combine(path, "assets", "frog-vivarium.png"), FileMode.Open);
-						Texture2D source = Texture2D.FromStream(Game1.graphics.GraphicsDevice, setStream);
-						setStream.Dispose();
-						Color[] srcData = new Color[source.Width * source.Height];
-						source.GetData(srcData);
+				harmony.Patch(
+					original: AccessTools.Constructor(typeof(CraftingRecipe), new Type[] { typeof(string), typeof(bool) }),
+					postfix: new HarmonyMethod(typeof(CraftingRecipe_Constructor_Patch), nameof(CraftingRecipe_Constructor_Patch.Postfix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(CraftingRecipe), nameof(CraftingRecipe.GetItemData)),
+					prefix: new HarmonyMethod(typeof(CraftingRecipe_GetItemData_Patch), nameof(CraftingRecipe_GetItemData_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(CraftingPage), "spaceOccupied"),
+					postfix: new HarmonyMethod(typeof(CraftingPage_spaceOccupied_Patch), nameof(CraftingPage_spaceOccupied_Patch.Postfix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(CraftingPage), "layoutRecipes"),
+					transpiler: new HarmonyMethod(typeof(CraftingPage_layoutRecipes_Patch), nameof(CraftingPage_layoutRecipes_Patch.Transpiler))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Furniture), "loadDescription"),
+					prefix: new HarmonyMethod(typeof(Furniture_loadDescription_Patch), nameof(Furniture_loadDescription_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Object), nameof(Object.placementAction)),
+					postfix: new HarmonyMethod(typeof(Object_placementAction_Patch), nameof(Object_placementAction_Patch.Postfix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Object), nameof(Object.performRemoveAction)),
+					postfix: new HarmonyMethod(typeof(Object_performRemoveAction_Patch), nameof(Object_performRemoveAction_Patch.Postfix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Object), nameof(Object.checkForAction)),
+					prefix: new HarmonyMethod(typeof(Object_checkForAction_Patch), nameof(Object_checkForAction_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(SebsFrogs), nameof(SebsFrogs.update)),
+					transpiler: new HarmonyMethod(typeof(SebsFrogs_update_Patch), nameof(SebsFrogs_update_Patch.Transpiler))
+				);
+			}
+			catch (Exception e)
+			{
+				Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
+				return;
+			}
+		}
 
-						for (int i = 0; i < srcData.Length; i++)
-						{
-							if (data.Length <= i + 48 * 12)
-								break;
-							data[i + 48 * 12] = srcData[i];
-						}
-						tex.SetData(data);
-						string outDir = Directory.GetParent(helper.DirectoryPath).GetDirectories().Where(f => f.FullName.EndsWith("[BC] Terrarium")).FirstOrDefault()?.FullName;
-						Stream stream = File.Create(Path.Combine(outDir, "assets", "terrarium.png"));
-						tex.SaveAsPng(stream, tex.Width, tex.Height);
-						stream.Dispose();
-						Monitor.Log("Terrarium overwritten with lively frog sanctuary", LogLevel.Debug);
-					}
-				}
-				catch (Exception ex)
+		private void Content_AssetRequested(object sender, AssetRequestedEventArgs e)
+		{
+			if (e.NameWithoutLocale.IsEquivalentTo("LooseSprites/Cursors"))
+			{
+				if (Context.IsGameLaunched && !Context.IsWorldReady)
 				{
-					Monitor.Log($"Can't load lively frog sanctuary for Terrarium\n{ex}", LogLevel.Error);
+					CreateTextureFile();
 				}
+			}
+			if (e.NameWithoutLocale.IsEquivalentTo("Data/CraftingRecipes"))
+			{
+				e.Edit(asset =>
+				{
+					IDictionary<string, string> data = asset.AsDictionary<string, string>().Data;
+
+					data.Add("aedenthorn.CraftableTerrarium_Terrarium", "338 20 390 10 771 10/Home/aedenthorn.CraftableTerrarium_Terrarium/false/default");
+				});
+			}
+			if (e.NameWithoutLocale.IsEquivalentTo("Data/Furniture"))
+			{
+				e.Edit(asset =>
+				{
+					IDictionary<string, string> data = asset.AsDictionary<string, string>().Data;
+
+					data.Add("aedenthorn.CraftableTerrarium_Terrarium", $"Terrarium/decor/3 3/3 2/1/0/2/[aedenthorn.CraftableTerrarium_i18n item.terrarium.name]/0/{SHelper.ModContent.GetInternalAssetName("assets/terrarium").Name.Replace('/', '\\')}");
+				});
 			}
 		}
 
@@ -98,113 +126,37 @@ namespace Terrarium
 
 		public void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
 		{
-			JsonAssets = Helper.ModRegistry.GetApi<IJsonAssetsApi>("spacechase0.JsonAssets");
-			if (JsonAssets == null)
-			{
-				Monitor.Log("Can't load Json Assets API for Terrarium", LogLevel.Error);
-			}
-			else
-			{
-				JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, "json-assets"));
-			}
+			TokensUtility.Register();
+
+			// get Generic Mod Config Menu's API (if it's installed)
+			var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+			if (configMenu is null)
+				return;
+
+			// register mod
+			configMenu.Register(
+				mod: ModManifest,
+				reset: () => Config = new ModConfig(),
+				save: () => Helper.WriteConfig(Config)
+			);
+
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.Frogs.Name"),
+				getValue: () => Config.Frogs,
+				setValue: value => Config.Frogs = value
+			);
+			configMenu.AddTextOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.Sound.Name"),
+				getValue: () => Config.Sound,
+				setValue: value => Config.Sound = value
+			);
 		}
 
 		private void Player_Warped(object sender, WarpedEventArgs e)
 		{
 			ShowFrogs(e.NewLocation);
-		}
-
-		private static void placementAction_Postfix(Object __instance, GameLocation location)
-		{
-			if(__instance.bigCraftable && IsTerrarium(__instance))
-			{
-				ShowFrogs(location);
-			}
-		}
-		private static void performRemoveAction_Postfix(Object __instance, GameLocation environment)
-		{
-			if (__instance.bigCraftable && IsTerrarium(__instance))
-			{
-				Game1.playSound("croak");
-				DelayedShowTerrariums(environment);
-			}
-		}
-
-
-		private static void checkForAction_Prefix(Object __instance, Farmer who, bool justCheckingForActivity)
-		{
-			if (__instance.bigCraftable && IsTerrarium(__instance) && !justCheckingForActivity)
-			{
-				var sprite = who.currentLocation.temporarySprites.FirstOrDefault(s => s is TerrariumFrogs && (s as TerrariumFrogs).tile == __instance.tileLocation.Value);
-				if(sprite is TerrariumFrogs)
-				{
-					context.Monitor.Log($"Animating terrarium at tile {__instance.TileLocation}");
-					(sprite as TerrariumFrogs).doAction();
-				}
-			}
-		}
-
-		public static bool Object_isPassable_Prefix(Object __instance, ref bool __result)
-		{
-			if (__instance.bigCraftable && __instance.Name == "Terrarium" && __instance.modData.ContainsKey("spacechase0.BiggerCraftables/BiggerIndex") && int.Parse(__instance.modData["spacechase0.BiggerCraftables/BiggerIndex"]) >= 6)
-			{
-				__result = true;
-				return false;
-			}
-			return true;
-		}
-
-		private static bool IsTerrarium(Object obj)
-		{
-			return obj.name.Equals("Terrarium");
-		}
-
-		private static Item GetRandomGift(Object obj)
-		{
-			return null;
-		}
-		private static async void DelayedShowTerrariums(GameLocation environment)
-		{
-			await Task.Delay(100);
-			ShowFrogs(environment);
-		}
-
-		private static void ShowFrogs(GameLocation location, Object excluded = null)
-		{
-			if (JsonAssets == null)
-				return;
-			location.temporarySprites.RemoveAll((s) => s is TerrariumFrogs);
-			foreach (KeyValuePair<Vector2, Object> kvp in location.objects.Pairs)
-			{
-				if (!IsTerrarium(kvp.Value) || kvp.Value == excluded || !kvp.Value.modData.ContainsKey("spacechase0.BiggerCraftables/BiggerIndex") || kvp.Value.modData["spacechase0.BiggerCraftables/BiggerIndex"] != "6")
-					continue;
-
-				context.Monitor.Log($"Showing {Config.Frogs} terrarium frogs for tile {kvp.Key}");
-				int i = 0;
-				while (i++ < Config.Frogs)
-				{
-					bool which = Game1.random.NextDouble() > 0.5;
-					Texture2D crittersText2 = Game1.temporaryContent.Load<Texture2D>("TileSheets\\critters");
-					location.TemporarySprites.Add(new TerrariumFrogs(kvp.Key)
-					{
-						texture = crittersText2,
-						sourceRect = which ? new Rectangle(64, 224, 16, 16) : new Rectangle(64, 240, 16, 16),
-						animationLength = 1,
-						sourceRectStartingPos = which ? new Vector2(64f, 224f) : new Vector2(64f, 240f),
-						interval = Game1.random.Next(100, 200),
-						totalNumberOfLoops = 9999,
-						position = kvp.Key * 64f + new Vector2(((Game1.random.NextDouble() < 0.5) ? 22 : 25), ((Game1.random.NextDouble() < 0.5) ? 2 : 1)) * 4f  + new Vector2(0, 42 + 42 / Config.Frogs * i),
-						scale = 4f,
-						flipped = (Game1.random.NextDouble() < 0.5),
-						layerDepth = (kvp.Key.Y + 2f + 0.11f + 0.01f * i) * 64f / 10000f + 0.005f,
-						Parent = location
-					});
-				}
-				if (Config.PlaySound != null && Config.PlaySound.Length > 0 && Game1.random.NextDouble() < 0.05 && Game1.timeOfDay > 610)
-				{
-					DelayedAction.playSoundAfterDelay(Config.PlaySound, Game1.random.Next(1000,3000), null, -1);
-				}
-			}
 		}
 	}
 }
