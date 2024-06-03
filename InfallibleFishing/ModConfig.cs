@@ -1,8 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using StardewModdingAPI;
-using System.Collections.Generic;
-
-namespace InfallibleFishing
+﻿namespace InfallibleFishing
 {
 	public class ModConfig
 	{

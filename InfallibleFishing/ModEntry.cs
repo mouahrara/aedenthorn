@@ -1,36 +1,17 @@
-﻿using HarmonyLib;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using Netcode;
+﻿using System;
+using HarmonyLib;
 using StardewModdingAPI;
-using StardewModdingAPI.Utilities;
-using StardewValley;
-using StardewValley.Locations;
-using StardewValley.Objects;
-using StardewValley.Quests;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
-using xTile;
-using xTile.Dimensions;
-using xTile.Tiles;
-using Rectangle = Microsoft.Xna.Framework.Rectangle;
+using StardewValley.Menus;
 
 namespace InfallibleFishing
 {
 	/// <summary>The mod entry point.</summary>
 	public partial class ModEntry : Mod
 	{
-
-		public static IMonitor SMonitor;
-		public static IModHelper SHelper;
-		public static ModConfig Config;
-		public static ModEntry context;
-
+		internal static IMonitor SMonitor;
+		internal static IModHelper SHelper;
+		internal static ModConfig Config;
+		internal static ModEntry context;
 
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
 		/// <param name="helper">Provides simplified APIs for writing mods.</param>
@@ -45,10 +26,23 @@ namespace InfallibleFishing
 
 			Helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
 
+			// Load Harmony patches
+			try
+			{
+				Harmony harmony = new(ModManifest.UniqueID);
 
-			var harmony = new Harmony(ModManifest.UniqueID);
-			harmony.PatchAll();
+				harmony.Patch(
+					original: AccessTools.Method(typeof(BobberBar), nameof(BobberBar.update)),
+					transpiler: new HarmonyMethod(typeof(BobberBar_update_Patch), nameof(BobberBar_update_Patch.Transpiler))
+				);
+			}
+			catch (Exception e)
+			{
+				Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
+				return;
+			}
 		}
+
 		private void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
 		{
 			// get Generic Mod Config Menu's API (if it's installed)
@@ -65,7 +59,7 @@ namespace InfallibleFishing
 
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => "Mod Enabled",
+				name: () => SHelper.Translation.Get("GMCM.ModEnabled.Name"),
 				getValue: () => Config.ModEnabled,
 				setValue: value => Config.ModEnabled = value
 			);
