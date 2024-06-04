@@ -2,6 +2,12 @@
 
 # Global release notes
 
+## 4 June 2024
+* Released Craftable Terrarium version [0.1.3-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CraftableTerrarium/release-notes.md#013-unofficial1-mouahrara)
+* Released Here Fishy version [0.4.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/HereFishy/release-notes.md#041-unofficial1-mouahrara)
+* Released Infallible Fishing version [0.1.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/InfallibleFishing/release-notes.md#012-unofficial1-mouahrara)
+* Released Moveable Mailbox version [0.2.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/MoveableMailbox/release-notes.md#021-unofficial1-mouahrara)
+
 ## 1 June 2024
 * Released April Bug Fix Suite version [0.1.7-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AprilBugFixSuite/release-notes.md#017-unofficial1-mouahrara)
 * Released Bee Paths version [0.2.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BeePaths/release-notes.md#021-unofficial2-mouahrara)
