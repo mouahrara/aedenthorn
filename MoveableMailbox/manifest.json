@@ -1,26 +1,13 @@
 ﻿{
 	"Name": "Moveable Mailbox",
 	"Author": "aedenthorn",
-	"Version": "0.2.1",
-	"Description": "Converts the mailbox into a movable object.",
+	"Version": "0.2.1-unofficial.1-mouahrara",
+	"Description": "Converts the farm's mailbox into a moveable object that you can place anywhere on your farm.",
 	"UniqueID": "aedenthorn.MoveableMailbox",
 	"EntryDll": "MoveableMailbox.dll",
-	"MinimumApiVersion": "3.8.0",
-	"ModUpdater": {
-		"Repository": "StardewValleyMods",
-		"User": "aedenthorn",
-		"Directory": "_releases",
-		"ModFolder": "MoveableMailbox"
-	},
-	"UpdateKeys": ["Nexus:7834"],
-	"Dependencies": [
-			{
-				"UniqueID": "Platonymous.ModUpdater",
-				"IsRequired": false
-			},
-			{
-			"UniqueID": "spacechase0.JsonAssets",
-				"IsRequired": true
-			},
+	"MinimumApiVersion": "4.0.0",
+	"UpdateKeys": [
+		"Nexus:7834",
+		"UpdateManifest:https://raw.githubusercontent.com/mouahrara/aedenthorn/master/update-manifest.json@MoveableMailbox"
 	]
 }
