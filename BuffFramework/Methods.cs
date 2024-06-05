@@ -178,12 +178,15 @@ namespace BuffFramework
 					string id = kvp.Value.Item1;
 					List<string> additionalBuffsIds = kvp.Value.Item2;
 
-					Game1.player.buffs.Remove(id);
-					if (additionalBuffsIds is not null)
+					if (Game1.player.hasBuff(id))
 					{
-						foreach (string additionalBuffsId in additionalBuffsIds)
+						Game1.player.buffs.Remove(id);
+						if (additionalBuffsIds is not null)
 						{
-							Game1.player.buffs.Remove(additionalBuffsId);
+							foreach (string additionalBuffsId in additionalBuffsIds)
+							{
+								Game1.player.buffs.Remove(additionalBuffsId);
+							}
 						}
 					}
 				}
@@ -279,12 +282,15 @@ namespace BuffFramework
 
 					List<string> additionalBuffsIds = GetAdditionalBuffsAsTupleList(value)?.Select(t => t.Item1).ToList();
 
-					Game1.player.buffs.Remove(id);
-					if (additionalBuffsIds is not null)
+					if (Game1.player.hasBuff(id))
 					{
-						foreach (string additionalBuffsId in additionalBuffsIds)
+						Game1.player.buffs.Remove(id);
+						if (additionalBuffsIds is not null)
 						{
-							Game1.player.buffs.Remove(additionalBuffsId);
+							foreach (string additionalBuffsId in additionalBuffsIds)
+							{
+								Game1.player.buffs.Remove(additionalBuffsId);
+							}
 						}
 					}
 				}

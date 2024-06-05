@@ -2,6 +2,10 @@
 
 # Release notes
 
+## 0.6.1-unofficial.4-mouahrara
+Released on 05 June, 2024, for SMAPI 4.0.0 or later.
+* Fixed an issue where if one or more entries specified an additional buff with equipment-based conditions, the buff would only apply if the equipment-based conditions for one of the entries for that specific buff were met, preventing the buff from being applied by any source other than the framework 🔧
+
 ## 0.6.1-unofficial.3-mouahrara
 Released on 12 May, 2024, for SMAPI 4.0.0 or later.
 * Added the following fields:
