@@ -124,7 +124,7 @@
 			"Name": "Buff Framework",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#BuffFramework",
 			"Versions": [
-				{ "Version": "0.6.1-unofficial.3-mouahrara" }
+				{ "Version": "0.6.1-unofficial.4-mouahrara" }
 			]
 		},
 		"BulkAnimalPurchase": {

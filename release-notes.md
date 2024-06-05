@@ -2,6 +2,9 @@
 
 # Global release notes
 
+## 5 June 2024
+* Released Buff Framework version [0.6.1-unofficial.4-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BuffFramework/release-notes.md#061-unofficial4-mouahrara)
+
 ## 4 June 2024
 * Released Craftable Terrarium version [0.1.3-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CraftableTerrarium/release-notes.md#013-unofficial1-mouahrara)
 * Released Here Fishy version [0.4.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/HereFishy/release-notes.md#041-unofficial1-mouahrara)
