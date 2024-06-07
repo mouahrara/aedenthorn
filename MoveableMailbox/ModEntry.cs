@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.Buildings;
 using StardewValley.GameData.BigCraftables;
 using StardewValley.GameData.Buildings;
 using Object = StardewValley.Object;
@@ -43,6 +44,10 @@ namespace MoveableMailbox
 				Harmony harmony = new(ModManifest.UniqueID);
 
 				harmony.Patch(
+					original: AccessTools.Method(typeof(Farm), nameof(Farm.GetMainMailboxPosition)),
+					postfix: new HarmonyMethod(typeof(Farm_GetMainMailboxPosition_Patch), nameof(Farm_GetMainMailboxPosition_Patch.Postfix))
+				);
+				harmony.Patch(
 					original: AccessTools.Method(typeof(Object), nameof(Object.placementAction)),
 					postfix: new HarmonyMethod(typeof(Object_placementAction_Patch), nameof(Object_placementAction_Patch.Postfix))
 				);
@@ -77,11 +82,19 @@ namespace MoveableMailbox
 				e.Edit(asset =>
 				{
 					IDictionary<string, BuildingData> data = asset.AsDictionary<string, BuildingData>().Data;
+					List<BuildingPlacementTile> placementTilesToRemove = new();
 					List<BuildingActionTile> actionTilesToRemove = new();
 					List<BuildingDrawLayer> drawLayersToRemove = new();
 
 					data["Farmhouse"].CollisionMap = data["Farmhouse"].CollisionMap.Replace(" ", "");
 					data["Farmhouse"].CollisionMap = data["Farmhouse"].CollisionMap.Remove(data["Farmhouse"].CollisionMap.Length - 2, 1);
+					foreach (BuildingPlacementTile placementTile in data["Farmhouse"].AdditionalPlacementTiles)
+					{
+						if (placementTile.TileArea == new Rectangle(9, 4, 1, 1) && !placementTile.OnlyNeedsToBePassable)
+						{
+							placementTilesToRemove.Add(placementTile);
+						}
+					}
 					foreach (BuildingActionTile actionTile in data["Farmhouse"].ActionTiles)
 					{
 						if (actionTile.Id.Equals("Default_Mailbox"))
@@ -95,6 +108,10 @@ namespace MoveableMailbox
 						{
 							drawLayersToRemove.Add(drawLayer);
 						}
+					}
+					foreach (BuildingPlacementTile placementTile in placementTilesToRemove)
+					{
+						data["Farmhouse"].AdditionalPlacementTiles.Remove(placementTile);
 					}
 					foreach (BuildingActionTile actionTile in actionTilesToRemove)
 					{
@@ -139,12 +156,17 @@ namespace MoveableMailbox
 			InitMailBoxesList();
 			if (!AnyOwnedMailbox(Game1.MasterPlayer.UniqueMultiplayerID.ToString()))
 			{
-				Vector2 tileLocation = Utility.PointToVector2(farm.GetMainMailboxPosition());
-				Object mailbox = new(tileLocation, "aedenthorn.MoveableMailbox_Mailbox");
+				Building farmhouse = farm.GetMainFarmHouse();
 
-				mailbox.modData[ownerKey] = Game1.MasterPlayer.UniqueMultiplayerID.ToString();
-				farm.objects.Add(tileLocation, mailbox);
-				mailboxes.Add(mailbox);
+				if (farmhouse is not null)
+				{
+					Vector2 tileLocation = new(farmhouse.tileX.Value + farmhouse.tilesWide.Value, farmhouse.tileY.Value + farmhouse.tilesHigh.Value - 1);
+					Object mailbox = new(tileLocation, "aedenthorn.MoveableMailbox_Mailbox");
+
+					mailbox.modData[ownerKey] = Game1.MasterPlayer.UniqueMultiplayerID.ToString();
+					farm.objects.Add(tileLocation, mailbox);
+					mailboxes.Add(mailbox);
+				}
 			}
 			farm.mapMainMailboxPosition = new Point(-1, -1);
 		}

@@ -8,6 +8,25 @@ namespace MoveableMailbox
 {
 	public partial class ModEntry : Mod
 	{
+		class Farm_GetMainMailboxPosition_Patch
+		{
+			public static void Postfix(Farm __instance, ref Point __result)
+			{
+				string masterPlayerUniqueMultiplayerID = Game1.MasterPlayer.UniqueMultiplayerID.ToString();
+
+				__instance.mapMainMailboxPosition = new Point(-1, -1);
+				foreach (Object mailbox in mailboxes)
+				{
+					if (mailbox.modData.TryGetValue(ownerKey, out string o) && o.Equals(masterPlayerUniqueMultiplayerID))
+					{
+						__result = Utility.Vector2ToPoint(mailbox.TileLocation);
+						return;
+					}
+				}
+				__result = new Point(-1, -1);
+			}
+		}
+
 		class Object_placementAction_Patch
 		{
 			public static void Postfix(Object __instance, GameLocation location, int x, int y, Farmer who, ref bool __result)
