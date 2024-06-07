@@ -1,0 +1,13 @@
+﻿{
+	"Name": "Weather Totem",
+	"Author": "aedenthorn",
+	"Version": "0.1.1-unofficial.1-mouahrara",
+	"Description": "Turns the rain totem into a 'weather totem' that lets you specify what sort of weather you are invoking.",
+	"UniqueID": "aedenthorn.WeatherTotem",
+	"EntryDll": "WeatherTotem.dll",
+	"MinimumApiVersion": "4.0.0",
+	"UpdateKeys": [
+		"Nexus:16455",
+		"UpdateManifest:https://raw.githubusercontent.com/mouahrara/aedenthorn/master/update-manifest.json@WeatherTotem"
+	]
+}
