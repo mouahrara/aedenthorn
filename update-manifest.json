@@ -89,7 +89,7 @@
 			"Name": "Bee Paths",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#BeePaths",
 			"Versions": [
-				{ "Version": "0.2.1-unofficial.2-mouahrara" }
+				{ "Version": "0.2.1-unofficial.3-mouahrara" }
 			]
 		},
 		"BetterElevator": {
@@ -124,7 +124,7 @@
 			"Name": "Buff Framework",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#BuffFramework",
 			"Versions": [
-				{ "Version": "0.6.1-unofficial.4-mouahrara" }
+				{ "Version": "0.6.1-unofficial.5-mouahrara" }
 			]
 		},
 		"BulkAnimalPurchase": {
@@ -299,7 +299,7 @@
 			"Name": "Moveable Mailbox",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#MoveableMailbox",
 			"Versions": [
-				{ "Version": "0.2.1-unofficial.1-mouahrara" }
+				{ "Version": "0.2.1-unofficial.2-mouahrara" }
 			]
 		},
 		"NapalmMummies": {
@@ -349,6 +349,13 @@
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#WallPlanters",
 			"Versions": [
 				{ "Version": "0.1.2-unofficial.1-mouahrara" }
+			]
+		},
+		"WeatherTotem": {
+			"Name": "Weather Totem",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#WeatherTotem",
+			"Versions": [
+				{ "Version": "0.1.1-unofficial.1-mouahrara" }
 			]
 		}
 	}

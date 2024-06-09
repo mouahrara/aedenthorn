@@ -2,6 +2,12 @@
 
 # Global release notes
 
+## 10 June 2024
+* Released Bee Paths version [0.2.1-unofficial.3-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BeePaths/release-notes.md#021-unofficial3-mouahrara)
+* Released Buff Framework version [0.6.1-unofficial.5-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BuffFramework/release-notes.md#061-unofficial5-mouahrara)
+* Released Moveable Mailbox version [0.2.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/MoveableMailbox/release-notes.md#021-unofficial2-mouahrara)
+* Released Weather Totem version [0.1.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/WeatherTotem/release-notes.md#011-unofficial1-mouahrara)
+
 ## 5 June 2024
 * Released Buff Framework version [0.6.1-unofficial.4-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BuffFramework/release-notes.md#061-unofficial4-mouahrara)
 
@@ -132,6 +138,7 @@
   * TreeTweaks ➜ CustomTreeTweaks 
   * TwoPlayerPrairieKing ➜ PlayPrairieKingWithNPCs
   * WallPlanter ➜ WallPlanters
+  * WeatherTotems ➜ WeatherTotem
   * YAJM ➜ YetAnotherJumpMod
 * Removed release files
 * Removed incomplete mods:
