@@ -2,6 +2,10 @@
 
 # Release notes
 
+## 0.2.1-unofficial.3-mouahrara
+Released on 10 June, 2024, for SMAPI 4.0.0 or later.
+* Fixed an issue where removing the last bee path from the location causes endless buzzing 🔧
+
 ## 0.2.1-unofficial.2-mouahrara
 Released on 1 June, 2024, for SMAPI 4.0.0 or later.
 * Now supports flowers in garden pots to reflect changes introduced in version 1.6.6 ✨

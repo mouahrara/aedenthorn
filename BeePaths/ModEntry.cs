@@ -85,97 +85,100 @@ namespace BeePaths
 
 		private void Display_RenderedWorld(object sender, StardewModdingAPI.Events.RenderedWorldEventArgs e)
 		{
-			if (!Config.ModEnabled || !Context.IsPlayerFree || (!Config.ShowWhenRaining && Game1.IsRainingHere(Game1.currentLocation)) || !hives.TryGetValue(Game1.currentLocation.NameOrUniqueName, out Dictionary<Vector2, HiveData> dictionary) || !dictionary.Any())
+			if (!Config.ModEnabled || !Context.IsPlayerFree || (!Config.ShowWhenRaining && Game1.IsRainingHere(Game1.currentLocation)))
 				return;
 
 			bool buzzing = false;
 			float buzzDistance = float.MaxValue;
 			float maxSoundDistance = Config.MaxSoundDistance;
 
-			foreach (HiveData hiveData in dictionary.Values)
+			if (hives.TryGetValue(Game1.currentLocation.NameOrUniqueName, out Dictionary<Vector2, HiveData> dictionary))
 			{
-				if (!IsOnScreen(hiveData.hiveTile * 64, hiveData.cropTile * 64, 64))
-					continue;
-
-				Vector2 offset;
-
-				if (hiveData.isIndoorPot)
+				foreach (HiveData hiveData in dictionary.Values)
 				{
-					if (CompatibilityUtility.IsWallPlantersLoaded)
-					{
-						int wallPlantersOffset = 0;
-						int wallPlantersInnerOffset = 0;
+					if (!IsOnScreen(hiveData.hiveTile * 64, hiveData.cropTile * 64, 64))
+						continue;
 
-						if (Game1.currentLocation.getObjectAtTile((int)hiveData.cropTile.X, (int)hiveData.cropTile.Y) is IndoorPot indoorPot)
+					Vector2 offset;
+
+					if (hiveData.isIndoorPot)
+					{
+						if (CompatibilityUtility.IsWallPlantersLoaded)
 						{
-							if (indoorPot.modData.ContainsKey(CompatibilityUtility.wallPlantersOffsetKey))
+							int wallPlantersOffset = 0;
+							int wallPlantersInnerOffset = 0;
+
+							if (Game1.currentLocation.getObjectAtTile((int)hiveData.cropTile.X, (int)hiveData.cropTile.Y) is IndoorPot indoorPot)
 							{
-								wallPlantersOffset = int.Parse(indoorPot.modData[CompatibilityUtility.wallPlantersOffsetKey]);
+								if (indoorPot.modData.ContainsKey(CompatibilityUtility.wallPlantersOffsetKey))
+								{
+									wallPlantersOffset = int.Parse(indoorPot.modData[CompatibilityUtility.wallPlantersOffsetKey]);
+								}
+								if (indoorPot.modData.ContainsKey(CompatibilityUtility.wallPlantersInnerOffsetKey))
+								{
+									wallPlantersInnerOffset = int.Parse(indoorPot.modData[CompatibilityUtility.wallPlantersInnerOffsetKey]);
+								}
 							}
-							if (indoorPot.modData.ContainsKey(CompatibilityUtility.wallPlantersInnerOffsetKey))
-							{
-								wallPlantersInnerOffset = int.Parse(indoorPot.modData[CompatibilityUtility.wallPlantersInnerOffsetKey]);
-							}
-						}
-						offset = new Vector2(0, -24 - wallPlantersOffset - wallPlantersInnerOffset);
-					}
-					else
-					{
-						offset = new Vector2(0, -24);
-					}
-				}
-				else
-				{
-					offset = Vector2.Zero;
-				}
-				while (hiveData.bees.Count < Config.NumberBees)
-				{
-					hiveData.bees.Add(GetBee(hiveData.hiveTile, hiveData.cropTile, true, false));
-				}
-				for (int i = hiveData.bees.Count - 1; i >= 0; i--)
-				{
-					BeeData bee = hiveData.bees[i];
-					Vector2 direction = Vector2.Normalize(new Vector2(-bee.position.Y, bee.position.X));
-					Vector2 drawPosition = bee.position + direction * 5 * (float)Math.Sin(Vector2.Distance(bee.startPosition, bee.position) / 20);
-					Vector2 adjustedEndPosition = bee.isGoingToFlower ? bee.endPosition + offset : bee.endPosition;
-					Vector2 translation = adjustedEndPosition - drawPosition;
-
-					e.SpriteBatch.Draw(beeTexture, Game1.GlobalToLocal(drawPosition), null, Config.BeeColor, -(float)Math.Atan2(translation.Y, translation.X), Vector2.Zero, Config.BeeScale, SpriteEffects.None, 1);
-					if (Config.BeeDamage > 0 && Game1.random.Next(100) < Config.BeeStingChance)
-					{
-						foreach (Farmer farmer in Game1.currentLocation.farmers)
-						{
-							if (farmer.GetBoundingBox().Contains(bee.position + new Vector2(0, 32)))
-								farmer.takeDamage(Config.BeeDamage, true, null);
-						}
-					}
-					if (!string.IsNullOrEmpty(Config.BeeSound) && maxSoundDistance > 0f)
-					{
-						float playerBeeDistance = Vector2.Distance(Game1.player.Tile, bee.position / 64 + new Vector2(-0.5f, 0.5f));
-
-						if (playerBeeDistance < maxSoundDistance && playerBeeDistance < buzzDistance)
-						{
-							buzzing = true;
-							buzzDistance = playerBeeDistance;
-						}
-					}
-
-					float beeDistanceToEndPosition = Vector2.Distance(adjustedEndPosition, bee.position);
-
-					if (beeDistanceToEndPosition > Config.BeeSpeed)
-					{
-						bee.position = Vector2.Lerp(bee.position, adjustedEndPosition, Config.BeeSpeed / beeDistanceToEndPosition);
-					}
-					else
-					{
-						if (bee.isGoingToFlower)
-						{
-							bee.isGoingToFlower = !bee.isGoingToFlower;
-							(bee.endPosition, bee.startPosition) = (bee.startPosition, bee.endPosition);
+							offset = new Vector2(0, -24 - wallPlantersOffset - wallPlantersInnerOffset);
 						}
 						else
 						{
-							hiveData.bees.RemoveAt(i);
+							offset = new Vector2(0, -24);
+						}
+					}
+					else
+					{
+						offset = Vector2.Zero;
+					}
+					while (hiveData.bees.Count < Config.NumberBees)
+					{
+						hiveData.bees.Add(GetBee(hiveData.hiveTile, hiveData.cropTile, true, false));
+					}
+					for (int i = hiveData.bees.Count - 1; i >= 0; i--)
+					{
+						BeeData bee = hiveData.bees[i];
+						Vector2 direction = Vector2.Normalize(new Vector2(-bee.position.Y, bee.position.X));
+						Vector2 drawPosition = bee.position + direction * 5 * (float)Math.Sin(Vector2.Distance(bee.startPosition, bee.position) / 20);
+						Vector2 adjustedEndPosition = bee.isGoingToFlower ? bee.endPosition + offset : bee.endPosition;
+						Vector2 translation = adjustedEndPosition - drawPosition;
+
+						e.SpriteBatch.Draw(beeTexture, Game1.GlobalToLocal(drawPosition), null, Config.BeeColor, -(float)Math.Atan2(translation.Y, translation.X), Vector2.Zero, Config.BeeScale, SpriteEffects.None, 1);
+						if (Config.BeeDamage > 0 && Game1.random.Next(100) < Config.BeeStingChance)
+						{
+							foreach (Farmer farmer in Game1.currentLocation.farmers)
+							{
+								if (farmer.GetBoundingBox().Contains(bee.position + new Vector2(0, 32)))
+									farmer.takeDamage(Config.BeeDamage, true, null);
+							}
+						}
+						if (!string.IsNullOrEmpty(Config.BeeSound) && maxSoundDistance > 0f)
+						{
+							float playerBeeDistance = Vector2.Distance(Game1.player.Tile, bee.position / 64 + new Vector2(-0.5f, 0.5f));
+
+							if (playerBeeDistance < maxSoundDistance && playerBeeDistance < buzzDistance)
+							{
+								buzzing = true;
+								buzzDistance = playerBeeDistance;
+							}
+						}
+
+						float beeDistanceToEndPosition = Vector2.Distance(adjustedEndPosition, bee.position);
+
+						if (beeDistanceToEndPosition > Config.BeeSpeed)
+						{
+							bee.position = Vector2.Lerp(bee.position, adjustedEndPosition, Config.BeeSpeed / beeDistanceToEndPosition);
+						}
+						else
+						{
+							if (bee.isGoingToFlower)
+							{
+								bee.isGoingToFlower = !bee.isGoingToFlower;
+								(bee.endPosition, bee.startPosition) = (bee.startPosition, bee.endPosition);
+							}
+							else
+							{
+								hiveData.bees.RemoveAt(i);
+							}
 						}
 					}
 				}
