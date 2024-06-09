@@ -550,13 +550,13 @@ namespace BuffFramework
 						break;
 					case "healthregen":
 					case "healthregeneration":
-						HealthRegenerationBuffs.TryAdd(id, GetIntAsString(p.Value));
+						HealthRegenerationBuffs.TryAdd(id, GetFloatAsString(p.Value));
 						break;
 					case "energyregen":
 					case "energyregeneration":
 					case "staminaregen":
 					case "staminaregeneration":
-						StaminaRegenerationBuffs.TryAdd(id, GetIntAsString(p.Value));
+						StaminaRegenerationBuffs.TryAdd(id, GetFloatAsString(p.Value));
 						break;
 					case "glowrate":
 						GlowRateBuffs.TryAdd(id, GetFloatAsString(p.Value));
@@ -815,6 +815,14 @@ namespace BuffFramework
 
 		public static string GetFloatAsString(object value)
 		{
+			if (value is int i)
+			{
+				return i.ToString();
+			}
+			else if (value is long l)
+			{
+				return ((int)l).ToString();
+			}
 			if (value is float f)
 			{
 				return f.ToString();

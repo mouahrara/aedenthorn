@@ -2,6 +2,11 @@
 
 # Release notes
 
+## 0.6.1-unofficial.5-mouahrara
+Released on 10 June, 2024, for SMAPI 4.0.0 or later.
+* The **HealthRegeneration** and **StaminaRegeneration** fields now support floating-point values ✨
+* Added Hungarian translation (thanks to [@martin66789](https://github.com/martin66789)) 🇭🇺
+
 ## 0.6.1-unofficial.4-mouahrara
 Released on 05 June, 2024, for SMAPI 4.0.0 or later.
 * Fixed an issue where if one or more entries specified an additional buff with equipment-based conditions, the buff would only apply if the equipment-based conditions for one of the entries for that specific buff were met, preventing the buff from being applied by any source other than the framework 🔧

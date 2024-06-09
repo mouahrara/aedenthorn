@@ -28,6 +28,7 @@ namespace BuffFramework
 		internal static PerScreen<Dictionary<string, string>> staminaRegenerationBuffs = new(() => new());
 		internal static PerScreen<Dictionary<string, string>> glowRateBuffs = new(() => new());
 		internal static Dictionary<string, (string, ICue)> soundBuffs = new();
+		private static float healthRegenerationRemainder = 0f;
 
 		internal static Dictionary<string, string> HealthRegenerationBuffs
 		{
@@ -113,18 +114,26 @@ namespace BuffFramework
 			if(!Config.ModEnabled || !Game1.shouldTimePass())
 				return;
 
+			float totalHealthRegeneration = 0f;
+			float totalStaminaRegeneration = 0f;
+
 			foreach (string healthRegen in HealthRegenerationBuffs.Values)
 			{
-				Game1.player.health = Math.Clamp(Game1.player.health + GetInt(healthRegen), 0, Game1.player.maxHealth);
+				totalHealthRegeneration += GetFloat(healthRegen);
 			}
 			foreach (string staminaRegen in StaminaRegenerationBuffs.Values)
 			{
-				Game1.player.Stamina = Math.Clamp(Game1.player.Stamina + GetInt(staminaRegen), 0, Game1.player.MaxStamina);
+				totalStaminaRegeneration += GetFloat(staminaRegen);
 			}
+			totalHealthRegeneration += healthRegenerationRemainder;
+			Game1.player.Stamina = Math.Clamp(Game1.player.Stamina + totalStaminaRegeneration, 0, Game1.player.MaxStamina);
+			Game1.player.health = Math.Clamp(Game1.player.health + (int)totalHealthRegeneration, 0, Game1.player.maxHealth);
+			healthRegenerationRemainder = totalHealthRegeneration % 1;
 		}
 
 		public void GameLoop_DayStarted(object sender, StardewModdingAPI.Events.DayStartedEventArgs e)
 		{
+			healthRegenerationRemainder = 0f;
 			Helper.Events.GameLoop.UpdateTicking += GameLoop_UpdateTicking;
 		}
 
