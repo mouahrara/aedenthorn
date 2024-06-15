@@ -6,6 +6,7 @@ namespace FishingChestsExpanded
 	{
 		public bool EnableMod { get; set; } = true;
 		public int VanillaLootChance { get; set; } = 0;
+		public bool AlwaysIncludeGeodes { get; set; } = true;
 		public int ChanceForTreasureChest { get; set; } = 15;
 		public int MaxItems { get; set; } = 5;
 		public int ItemsBaseMaxValue { get; set; } = 100;

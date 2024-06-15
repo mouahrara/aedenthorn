@@ -40,7 +40,7 @@ namespace FishingChestsExpanded
 
 				foreach (Item item in inventory)
 				{
-					if (item.ItemId == fishingRod.whichFish.LocalItemId || vanilla)
+					if (item.ItemId.Equals(fishingRod.whichFish.LocalItemId) || item.ItemId.Equals("GoldenBobber") || vanilla || (Config.AlwaysIncludeGeodes && Utility.IsGeode(item)))
 					{
 						items.Add(item);
 					}

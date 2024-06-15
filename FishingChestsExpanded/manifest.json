@@ -1,7 +1,7 @@
 ﻿{
 	"Name": "Fishing Chests Expanded",
 	"Author": "aedenthorn",
-	"Version": "0.4.3-unofficial.1-mouahrara",
+	"Version": "0.4.3-unofficial.2-mouahrara",
 	"Description": "This customizable mod greatly expands the range of items received in fishing treasure chests.",
 	"UniqueID": "aedenthorn.FishingChestsExpanded",
 	"EntryDll": "FishingChestsExpanded.dll",

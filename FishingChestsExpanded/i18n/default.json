@@ -3,6 +3,8 @@
 	"GMCM.ModEnabled.Name": "Mod Enabled",
 	"GMCM.VanillaLootChance.Name": "Vanilla Loot Chance",
 	"GMCM.VanillaLootChance.Tooltip": "The percent chance to include what would ordinarily be in a fishing chest on top of what this mod adds (not including Qi beans, which are calculated separately).",
+	"GMCM.AlwaysIncludeGeodes.Name": "Always Include Geodes",
+	"GMCM.AlwaysIncludeGeodes.Tooltip": "Whether objects of the geode type (geode, frozen geode, etc., as well as mystery boxes) should always be included in fishing chests regardless of the 'Vanilla Loot Chance' option.",
 	"GMCM.ChanceForTreasureChest.Name": "Base Chance For Treasure Chest",
 	"GMCM.ChanceForTreasureChest.Tooltip": "The base percent chance a fishing catch will include a chest, before factoring in luck.",
 	"GMCM.MaxItems.Name": "Max Items",

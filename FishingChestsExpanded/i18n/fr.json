@@ -3,6 +3,8 @@
 	"GMCM.ModEnabled.Name": "Activer le Mod",
 	"GMCM.VanillaLootChance.Name": "Chance de butin classique",
 	"GMCM.VanillaLootChance.Tooltip": "Le pourcentage de chance d'inclure ce qui serait normalement dans un coffre de pêche en plus de ce que ce mod ajoute (à l'exclusion des haricots Qi, qui sont calculés séparément).",
+	"GMCM.AlwaysIncludeGeodes.Name": "Toujours inclure les géodes",
+	"GMCM.AlwaysIncludeGeodes.Tooltip": "Indique si les objets de type géode (géode, géode gelée, etc., ainsi que les boîtes mystères) doivent toujours être inclus dans les coffres de pêche, indépendamment de l'option 'Chance de butin classique'.",
 	"GMCM.ChanceForTreasureChest.Name": "Chance de base de coffre au trésor",
 	"GMCM.ChanceForTreasureChest.Tooltip": "Le pourcentage de chance de base qu'une prise de pêche inclura un coffre, avant de prendre en compte la chance.",
 	"GMCM.MaxItems.Name": "Nombre maximal d'objets",

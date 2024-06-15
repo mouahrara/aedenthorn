@@ -87,6 +87,13 @@ namespace FishingChestsExpanded
 				min: 0,
 				max: 100
 			);
+			configMenu.AddBoolOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.AlwaysIncludeGeodes.Name"),
+				tooltip: () => SHelper.Translation.Get("GMCM.AlwaysIncludeGeodes.Tooltip"),
+				getValue: () => Config.AlwaysIncludeGeodes,
+				setValue: value => Config.AlwaysIncludeGeodes = value
+			);
 			configMenu.AddNumberOption(
 				mod: ModManifest,
 				name: () => SHelper.Translation.Get("GMCM.ChanceForTreasureChest.Name"),
