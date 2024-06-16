@@ -243,7 +243,7 @@
 			"Name": "Fishing Chests Expanded",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#FishingChestsExpanded",
 			"Versions": [
-				{ "Version": "0.4.3-unofficial.1-mouahrara" }
+				{ "Version": "0.4.3-unofficial.2-mouahrara" }
 			]
 		},
 		"FloatingGardenPots": {
@@ -293,6 +293,13 @@
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#LivestockChoices",
 			"Versions": [
 				{ "Version": "0.2.2-unofficial.1-mouahrara" }
+			]
+		},
+		"ModifyThis": {
+			"Name": "Modify This",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#ModifyThis",
+			"Versions": [
+				{ "Version": "0.9.1-unofficial.1-mouahrara" }
 			]
 		},
 		"MoveableMailbox": {

@@ -2,6 +2,10 @@
 
 # Global release notes
 
+## 17 June 2024
+* Released Fishing Chests Expanded version [0.4.3-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/FishingChestsExpanded/release-notes.md#043-unofficial2-mouahrara)
+* Released Modify This version [0.9.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/ModifyThis/release-notes.md#091-unofficial1-mouahrara)
+
 ## 10 June 2024
 * Released Bee Paths version [0.2.1-unofficial.3-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BeePaths/release-notes.md#021-unofficial3-mouahrara)
 * Released Buff Framework version [0.6.1-unofficial.5-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BuffFramework/release-notes.md#061-unofficial5-mouahrara)
@@ -118,6 +122,7 @@
   * LogUploader ➜ InGameSMAPILogUploader  
   * MagnetMod ➜ EnhancedLootMagnet  
   * MapEdit ➜ MapEditorExtended
+  * ModThis ➜ ModifyThis
   * Moolah ➜ MoolahMoneyMod
   * MultiStoryFarmhouse ➜ MultipleFloorFarmhouse
   * OutdoorButterflyHutch ➜ CraftableButterflyHutches 
