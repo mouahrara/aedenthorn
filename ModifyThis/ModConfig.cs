@@ -1,10 +1,11 @@
 ﻿using StardewModdingAPI;
+using StardewModdingAPI.Utilities;
 
-namespace ModThis
+namespace ModifyThis
 {
 	public class ModConfig
 	{
-		public bool Enabled { get; set; } = true;
+		public bool ModEnabled { get; set; } = true;
 		public SButton WizardKey { get; set; } = SButton.Pause;
 	}
 }

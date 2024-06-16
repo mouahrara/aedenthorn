@@ -1,0 +1,13 @@
+﻿{
+		"Name": "Modify This",
+		"Author": "aedenthorn",
+		"Version": "0.9.1-unofficial.1-mouahrara",
+		"Description": "Allows you to remove, move, pick up, grow, rename, water, or kill various things by selecting them in the world.",
+		"UniqueID": "aedenthorn.ModifyThis",
+		"EntryDll": "ModifyThis.dll",
+		"MinimumApiVersion": "4.0.0",
+		"UpdateKeys": [
+			"Nexus:7814",
+			"UpdateManifest:https://raw.githubusercontent.com/mouahrara/aedenthorn/master/update-manifest.json@ModifyThis"
+		]
+}
