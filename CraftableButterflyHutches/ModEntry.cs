@@ -1,124 +1,188 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using StardewModdingAPI;
-using StardewValley;
-using StardewValley.BellsAndWhistles;
-using StardewValley.Locations;
-using StardewValley.Network;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
-using xTile.Dimensions;
+using System.IO;
+using HarmonyLib;
+using StardewModdingAPI;
+using StardewModdingAPI.Events;
+using StardewValley;
+using StardewValley.Menus;
+using StardewValley.Objects;
+using Object = StardewValley.Object;
 
-namespace OutdoorButterflyHutch
+namespace CraftableButterflyHutches
 {
 	/// <summary>The mod entry point.</summary>
-	public class ModEntry : Mod, IAssetEditor
+	public partial class ModEntry : Mod
 	{
+		internal static ModEntry context;
 
-		public static ModEntry context;
 		internal static ModConfig Config;
+		internal static IMonitor SMonitor;
+		internal static IModHelper SHelper;
 
-		private int customTexturesWidth;
-		private int customTexturesHeight;
-		private int spriteIndex;
-		private Random myRand;
-
-		/// <summary>Get whether this instance can edit the given asset.</summary>
-		/// <param name="asset">Basic metadata about the asset being loaded.</param>
-		public bool CanEdit<T>(IAssetInfo asset)
-		{
-			if (asset.AssetNameEquals("TileSheets/Craftables") || asset.AssetNameEquals("Data/CraftingRecipes") || asset.AssetNameEquals("Data/BigCraftablesInformation"))
-			{
-				return true;
-			}
-
-			return false;
-		}
-
-		/// <summary>Edit a matched asset.</summary>
-		/// <param name="asset">A helper which encapsulates metadata about an asset and enables changes to it.</param>
-		public void Edit<T>(IAssetData asset)
-		{
-			int extension = Config.SpriteSheetOffsetRows * 32;
-			if (asset.AssetNameEquals("TileSheets/Craftables"))
-			{
-				Texture2D customTexture = this.Helper.Content.Load<Texture2D>("assets/ButteryflyHutch.png", ContentSource.ModFolder);
-				var editor = asset.AsImage();
-				editor.ExtendImage(minWidth: editor.Data.Width, minHeight: customTexturesHeight + extension + 32);
-				editor.PatchImage(customTexture, sourceArea: new Microsoft.Xna.Framework.Rectangle(0, 0, 16, 32), targetArea: new Microsoft.Xna.Framework.Rectangle(0, customTexturesHeight + extension, 16, 32));
-			}
-			else if (asset.AssetNameEquals("Data/CraftingRecipes"))
-			{
-				IDictionary<string, string> data = asset.AsDictionary<string, string>().Data;
-				data.Add("Outdoor Butterfly Hutch", $"{Config.HutchCost}/Field/{spriteIndex}/true/{Config.SkillReq}");
-			}
-			else if (asset.AssetNameEquals("Data/BigCraftablesInformation"))
-			{
-				IDictionary<int, string> data = asset.AsDictionary<int, string>().Data;
-				data.Add(spriteIndex, "Outdoor Butterfly Hutch/0/-300/Crafting -9/Attracts butterflies./true/true/0/Outdoor Butterfly Hutch");
-			}
-		}
-
+		private static string assetDirectory;
+		private static string textureFile;
 
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
 		/// <param name="helper">Provides simplified APIs for writing mods.</param>
 		public override void Entry(IModHelper helper)
 		{
+			Config = Helper.ReadConfig<ModConfig>();
+
+			SMonitor = Monitor;
+			SHelper = Helper;
 			context = this;
-			Config = this.Helper.ReadConfig<ModConfig>();
 
-			Texture2D customTexture = this.Helper.Content.Load<Texture2D>("TileSheets/Craftables", ContentSource.GameContent);
-			customTexturesWidth = customTexture.Width;
-			customTexturesHeight = customTexture.Height;
-			spriteIndex = (customTexturesWidth * customTexturesHeight / 16 / 32) + (Config.SpriteSheetOffsetRows * customTexturesWidth / 16);
-			myRand = new Random();
+			helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
+			helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
 			helper.Events.Player.Warped += Player_Warped;
-			helper.Events.Input.ButtonReleased += Input_ButtonReleased;
-		}
+			helper.Events.Content.AssetRequested += Content_AssetRequested;
 
-		private void Input_ButtonReleased(object sender, StardewModdingAPI.Events.ButtonReleasedEventArgs e)
-		{
-			if (e.Button != SButton.MouseLeft && e.Button != SButton.MouseRight)
-				return;
-			//AddButterflies(Game1.currentLocation);
-		}
+			assetDirectory = Path.Combine(SHelper.DirectoryPath, "assets");
+			textureFile = Path.Combine(assetDirectory, "butterflyHutch.png");
 
-		private void Player_Warped(object sender, StardewModdingAPI.Events.WarpedEventArgs e)
-		{
-			GameLocation location = e.NewLocation;
-			AddButterflies(location);
-		}
-
-		private void AddButterflies(GameLocation location)
-		{
-			int hutches = 0;
-			using (OverlaidDictionary.ValuesCollection.Enumerator enumerator = location.objects.Values.GetEnumerator())
+			// Load Harmony patches
+			try
 			{
-				while (enumerator.MoveNext())
+				Harmony harmony = new(ModManifest.UniqueID);
+
+				harmony.Patch(
+					original: AccessTools.Constructor(typeof(CraftingRecipe), new Type[] { typeof(string), typeof(bool) }),
+					postfix: new HarmonyMethod(typeof(CraftingRecipe_Constructor_Patch), nameof(CraftingRecipe_Constructor_Patch.Postfix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(CraftingRecipe), nameof(CraftingRecipe.GetItemData)),
+					prefix: new HarmonyMethod(typeof(CraftingRecipe_GetItemData_Patch), nameof(CraftingRecipe_GetItemData_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(CraftingPage), "spaceOccupied"),
+					postfix: new HarmonyMethod(typeof(CraftingPage_spaceOccupied_Patch), nameof(CraftingPage_spaceOccupied_Patch.Postfix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(CraftingPage), "layoutRecipes"),
+					transpiler: new HarmonyMethod(typeof(CraftingPage_layoutRecipes_Patch), nameof(CraftingPage_layoutRecipes_Patch.Transpiler))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Furniture), "loadDescription"),
+					prefix: new HarmonyMethod(typeof(Furniture_loadDescription_Patch), nameof(Furniture_loadDescription_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Object), nameof(Object.placementAction)),
+					postfix: new HarmonyMethod(typeof(Object_placementAction_Patch), nameof(Object_placementAction_Patch.Postfix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Object), nameof(Object.performRemoveAction)),
+					postfix: new HarmonyMethod(typeof(Object_performRemoveAction_Patch), nameof(Object_performRemoveAction_Patch.Postfix))
+				);
+			}
+			catch (Exception e)
+			{
+				Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
+				return;
+			}
+		}
+
+		private void Content_AssetRequested(object sender, AssetRequestedEventArgs e)
+		{
+			if (e.NameWithoutLocale.IsEquivalentTo("LooseSprites/Cursors"))
+			{
+				if (Context.IsGameLaunched && !Context.IsWorldReady)
 				{
-					if (enumerator.Current.bigCraftable && enumerator.Current.parentSheetIndex == spriteIndex)
-					{
-						hutches++; 
-						location.instantiateCrittersList();
-						location.addCritter(new Butterfly(location.getRandomTile()).setStayInbounds(true));
-						int num1 = (int)(Config.MinButterfliesDensity * location.map.Layers[0].TileSize.Area);
-						int num2 = (int)(Math.Max(Config.MinButterfliesDensity,Config.MaxButterfliesDensity)*location.map.Layers[0].TileSize.Area)+1;
-						int num = myRand.Next(num1, Math.Max(num1+1,num2));
-						Monitor.Log($"{num1} {num2} Number of butterflies: {num}");
-						int count = 0;
-						while (count < num)
-						{
-							location.addCritter(new Butterfly(location.getRandomTile()).setStayInbounds(true));
-							count++;
-						}
-					}
+					CreateTextureFile();
 				}
 			}
-			if(hutches == 0)
+			if (e.NameWithoutLocale.IsEquivalentTo("Data/CraftingRecipes"))
 			{
-				//foreach(Critter c in location.critt)
+				e.Edit(asset =>
+				{
+					IDictionary<string, string> data = asset.AsDictionary<string, string>().Data;
+
+					data.Add("aedenthorn.CraftableButterflyHutches_ButterflyHutch", $"{Config.HutchCost}/Home/aedenthorn.CraftableButterflyHutches_ButterflyHutch/false/{Config.SkillsRequired}");
+				});
 			}
+			if (e.NameWithoutLocale.IsEquivalentTo("Data/Furniture"))
+			{
+				e.Edit(asset =>
+				{
+					IDictionary<string, string> data = asset.AsDictionary<string, string>().Data;
+
+					data.Add("aedenthorn.CraftableButterflyHutches_ButterflyHutch", $"Butterfly Hutch/decor/2 3/2 1/1/0/2/[LocalizedText Strings\\Furniture:ButterflyHutch]/0/{SHelper.ModContent.GetInternalAssetName("assets/butterflyHutch").Name.Replace('/', '\\')}");
+				});
+			}
+		}
+
+		private void GameLoop_DayStarted(object sender, DayStartedEventArgs e)
+		{
+			AddButterflies(Game1.player.currentLocation);
+		}
+
+		public void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
+		{
+			TokensUtility.Register();
+
+			// get Generic Mod Config Menu's API (if it's installed)
+			var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+			if (configMenu is null)
+				return;
+
+			// register mod
+			configMenu.Register(
+				mod: ModManifest,
+				reset: () => Config = new ModConfig(),
+				save: () => Helper.WriteConfig(Config)
+			);
+
+			configMenu.AddTextOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.HutchCost.Name"),
+				tooltip: () => SHelper.Translation.Get("GMCM.HutchCost.Tooltip"),
+				getValue: () => Config.HutchCost,
+				setValue: value => {
+					Config.HutchCost = value;
+					SHelper.GameContent.InvalidateCache("Data/CraftingRecipes");
+				}
+			);
+			configMenu.AddTextOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.SkillsRequired.Name"),
+				tooltip: () => SHelper.Translation.Get("GMCM.SkillsRequired.Tooltip"),
+				getValue: () => Config.SkillsRequired,
+				setValue: value => {
+					Config.SkillsRequired = value;
+					SHelper.GameContent.InvalidateCache("Data/CraftingRecipes");
+				}
+			);
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.MinDensity.Name"),
+				tooltip: () => SHelper.Translation.Get("GMCM.MinDensity.Tooltip"),
+				getValue: () => Config.MinDensity,
+				setValue: value => {
+					Config.MinDensity = value;
+					AddButterflies(Game1.currentLocation);
+				},
+				min: 0f,
+				max: 1f,
+				interval: 0.01f
+			);
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.MaxDensity.Name"),
+				tooltip: () => SHelper.Translation.Get("GMCM.MaxDensity.Tooltip"),
+				getValue: () => Config.MaxDensity,
+				setValue: value => {
+					Config.MaxDensity = value;
+					AddButterflies(Game1.currentLocation);
+				},
+				min: 0f,
+				max: 1f,
+				interval: 0.01f
+			);
+		}
+
+		private void Player_Warped(object sender, WarpedEventArgs e)
+		{
+			AddButterflies(e.NewLocation);
 		}
 	}
 }

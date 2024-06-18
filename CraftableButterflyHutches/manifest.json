@@ -1,10 +1,13 @@
 ﻿{
 	"Name": "Craftable Butterfly Hutches",
 	"Author": "aedenthorn",
-	"Version": "0.1.0",
-	"Description": "Allows you to build and place butterfly hutches outdoors and indoors.",
-	"UniqueID": "aedenthorn.OutdoorButterflyHutch",
-	"EntryDll": "OutdoorButterflyHutch.dll",
-	"MinimumApiVersion": "3.4.0",
-	"UpdateKeys": ["Nexus:6279"]
+	"Version": "0.1.1-unofficial.1-mouahrara",
+	"Description": "Allows you to craft butterfly hutches and place them outdoors and indoors.",
+	"UniqueID": "aedenthorn.CraftableButterflyHutches",
+	"EntryDll": "CraftableButterflyHutches.dll",
+	"MinimumApiVersion": "4.0.0",
+	"UpdateKeys": [
+		"Nexus:6279",
+		"UpdateManifest:https://raw.githubusercontent.com/mouahrara/aedenthorn/master/update-manifest.json@CraftableButterflyHutches"
+	]
 }
