@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection.Emit;
 using HarmonyLib;
+using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.Extensions;
 using StardewValley.ItemTypeDefinitions;
@@ -70,6 +71,13 @@ namespace CraftableTerrarium
 							__result = true;
 							return;
 						}
+					}
+				}
+				for (int i = 0; i < width; i++)
+				{
+					for (int j = 0; j < height; j++)
+					{
+						pageLayout[x + i, y + j] = new ClickableTextureComponent(null, Rectangle.Empty, null, null, null, Rectangle.Empty, 0f);
 					}
 				}
 			}
