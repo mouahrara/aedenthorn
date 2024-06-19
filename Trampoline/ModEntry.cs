@@ -1,39 +1,34 @@
-﻿using HarmonyLib;
-using Microsoft.Xna.Framework;
+﻿using System;
+using HarmonyLib;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Objects;
-using StardewValley.Util;
-using System;
-using Object = StardewValley.Object;
 
 namespace Trampoline
 {
 	/// <summary>The mod entry point.</summary>
 	public partial class ModEntry : Mod
 	{
+		internal static IMonitor SMonitor;
+		internal static IModHelper SHelper;
+		internal static ModConfig Config;
+		internal static ModEntry context;
 
-		public static IMonitor SMonitor;
-		public static IModHelper SHelper;
-		public static ModConfig Config;
-		public static ModEntry context;
-		public static int jumpHeight;
-		public static float jumpSpeed;
-		public static int jumpTicks;
-		public static double lastPoint;
-		public static bool goingDown;
-		public static bool isEmoting;
-		public static bool goingHigher;
-		public static bool goingLower;
-		public static bool goingSlower;
-		public static bool goingFaster;
+		internal static int jumpHeight;
+		internal static float jumpSpeed;
+		internal static int jumpTicks;
+		internal static double lastPoint;
+		internal static bool isEmoting;
+		internal static bool goingHigher;
+		internal static bool goingLower;
+		internal static bool goingSlower;
+		internal static bool goingFaster;
 
+		private const string trampolineKey = "aedenthorn.Trampoline/trampoline";
 		private static Texture2D trampolineTexture;
-
-		private static string trampolineKey = "aedenthorn.Trampoline/trampoline";
 
 		public override void Entry(IModHelper helper)
 		{
@@ -48,17 +43,44 @@ namespace Trampoline
 			helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
 			helper.Events.Input.ButtonPressed += Input_ButtonPressed;
 			helper.Events.GameLoop.UpdateTicked += GameLoop_UpdateTicked;
-			var harmony = new Harmony(ModManifest.UniqueID);
-			harmony.PatchAll();
+
+			// Load Harmony patches
+			try
+			{
+				Harmony harmony = new(ModManifest.UniqueID);
+
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Furniture), nameof(Furniture.draw), new Type[] { typeof(SpriteBatch), typeof(int), typeof(int), typeof(float) }),
+					prefix: new HarmonyMethod(typeof(Furniture_draw_Patch), nameof(Furniture_draw_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Furniture), nameof(Furniture.GetSeatPositions)),
+					prefix: new HarmonyMethod(typeof(Furniture_GetSeatPositions_Patch), nameof(Furniture_GetSeatPositions_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Furniture), nameof(Furniture.GetSeatCapacity)),
+					prefix: new HarmonyMethod(typeof(Furniture_GetSeatCapacity_Patch), nameof(Furniture_GetSeatCapacity_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Farmer), nameof(Farmer.ShowSitting)),
+					prefix: new HarmonyMethod(typeof(Farmer_ShowSitting_Patch), nameof(Farmer_ShowSitting_Patch.Prefix))
+				);
+			}
+			catch (Exception e)
+			{
+				Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
+				return;
+			}
 		}
 
 		private void GameLoop_UpdateTicked(object sender, UpdateTickedEventArgs e)
 		{
 			if (!Config.EnableMod)
 				return;
+
 			if (IsOnTrampoline())
 			{
-				if (jumpTicks  >= (jumpHeight / jumpSpeed) * 2 || jumpHeight < 64)
+				if (jumpTicks >= jumpHeight / jumpSpeed * 2 || jumpHeight < 64)
 				{
 					jumpTicks = 0;
 					if (goingLower || Helper.Input.IsDown(Config.LowerKey))
@@ -87,8 +109,12 @@ namespace Trampoline
 					}
 				}
 				if (jumpHeight < 64)
+				{
 					return;
-				var currentPoint = Math.Sin(jumpTicks / (jumpHeight / jumpSpeed) * Math.PI);
+				}
+
+				double currentPoint = Math.Sin(jumpTicks / (jumpHeight / jumpSpeed) * Math.PI);
+
 				Game1.player.yOffset = (int)Math.Round((currentPoint + 0.75) * (currentPoint > -1.7 ? jumpHeight : (int)Math.Round(Math.Sqrt(jumpHeight) * 8)));
 				if (jumpTicks / (jumpHeight / jumpSpeed) > Math.PI / 2f && lastPoint < Math.PI / 2f)
 				{
@@ -96,15 +122,17 @@ namespace Trampoline
 				}
 				lastPoint = jumpTicks / (jumpHeight / jumpSpeed);
 				jumpTicks++;
-				if(currentPoint < 0)
+				if (currentPoint < 0)
+				{
 					jumpTicks++;
-
+				}
 				if (jumpHeight >= 128 && currentPoint > -0.25f)
 				{
-					isEmoting = true;
 					int facing = Game1.player.FacingDirection;
 					int frame = 94;
 					bool flipped = false;
+
+					isEmoting = true;
 					switch (facing)
 					{
 						case 0:
@@ -121,7 +149,7 @@ namespace Trampoline
 					Game1.player.completelyStopAnimatingOrDoingAction();
 					Game1.player.FarmerSprite.setCurrentAnimation(new FarmerSprite.AnimationFrame[]
 						{
-							new FarmerSprite.AnimationFrame(frame, 1500, false, flipped, null, false)
+							new(frame, 1500, false, flipped, null, false)
 						}
 					);
 					Game1.player.FarmerSprite.PauseForSingleAnimation = true;
@@ -153,6 +181,7 @@ namespace Trampoline
 		{
 			if (!Config.EnableMod || !Context.IsPlayerFree)
 				return;
+
 			if (IsOnTrampoline())
 			{
 				KeyboardState currentKBState = Game1.GetKeyboardState();
@@ -192,38 +221,41 @@ namespace Trampoline
 			}
 			else if(e.Button == Config.ConvertKey)
 			{
-				foreach (var f in Game1.currentLocation.furniture)
+				foreach (Furniture f in Game1.currentLocation.furniture)
 				{
-					if (f.isGroundFurniture() && f.boundingBox.Width == 128 && f.boundingBox.Height == 128 && f.boundingBox.Value.Contains(Game1.viewport.X + Game1.getOldMouseX(), Game1.viewport.Y + Game1.getOldMouseY()))
+					if (f.isGroundFurniture() && !f.isPassable() && f.boundingBox.Width == 128 && f.boundingBox.Height == 128 && f.boundingBox.Value.Contains(Game1.viewport.X + Game1.getOldMouseX(), Game1.viewport.Y + Game1.getOldMouseY()))
 					{
 						if (f.modData.ContainsKey(trampolineKey))
+						{
 							f.modData.Remove(trampolineKey);
+						}
 						else
+						{
 							f.modData[trampolineKey] = "true";
+						}
 						Helper.Input.Suppress(e.Button);
-
 						return;
 					}
 				}
 			}
 		}
-		private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
+
+		private static void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
 		{
 			try
 			{
-				trampolineTexture = Game1.content.Load<Texture2D>("aedenthorn.Trampoline/trampoline");
-				Monitor.Log("Loaded custom pieces sheet");
+				trampolineTexture = SHelper.GameContent.Load<Texture2D>("aedenthorn.Trampoline/trampoline");
+				SMonitor.Log("Loaded custom pieces sheet");
 			}
 			catch
 			{
-				trampolineTexture = Helper.Content.Load<Texture2D>("assets/trampoline.png");
-				Monitor.Log("Loaded default pieces sheet");
+				trampolineTexture = SHelper.ModContent.Load<Texture2D>("assets/trampoline.png");
+				SMonitor.Log("Loaded default pieces sheet");
 			}
 		}
 
 		private void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
 		{
-
 			// get Generic Mod Config Menu's API (if it's installed)
 			var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
 			if (configMenu is null)
@@ -238,46 +270,55 @@ namespace Trampoline
 
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => "Mod Enabled",
+				name: () => SHelper.Translation.Get("GMCM.ModEnabled.Name"),
 				getValue: () => Config.EnableMod,
-				setValue: value => Config.EnableMod = value
+				setValue: value => {
+					if (Config.EnableMod && !value)
+					{
+						if (Context.IsWorldReady && IsOnTrampoline(Game1.player))
+						{
+							Game1.player.sittingFurniture.RemoveSittingFarmer(Game1.player);
+							Game1.player.sittingFurniture = null;
+							Game1.player.isSitting.Value = false;
+							Game1.player.completelyStopAnimatingOrDoingAction();
+						}
+					}
+					Config.EnableMod = value;
+				}
 			);
-
-			
 			configMenu.AddTextOption(
 				mod: ModManifest,
-				name: () => "Jump Sound",
+				name: () => SHelper.Translation.Get("GMCM.JumpSound.Name"),
 				getValue: () => Config.JumpSound,
 				setValue: value => Config.JumpSound = value
 			);
-			
 			configMenu.AddKeybind(
 				mod: ModManifest,
-				name: () => "Convert Key",
+				name: () => SHelper.Translation.Get("GMCM.ConvertKey.Name"),
 				getValue: () => Config.ConvertKey,
 				setValue: value => Config.ConvertKey = value
 			);
 			configMenu.AddKeybind(
 				mod: ModManifest,
-				name: () => "Higher Key",
+				name: () => SHelper.Translation.Get("GMCM.HigherKey.Name"),
 				getValue: () => Config.HigherKey,
 				setValue: value => Config.HigherKey = value
 			);
 			configMenu.AddKeybind(
 				mod: ModManifest,
-				name: () => "Lower Key",
+				name: () => SHelper.Translation.Get("GMCM.LowerKey.Name"),
 				getValue: () => Config.LowerKey,
 				setValue: value => Config.LowerKey = value
 			);
 			configMenu.AddKeybind(
 				mod: ModManifest,
-				name: () => "Faster Key",
+				name: () => SHelper.Translation.Get("GMCM.FasterKey.Name"),
 				getValue: () => Config.FasterKey,
 				setValue: value => Config.FasterKey = value
 			);
 			configMenu.AddKeybind(
 				mod: ModManifest,
-				name: () => "Slower Key",
+				name: () => SHelper.Translation.Get("GMCM.SlowerKey.Name"),
 				getValue: () => Config.SlowerKey,
 				setValue: value => Config.SlowerKey = value
 			);
