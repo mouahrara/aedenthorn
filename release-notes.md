@@ -2,6 +2,12 @@
 
 # Global release notes
 
+## 21 June 2024
+* Released Craftable Butterfly Hutches version [0.1.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CraftableButterflyHutches/release-notes.md#011-unofficial1-mouahrara)
+* Released Craftable Terrarium version [0.1.3-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CraftableTerrarium/release-notes.md#013-unofficial2-mouahrara)
+* Released Fish Spot Bait version [0.1.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/FishSpotBait/release-notes.md#012-unofficial1-mouahrara)
+* Released Trampoline version [0.1.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/Trampoline/release-notes.md#012-unofficial1-mouahrara)
+
 ## 17 June 2024
 * Released Fishing Chests Expanded version [0.4.3-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/FishingChestsExpanded/release-notes.md#043-unofficial2-mouahrara)
 * Released Modify This version [0.9.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/ModifyThis/release-notes.md#091-unofficial1-mouahrara)
