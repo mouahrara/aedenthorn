@@ -162,11 +162,18 @@
 				{ "Version": "0.1.1-unofficial.2-mouahrara" }
 			]
 		},
+		"CraftableButterflyHutches": {
+			"Name": "Craftable Butterfly Hutches",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#CraftableButterflyHutches",
+			"Versions": [
+				{ "Version": "0.1.1-unofficial.1-mouahrara" }
+			]
+		},
 		"CraftableTerrarium": {
 			"Name": "Craftable Terrarium",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#CraftableTerrarium",
 			"Versions": [
-				{ "Version": "0.1.3-unofficial.1-mouahrara" }
+				{ "Version": "0.1.3-unofficial.2-mouahrara" }
 			]
 		},
 		"CropGrowthInfo": {
@@ -244,6 +251,13 @@
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#FishingChestsExpanded",
 			"Versions": [
 				{ "Version": "0.4.3-unofficial.2-mouahrara" }
+			]
+		},
+		"FishSpotBait": {
+			"Name": "Fish Spot Bait",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#FishSpotBait",
+			"Versions": [
+				{ "Version": "0.1.2-unofficial.1-mouahrara" }
 			]
 		},
 		"FloatingGardenPots": {
@@ -342,6 +356,13 @@
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#SubmergedCrabPots",
 			"Versions": [
 				{ "Version": "0.2.2-unofficial.1-mouahrara" }
+			]
+		},
+		"Trampoline": {
+			"Name": "Trampoline",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#Trampoline",
+			"Versions": [
+				{ "Version": "0.1.2-unofficial.1-mouahrara" }
 			]
 		},
 		"TreasureChestsExpanded": {
