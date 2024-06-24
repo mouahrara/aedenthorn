@@ -2,6 +2,10 @@
 
 # Global release notes
 
+## 24 June 2024
+* Released Bat Form version [0.3.4-unofficial.3-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BatForm/release-notes.md#034-unofficial3-mouahrara)
+* Released Fire Breath version [0.1.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/FireBreath/release-notes.md#011-unofficial1-mouahrara)
+
 ## 21 June 2024
 * Released Craftable Butterfly Hutches version [0.1.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CraftableButterflyHutches/release-notes.md#011-unofficial1-mouahrara)
 * Released Craftable Terrarium version [0.1.3-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CraftableTerrarium/release-notes.md#013-unofficial2-mouahrara)

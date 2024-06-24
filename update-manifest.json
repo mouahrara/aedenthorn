@@ -75,7 +75,7 @@
 			"Name": "Bat Form",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#BatForm",
 			"Versions": [
-				{ "Version": "0.3.4-unofficial.2-mouahrara" }
+				{ "Version": "0.3.4-unofficial.3-mouahrara" }
 			]
 		},
 		"BedTweaks": {
@@ -244,6 +244,13 @@
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#DynamicMapTiles",
 			"Versions": [
 				{ "Version": "0.9.7-unofficial.1-mouahrara" }
+			]
+		},
+		"FireBreath": {
+			"Name": "Fire Breath",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#FireBreath",
+			"Versions": [
+				{ "Version": "0.1.1-unofficial.1-mouahrara" }
 			]
 		},
 		"FishingChestsExpanded": {
