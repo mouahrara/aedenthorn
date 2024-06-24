@@ -19,7 +19,7 @@ namespace BatForm
 		{
 			public static void Postfix(ref float __result)
 			{
-				if (!Config.ModEnabled || Game1.currentLocation == null || BatFormStatus(Game1.player) == BatForm.Inactive)
+				if (!Config.ModEnabled || !Config.ZoomOutEnabled || Game1.currentLocation == null || BatFormStatus(Game1.player) == BatForm.Inactive)
 					return;
 
 				float nextZoomLevel = __result - height.Value / 100f;

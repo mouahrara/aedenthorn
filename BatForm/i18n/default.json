@@ -7,5 +7,6 @@
 	"GMCM.ActionsEnabled.Name": "Actions Enabled",
 	"GMCM.MoveSpeed.Name": "Move Speed",
 	"GMCM.StaminaUse.Name": "Stamina Use",
-	"GMCM.TransformSound.Name": "Transform Sound"
+	"GMCM.TransformSound.Name": "Transform Sound",
+	"GMCM.ZoomOutEnabled.Name": "Zoom Out Enabled"
 }

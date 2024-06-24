@@ -20,10 +20,8 @@ namespace BatForm
 
 		internal static ModEntry context;
 
-		internal static int maxHeight = 50;
-
-		internal static string batFormKey = "aedenthorn.BatForm";
-
+		internal const string batFormKey = "aedenthorn.BatForm";
+		internal const int maxHeight = 50;
 		internal static PerScreen<ICue> batSound = new();
 		internal static PerScreen<int> height = new();
 		internal static PerScreen<int> heightViewportLimit = new(() => maxHeight);
@@ -36,9 +34,6 @@ namespace BatForm
 			SwitchingFrom,
 			Active
 		}
-
-		//public static string dictPath = "aedenthorn.BatForm/dictionary";
-		//public static Dictionary<string, BatFormData> dataDict = new();
 
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
 		/// <param name="helper">Provides simplified APIs for writing mods.</param>
@@ -234,6 +229,11 @@ namespace BatForm
 
 		private void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
 		{
+			if (CompatibilityUtility.IsZoomLevelLoaded)
+			{
+				Config.ZoomOutEnabled = false;
+			}
+
 			// get Generic Mod Config Menu's API (if it's installed)
 			var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
 			if (configMenu is null)
@@ -317,6 +317,12 @@ namespace BatForm
 				name: () => SHelper.Translation.Get("GMCM.TransformSound.Name"),
 				getValue: () => Config.TransformSound,
 				setValue: value => Config.TransformSound = value
+			);
+			configMenu.AddBoolOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.ZoomOutEnabled.Name"),
+				getValue: () => Config.ZoomOutEnabled,
+				setValue: value => Config.ZoomOutEnabled = value
 			);
 		}
 	}

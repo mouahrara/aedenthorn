@@ -2,6 +2,11 @@
 
 # Release notes
 
+## 0.3.4-unofficial.3-mouahrara
+Released on 24 June, 2024, for SMAPI 4.0.0 or later.
+* Added compatibility with [Zoom Level](https://www.nexusmods.com/stardewvalley/mods/7363) ✨
+* Added **Zoom Out Enabled** option ✨
+
 ## 0.3.4-unofficial.2-mouahrara
 Released on 2 April, 2024, for SMAPI 4.0.0 or later.
 * Fixed a minor bug 🔧
