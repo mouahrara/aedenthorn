@@ -2,6 +2,10 @@
 
 # Release notes
 
+## 0.1.1-unofficial.2-mouahrara
+Released on 6 July, 2024, for SMAPI 4.0.0 or later.
+* Fixed Nexus Mods Id in the manifest 📝
+
 ## 0.1.1-unofficial.1-mouahrara
 Released on 22 April, 2024, for SMAPI 4.0.0 or later.
 * Migrated to 1.6.0 and project cleanup 🚀

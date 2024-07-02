@@ -1,13 +1,13 @@
 ﻿{
 	"Name": "Animated Parrot and Perch",
 	"Author": "aedenthorn",
-	"Version": "0.1.1-unofficial.1-mouahrara",
+	"Version": "0.1.1-unofficial.2-mouahrara",
 	"Description": "Adds three craftable parrot perches with an animated interactive parrot.",
 	"UniqueID": "aedenthorn.AnimatedParrotAndPerch",
 	"EntryDll": "AnimatedParrotAndPerch.dll",
 	"MinimumApiVersion": "4.0.0",
 	"UpdateKeys": [
-		"Nexus:7960",
+		"Nexus:7957",
 		"UpdateManifest:https://raw.githubusercontent.com/mouahrara/aedenthorn/master/update-manifest.json@AnimatedParrotAndPerch"
 	]
 }
