@@ -1,7 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using StardewModdingAPI;
-
-namespace MapTeleport
+﻿namespace MapTeleport
 {
 	public class ModConfig
 	{
