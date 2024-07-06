@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using StardewValley;
+using StardewValley.Extensions;
+using StardewValley.ItemTypeDefinitions;
 using StardewValley.Tools;
-using Object = StardewValley.Object;
 
 namespace FishingChestsExpanded
 {
@@ -37,17 +40,16 @@ namespace FishingChestsExpanded
 
 				IList<Item> items = advancedLootFrameworkApi.GetChestItems(treasuresList, Config.ItemListChances, Config.MaxItems, Config.MinItemValue, Config.MaxItemValue, difficulty, Config.IncreaseRate, Config.ItemsBaseMaxValue);
 				bool vanilla = Game1.random.NextDouble() < Config.VanillaLootChance / 100f;
+				string[] array = !string.IsNullOrEmpty(Config.AlwaysIncludeItems) ? Config.AlwaysIncludeItems.Split(',') : Array.Empty<string>();
 
 				foreach (Item item in inventory)
 				{
-					if (item.ItemId.Equals(fishingRod.whichFish.LocalItemId) || item.ItemId.Equals("GoldenBobber") || vanilla || (Config.AlwaysIncludeGeodes && Utility.IsGeode(item)))
+					ParsedItemData itemData = ItemRegistry.GetData(item.ItemId);
+
+					if (item.ItemId.Equals(fishingRod.whichFish.LocalItemId) || item.ItemId.Equals("890") || item.ItemId.Equals("GoldenBobber") || item.ItemId.Equals("TroutDerbyTag") || vanilla || array.Any(text => item.Name.Equals(text)) || (Config.AlwaysIncludeRoe && item.ItemId.Equals("812")) || (Config.AlwaysIncludeBooks && item.HasContextTag("book_item")) || (Config.AlwaysIncludeGeodes && Utility.IsGeode(item)) || (Config.AlwaysIncludeArtifacts && itemData.HasTypeObject() && itemData.ObjectType.Equals("Arch")))
 					{
 						items.Add(item);
 					}
-				}
-				if (Game1.random.NextDouble() <= 0.33 && Game1.player.team.SpecialOrderRuleActive("DROP_QI_BEANS", null))
-				{
-					items.Add(new Object("890", Game1.random.Next(1, 3) + ((Game1.random.NextDouble() < 0.25) ? 2 : 0), false, -1, 0));
 				}
 				inventory = items;
 				Game1.player.Money += coins;

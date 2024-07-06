@@ -89,10 +89,38 @@ namespace FishingChestsExpanded
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.AlwaysIncludeRoe.Name"),
+				tooltip: () => SHelper.Translation.Get("GMCM.AlwaysIncludeRoe.Tooltip"),
+				getValue: () => Config.AlwaysIncludeRoe,
+				setValue: value => Config.AlwaysIncludeRoe = value
+			);
+			configMenu.AddBoolOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.AlwaysIncludeBooks.Name"),
+				tooltip: () => SHelper.Translation.Get("GMCM.AlwaysIncludeBooks.Tooltip"),
+				getValue: () => Config.AlwaysIncludeBooks,
+				setValue: value => Config.AlwaysIncludeBooks = value
+			);
+			configMenu.AddBoolOption(
+				mod: ModManifest,
 				name: () => SHelper.Translation.Get("GMCM.AlwaysIncludeGeodes.Name"),
 				tooltip: () => SHelper.Translation.Get("GMCM.AlwaysIncludeGeodes.Tooltip"),
 				getValue: () => Config.AlwaysIncludeGeodes,
 				setValue: value => Config.AlwaysIncludeGeodes = value
+			);
+			configMenu.AddBoolOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.AlwaysIncludeArtifacts.Name"),
+				tooltip: () => SHelper.Translation.Get("GMCM.AlwaysIncludeArtifacts.Tooltip"),
+				getValue: () => Config.AlwaysIncludeArtifacts,
+				setValue: value => Config.AlwaysIncludeArtifacts = value
+			);
+			configMenu.AddTextOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.AlwaysIncludeItems.Name"),
+				tooltip: () => SHelper.Translation.Get("GMCM.AlwaysIncludeItems.Tooltip"),
+				getValue: () => Config.AlwaysIncludeItems,
+				setValue: value => Config.AlwaysIncludeItems = value
 			);
 			configMenu.AddNumberOption(
 				mod: ModManifest,

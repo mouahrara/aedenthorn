@@ -6,7 +6,11 @@ namespace FishingChestsExpanded
 	{
 		public bool EnableMod { get; set; } = true;
 		public int VanillaLootChance { get; set; } = 0;
+		public bool AlwaysIncludeRoe { get; set; } = true;
+		public bool AlwaysIncludeBooks { get; set; } = true;
 		public bool AlwaysIncludeGeodes { get; set; } = true;
+		public bool AlwaysIncludeArtifacts { get; set; } = true;
+		public string AlwaysIncludeItems { get; set; } = "Golden Animal Cracker,Golden Egg";
 		public int ChanceForTreasureChest { get; set; } = 15;
 		public int MaxItems { get; set; } = 5;
 		public int ItemsBaseMaxValue { get; set; } = 100;
