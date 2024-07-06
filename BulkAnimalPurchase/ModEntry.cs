@@ -6,6 +6,8 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.BellsAndWhistles;
+using StardewValley.GameData.FarmAnimals;
+using StardewValley.GameData.Machines;
 using StardewValley.Menus;
 using Object = StardewValley.Object;
 
@@ -30,10 +32,12 @@ namespace BulkAnimalPurchase
 			Config = Helper.ReadConfig<ModConfig>();
 
 			context = this;
-
 			SMonitor = Monitor;
 			SHelper = helper;
+
 			helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
+			helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
+			helper.Events.Content.AssetRequested += Content_AssetRequested;
 
 			// Load Harmony patches
 			try
@@ -76,12 +80,79 @@ namespace BulkAnimalPurchase
 					original: AccessTools.Method(typeof(SpriteText), nameof(SpriteText.drawStringWithScrollBackground)),
 					prefix: new HarmonyMethod(typeof(SpriteText_drawStringWithScrollBackground_Patch), nameof(SpriteText_drawStringWithScrollBackground_Patch.Prefix))
 				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(AnimalHouse), nameof(AnimalHouse.addNewHatchedAnimal), new Type[] { typeof(string) }),
+					transpiler: new HarmonyMethod(typeof(AnimalHouse_addNewHatchedAnimal_Patch), nameof(AnimalHouse_addNewHatchedAnimal_Patch.Transpiler))
+				);
 			}
 			catch (Exception e)
 			{
 				Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
 				return;
 			}
+		}
+
+		private void Content_AssetRequested(object sender, AssetRequestedEventArgs e)
+		{
+			if (!Config.EnableMod)
+				return;
+
+			if (e.NameWithoutLocale.IsEquivalentTo("Data/Machines"))
+			{
+				e.Edit(asset =>
+				{
+					IDictionary<string, MachineData> data = asset.AsDictionary<string, MachineData>().Data;
+
+					foreach (MachineOutputRule machineOutputRule in data["(BC)101"].OutputRules)
+					{
+						if (machineOutputRule.Id.Equals("Default"))
+						{
+							machineOutputRule.MinutesUntilReady = Config.DefaultIncubatorTime;
+						}
+					}
+					foreach (MachineOutputRule machineOutputRule in data["(BC)254"].OutputRules)
+					{
+						if (machineOutputRule.Id.Equals("Default"))
+						{
+							machineOutputRule.MinutesUntilReady = Config.DefaultOstrichIncubatorTime;
+						}
+					}
+					foreach (MachineOutputRule machineOutputRule in data["(BC)156"].OutputRules)
+					{
+						if (machineOutputRule.Id.Equals("Default"))
+						{
+							machineOutputRule.MinutesUntilReady = Config.DefaultSlimeIncubatorTime;
+						}
+					}
+				});
+			}
+			if (e.NameWithoutLocale.IsEquivalentTo("Data/FarmAnimals"))
+			{
+				e.Edit(asset =>
+				{
+					IDictionary<string, FarmAnimalData> data = asset.AsDictionary<string, FarmAnimalData>().Data;
+
+					data["White Chicken"].IncubationTime = Config.ChickenIncubationTime;
+					data["Brown Chicken"].IncubationTime = Config.ChickenIncubationTime;
+					data["Blue Chicken"].IncubationTime = Config.ChickenIncubationTime;
+					data["Void Chicken"].IncubationTime = Config.ChickenIncubationTime;
+					data["Golden Chicken"].IncubationTime = Config.ChickenIncubationTime;
+					data["Duck"].IncubationTime = Config.DuckIncubationTime;
+					data["Dinosaur"].IncubationTime = Config.DinosaurIncubationTime;
+					data["Ostrich"].IncubationTime = Config.OstrichIncubationTime;
+				});
+			}
+		}
+
+		private static void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
+		{
+			SHelper.Events.GameLoop.UpdateTicked += GameLoop_UpdateTicked;
+		}
+
+		private static void GameLoop_UpdateTicked(object sender, UpdateTickedEventArgs e)
+		{
+			UpdateMachinesRules();
+			SHelper.Events.GameLoop.UpdateTicked -= GameLoop_UpdateTicked;
 		}
 
 		private void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
@@ -95,7 +166,15 @@ namespace BulkAnimalPurchase
 			configMenu.Register(
 				mod: ModManifest,
 				reset: () => Config = new ModConfig(),
-				save: () => Helper.WriteConfig(Config)
+				save: () => {
+					Config.DefaultIncubatorTime = Math.Max(Math.Min(Math.Min(Config.ChickenIncubationTime, Config.DuckIncubationTime), Config.DinosaurIncubationTime), 10);
+					Config.DefaultOstrichIncubatorTime = Math.Max(Config.OstrichIncubationTime, 10);
+					Config.DefaultSlimeIncubatorTime = Math.Max(Math.Min(Math.Min(Math.Min(Math.Min(Config.GreenSlimeIncubationTime, Config.BlueSlimeIncubationTime), Config.RedSlimeIncubationTime), Config.PurpleSlimeIncubationTime), Config.TigerSlimeIncubationTime), 10);
+					SHelper.GameContent.InvalidateCache("Data/Machines");
+					SHelper.GameContent.InvalidateCache("Data/FarmAnimals");
+					UpdateMachinesRules();
+					Helper.WriteConfig(Config);
+				}
 			);
 
 			configMenu.AddBoolOption(
@@ -104,13 +183,127 @@ namespace BulkAnimalPurchase
 				getValue: () => Config.EnableMod,
 				setValue: value => Config.EnableMod = value
 			);
-		}
-
-		public static string AddToString(string str)
-		{
-			if (!Config.EnableMod)
-				return str;
-			return str + " " + string.Format(SHelper.Translation.Get("x-left-to-add"), animalsToBuy);
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.InitialFriendship.Name"),
+				getValue: () => Config.InitialFriendship,
+				setValue: value => Config.InitialFriendship = value
+			);
+			configMenu.AddBoolOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.AdultAnimals.Name"),
+				tooltip: () => SHelper.Translation.Get("GMCM.AdultAnimals.Tooltip"),
+				getValue: () => Config.AdultAnimals,
+				setValue: value => Config.AdultAnimals = value
+			);
+			configMenu.AddSectionTitle(
+				mod: ModManifest,
+				text: () => SHelper.Translation.Get("GMCM.Price.Text")
+			);
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.Chicken.Name"),
+				getValue: () => Config.ChickenPrice,
+				setValue: value => Config.ChickenPrice = Math.Max(value, 0)
+			);
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => Game1.content.LoadString("Strings\\FarmAnimals:DisplayType_Duck"),
+				getValue: () => Config.DuckPrice,
+				setValue: value => Config.DuckPrice = Math.Max(value, 0)
+			);
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => Game1.content.LoadString("Strings\\FarmAnimals:DisplayType_Rabbit"),
+				getValue: () => Config.RabbitPrice,
+				setValue: value => Config.RabbitPrice = Math.Max(value, 0)
+			);
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.Cow.Name"),
+				getValue: () => Config.CowPrice,
+				setValue: value => Config.CowPrice = Math.Max(value, 0)
+			);
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => Game1.content.LoadString("Strings\\FarmAnimals:DisplayType_Goat"),
+				getValue: () => Config.GoatPrice,
+				setValue: value => Config.GoatPrice = Math.Max(value, 0)
+			);
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => Game1.content.LoadString("Strings\\FarmAnimals:DisplayType_Sheep"),
+				getValue: () => Config.SheepPrice,
+				setValue: value => Config.SheepPrice = Math.Max(value, 0)
+			);
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => Game1.content.LoadString("Strings\\FarmAnimals:DisplayType_Pig"),
+				getValue: () => Config.PigPrice,
+				setValue: value => Config.PigPrice = Math.Max(value, 0)
+			);
+			configMenu.AddSectionTitle(
+				mod: ModManifest,
+				text: () => SHelper.Translation.Get("GMCM.IncubationTime.Name")
+			);
+			configMenu.AddParagraph(
+				mod: ModManifest,
+				text: () => SHelper.Translation.Get("GMCM.IncubationTime.Desc")
+			);
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.Chicken.Name"),
+				getValue: () => Config.ChickenIncubationTime,
+				setValue: value => Config.ChickenIncubationTime = Math.Max(value, 10)
+			);
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => Game1.content.LoadString("Strings\\FarmAnimals:DisplayType_Duck"),
+				getValue: () => Config.DuckIncubationTime,
+				setValue: value => Config.DuckIncubationTime = Math.Max(value, 10)
+			);
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => Game1.content.LoadString("Strings\\FarmAnimals:DisplayType_Dinosaur"),
+				getValue: () => Config.DinosaurIncubationTime,
+				setValue: value => Config.DinosaurIncubationTime = Math.Max(value, 10)
+			);
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => Game1.content.LoadString("Strings\\FarmAnimals:DisplayType_Ostrich"),
+				getValue: () => Config.OstrichIncubationTime,
+				setValue: value => Config.OstrichIncubationTime = Math.Max(value, 10)
+			);
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.GreenSlime.Name"),
+				getValue: () => Config.GreenSlimeIncubationTime,
+				setValue: value => Config.GreenSlimeIncubationTime = Math.Max(value, 10)
+			);
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.BlueSlime.Name"),
+				getValue: () => Config.BlueSlimeIncubationTime,
+				setValue: value => Config.BlueSlimeIncubationTime = Math.Max(value, 10)
+			);
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.RedSlime.Name"),
+				getValue: () => Config.RedSlimeIncubationTime,
+				setValue: value => Config.RedSlimeIncubationTime = Math.Max(value, 10)
+			);
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.PurpleSlime.Name"),
+				getValue: () => Config.PurpleSlimeIncubationTime,
+				setValue: value => Config.PurpleSlimeIncubationTime = Math.Max(value, 10)
+			);
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.TigerSlime.Name"),
+				getValue: () => Config.TigerSlimeIncubationTime,
+				setValue: value => Config.TigerSlimeIncubationTime = Math.Max(value, 10)
+			);
 		}
 	}
 }

@@ -5,10 +5,12 @@ using System.Reflection;
 using System.Reflection.Emit;
 using HarmonyLib;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.Extensions;
 using StardewValley.GameData.FarmAnimals;
 using StardewValley.Menus;
+using Object = StardewValley.Object;
 
 namespace BulkAnimalPurchase
 {
@@ -23,10 +25,9 @@ namespace BulkAnimalPurchase
 				if (!Config.EnableMod)
 					return;
 
-				animalsToBuy = 1;
-
 				Point start = new Point(Game1.uiViewport.Width / 2 + PurchaseAnimalsMenu.menuWidth / 2 - IClickableMenu.borderWidth * 2, (Game1.uiViewport.Height - PurchaseAnimalsMenu.menuHeight - IClickableMenu.borderWidth * 2) / 4) + new Point(-100, PurchaseAnimalsMenu.menuHeight + 120);
 
+				animalsToBuy = 1;
 				minusButton = new ClickableTextureComponent("BAPMod_minus", new Rectangle(start, new Point(64, 64)), null, "", Game1.mouseCursors, OptionsPlusMinus.minusButtonSource, 4f, false)
 				{
 					myID = 200,
@@ -43,7 +44,6 @@ namespace BulkAnimalPurchase
 					rightNeighborID = -99998,
 					downNeighborID = -99998
 				};
-
 			}
 		}
 
@@ -56,8 +56,9 @@ namespace BulkAnimalPurchase
 				if (!Config.EnableMod || Game1.activeClickableMenu is not PurchaseAnimalsMenu || Game1.IsFading() || skip || AccessTools.FieldRefAccess<PurchaseAnimalsMenu, bool>(Game1.activeClickableMenu as PurchaseAnimalsMenu, "onFarm") || AccessTools.FieldRefAccess<PurchaseAnimalsMenu, bool>(Game1.activeClickableMenu as PurchaseAnimalsMenu, "namingAnimal"))
 					return;
 
-				var menu = Game1.activeClickableMenu;
-				var b = Game1.spriteBatch;
+				IClickableMenu menu = Game1.activeClickableMenu;
+				SpriteBatch b = Game1.spriteBatch;
+
 				skip = true;
 				Game1.drawDialogueBox(menu.xPositionOnScreen, menu.yPositionOnScreen + menu.height - 100, menu.width, 200, false, true, null, false, true, -1, -1, -1);
 				skip = false;
@@ -73,14 +74,15 @@ namespace BulkAnimalPurchase
 			public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 			{
 				SMonitor.Log($"Transpiling PurchaseAnimalsMenu.draw");
-				var codes = new List<CodeInstruction>(instructions);
+				List<CodeInstruction> codes = instructions.ToList();
 				bool found = false;
+
 				for (int i = 0; i < codes.Count; i++)
 				{
 					if (found && codes[i].opcode == OpCodes.Callvirt && (MethodInfo)codes[i].operand == AccessTools.Method(typeof(LocalizedContentManager), nameof(LocalizedContentManager.LoadString), new Type[] { typeof(string),typeof(object),typeof(object) }))
 					{
 						SMonitor.Log("Adding to string result");
-						codes.Insert(i + 1, new CodeInstruction(OpCodes.Call, typeof(ModEntry).GetMethod(nameof(ModEntry.AddToString))));
+						codes.Insert(i + 1, new CodeInstruction(OpCodes.Call, typeof(PurchaseAnimalsMenu_draw_Patch).GetMethod(nameof(AddToString))));
 						break;
 					}
 					else if (!found && codes[i].opcode == OpCodes.Ldstr && (string)codes[i].operand == "Strings\\StringsFromCSFiles:PurchaseAnimalsMenu.cs.11355")
@@ -89,8 +91,15 @@ namespace BulkAnimalPurchase
 						found = true;
 					}
 				}
+				return codes;
+			}
 
-				return codes.AsEnumerable();
+			public static string AddToString(string str)
+			{
+				if (!Config.EnableMod)
+					return str;
+
+				return str + " " + string.Format(SHelper.Translation.Get("x-left-to-add"), animalsToBuy);
 			}
 		}
 
@@ -120,6 +129,7 @@ namespace BulkAnimalPurchase
 				if (!Config.EnableMod || animalsToBuy <= 1)
 					return true;
 
+				ApplyConfiguration(__instance.animalBeingPurchased);
 				animalsToBuy--;
 				Game1.addHUDMessage(new HUDMessage(__instance.animalBeingPurchased.isMale() ? Game1.content.LoadString("Strings\\StringsFromCSFiles:PurchaseAnimalsMenu.cs.11311", __instance.animalBeingPurchased.displayName) : Game1.content.LoadString("Strings\\StringsFromCSFiles:PurchaseAnimalsMenu.cs.11314", __instance.animalBeingPurchased.displayName), 1));
 				__instance.namingAnimal = false;
@@ -209,11 +219,22 @@ namespace BulkAnimalPurchase
 
 		public class Item_salePrice_Patch
 		{
-			public static void Postfix(ref int __result)
+			public static void Postfix(Object __instance, ref int __result)
 			{
 				if (!Config.EnableMod || Game1.activeClickableMenu is not PurchaseAnimalsMenu)
 					return;
 
+				__result = __instance.Name switch
+				{
+					"White Chicken" => Config.ChickenPrice,
+					"Duck" => Config.DuckPrice,
+					"Rabbit" => Config.RabbitPrice,
+					"White Cow" => Config.CowPrice,
+					"Goat" => Config.GoatPrice,
+					"Sheep" => Config.SheepPrice,
+					"Pig" => Config.PigPrice,
+					_ => __result
+				};
 				__result *= animalsToBuy;
 			}
 		}
@@ -227,6 +248,25 @@ namespace BulkAnimalPurchase
 
 				s += " x" + animalsToBuy;
 				placeHolderWidthText += " x" + animalsToBuy;
+			}
+		}
+
+		public class AnimalHouse_addNewHatchedAnimal_Patch
+		{
+			public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+			{
+				SMonitor.Log($"Transpiling AnimalHouse.addNewHatchedAnimal");
+				List<CodeInstruction> codes = instructions.ToList();
+
+				for (int i = 0; i < codes.Count; i++)
+				{
+					if (codes[i].opcode == OpCodes.Call && (MethodInfo)codes[i].operand == AccessTools.Method(typeof(AnimalHouse), nameof(AnimalHouse.adoptAnimal), new Type[] { typeof(FarmAnimal) }))
+					{
+						codes.Insert(i, new CodeInstruction(OpCodes.Call, typeof(ModEntry).GetMethod(nameof(ApplyConfiguration))));
+						i++;
+					}
+				}
+				return codes;
 			}
 		}
 	}
