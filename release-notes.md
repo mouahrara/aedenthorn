@@ -2,6 +2,12 @@
 
 # Global release notes
 
+## 6 July 2024
+* Released Animated Parrot and Perch version [0.1.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AnimatedParrotAndPerch/release-notes.md#011-unofficial2-mouahrara)
+* Released Bulk Animal Purchase version [0.2.2-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BulkAnimalPurchase/release-notes.md#022-unofficial2-mouahrara)
+* Released Fishing Chests Expanded version [0.4.3-unofficial.3-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/FishingChestsExpanded/release-notes.md#043-unofficial3-mouahrara)
+* Released Map Teleport version [0.5.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/MapTeleport/release-notes.md#051-unofficial1-mouahrara)
+
 ## 24 June 2024
 * Released Bat Form version [0.3.4-unofficial.3-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BatForm/release-notes.md#034-unofficial3-mouahrara)
 * Released Fire Breath version [0.1.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/FireBreath/release-notes.md#011-unofficial1-mouahrara)

@@ -61,7 +61,7 @@
 			"Name": "Animated Parrot and Perch",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#AnimatedParrotAndPerch",
 			"Versions": [
-				{ "Version": "0.1.1-unofficial.1-mouahrara" }
+				{ "Version": "0.1.1-unofficial.2-mouahrara" }
 			]
 		},
 		"AprilBugFixSuite": {
@@ -131,7 +131,7 @@
 			"Name": "Bulk Animal Purchase",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#BulkAnimalPurchase",
 			"Versions": [
-				{ "Version": "0.2.2-unofficial.1-mouahrara" }
+				{ "Version": "0.2.2-unofficial.2-mouahrara" }
 			]
 		},
 		"CatalogueFilter": {
@@ -257,7 +257,7 @@
 			"Name": "Fishing Chests Expanded",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#FishingChestsExpanded",
 			"Versions": [
-				{ "Version": "0.4.3-unofficial.2-mouahrara" }
+				{ "Version": "0.4.3-unofficial.3-mouahrara" }
 			]
 		},
 		"FishSpotBait": {
@@ -314,6 +314,13 @@
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#LivestockChoices",
 			"Versions": [
 				{ "Version": "0.2.2-unofficial.1-mouahrara" }
+			]
+		},
+		"MapTeleport": {
+			"Name": "Map Teleport",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#MapTeleport",
+			"Versions": [
+				{ "Version": "0.5.1-unofficial.1-mouahrara" }
 			]
 		},
 		"ModifyThis": {
