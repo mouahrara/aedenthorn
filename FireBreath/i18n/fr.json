@@ -6,5 +6,9 @@
 	"GMCM.FireDamage.Name": "Dégâts du feu",
 	"GMCM.FireDistance.Name": "Distance du feu",
 	"GMCM.FireSound.Name": "Son du feu",
+	"GMCM.StaminaUse.Name": "Consommation d'endurance",
+	"GMCM.StaminaManaUse.Name": "Consommation d'endurance ou de mana",
+	"GMCM.UseMana.Name": "Utiliser du mana",
+	"GMCM.UseMana.Tooltip": "Détermine s'il faut consommer du mana au lieu de l'endurance pour cracher du feu.",
 	"GMCM.FireAnnoysNonMonsters.Name": "Le feu agace les non-monstres"
 }

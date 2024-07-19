@@ -1,7 +1,4 @@
-﻿using System;
-using Microsoft.Xna.Framework;
-using StardewModdingAPI;
-using StardewModdingAPI.Events;
+﻿using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.Monsters;
 using StardewValley.Projectiles;

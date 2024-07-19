@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
-using StardewValley.Projectiles;
 
 namespace FireBreath
 {
@@ -14,8 +13,10 @@ namespace FireBreath
 		internal static IModHelper SHelper;
 		internal static IManifest SModManifest;
 		internal static ModConfig Config;
-
 		internal static ModEntry context;
+
+		internal static IManaBarApi manaBarApi = null;
+
 		private bool firing = false;
 		private int ticks;
 
@@ -26,15 +27,15 @@ namespace FireBreath
 			Config = Helper.ReadConfig<ModConfig>();
 
 			context = this;
-
 			SMonitor = Monitor;
 			SHelper = helper;
 			SModManifest = ModManifest;
 
 			helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
+			Helper.Events.GameLoop.UpdateTicking += GameLoop_UpdateTicking;
+			helper.Events.GameLoop.OneSecondUpdateTicked += GameLoop_OneSecondUpdateTicked;
 			Helper.Events.Input.ButtonPressed += Input_ButtonPressed;
 			Helper.Events.Input.ButtonReleased += Input_ButtonReleased;
-			Helper.Events.GameLoop.UpdateTicking += GameLoop_UpdateTicking;
 		}
 
 		private void GameLoop_UpdateTicking(object sender, UpdateTickingEventArgs e)
@@ -95,6 +96,31 @@ namespace FireBreath
 			}
 		}
 
+		private void GameLoop_OneSecondUpdateTicked(object sender, StardewModdingAPI.Events.OneSecondUpdateTickedEventArgs e)
+		{
+			if (!Config.ModEnabled || !firing || Config.StaminaUse <= 0)
+				return;
+
+			if (manaBarApi is not null && Config.UseMana)
+			{
+				if (manaBarApi.GetMana(Game1.player) < Config.StaminaUse)
+				{
+					firing = false;
+					return;
+				}
+				manaBarApi.AddMana(Game1.player, -Config.StaminaUse);
+			}
+			else
+			{
+				if (Game1.player.Stamina < Config.StaminaUse)
+				{
+					firing = false;
+					return;
+				}
+				Game1.player.Stamina = Math.Max(0.1f, Game1.player.Stamina - Config.StaminaUse);
+			}
+		}
+
 		private void Input_ButtonPressed(object sender, ButtonPressedEventArgs e)
 		{
 			if (!Config.ModEnabled)
@@ -102,8 +128,26 @@ namespace FireBreath
 
 			if (e.Button == Config.FireButton)
 			{
-				Monitor.Log($"Begin fire breath, skill level {Game1.player.getEffectiveSkillLevel(4)}");
-				firing = true;
+				void Fire()
+				{
+					Monitor.Log($"Begin fire breath, skill level {Game1.player.getEffectiveSkillLevel(4)}");
+					firing = true;
+				}
+
+				if (manaBarApi is not null && Config.UseMana)
+				{
+					if (manaBarApi.GetMana(Game1.player) >= Config.StaminaUse)
+					{
+						Fire();
+					}
+				}
+				else
+				{
+					if (Game1.player.Stamina >= Config.StaminaUse)
+					{
+						Fire();
+					}
+				}
 			}
 		}
 
@@ -118,6 +162,11 @@ namespace FireBreath
 
 		private void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
 		{
+			if (CompatibilityUtility.IsManaBarLoaded)
+			{
+				manaBarApi = context.Helper.ModRegistry.GetApi<IManaBarApi>("spacechase0.ManaBar");
+			}
+
 			// get Generic Mod Config Menu's API (if it's installed)
 			var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
 			if (configMenu is null)
@@ -166,6 +215,23 @@ namespace FireBreath
 				getValue: () => Config.FireSound,
 				setValue: value => Config.FireSound = value
 			);
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => CompatibilityUtility.IsManaBarLoaded ? SHelper.Translation.Get("GMCM.StaminaManaUse.Name") : SHelper.Translation.Get("GMCM.StaminaUse.Name"),
+				getValue: () => Config.StaminaUse,
+				setValue: value => Config.StaminaUse = value
+			);
+
+			if (CompatibilityUtility.IsManaBarLoaded)
+			{
+				configMenu.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.UseMana.Name"),
+					tooltip: () => SHelper.Translation.Get("GMCM.UseMana.Tooltip"),
+					getValue: () => Config.UseMana,
+					setValue: value => Config.UseMana = value
+				);
+			}
 			configMenu.AddBoolOption(
 				mod: ModManifest,
 				name: () => SHelper.Translation.Get("GMCM.FireAnnoysNonMonsters.Name"),
