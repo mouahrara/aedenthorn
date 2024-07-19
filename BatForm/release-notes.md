@@ -2,6 +2,11 @@
 
 # Release notes
 
+## 0.3.4-unofficial.4-mouahrara
+Released on 20 July, 2024, for SMAPI 4.0.0 or later.
+* Added compatibility with [Mana Bar](https://www.nexusmods.com/stardewvalley/mods/7831) ✨
+* Fixed minor bugs 🔧
+
 ## 0.3.4-unofficial.3-mouahrara
 Released on 24 June, 2024, for SMAPI 4.0.0 or later.
 * Added compatibility with [Zoom Level](https://www.nexusmods.com/stardewvalley/mods/7363) ✨

@@ -8,24 +8,36 @@ namespace BatForm
 	{
 		public static void TransformBat()
 		{
-			var status = BatFormStatus(Game1.player);
+			BatForm status = BatFormStatus(Game1.player);
+
 			if (status == BatForm.Inactive || status == BatForm.SwitchingFrom)
+			{
 				status = BatForm.SwitchingTo;
+			}
 			else
+			{
 				status = BatForm.SwitchingFrom;
+			}
 			Game1.player.modData[batFormKey] = status.ToString();
 		}
 
 		public static void PlayTransform()
 		{
 			TemporaryAnimatedSpriteList sprites = new();
+
 			if (Game1.random.NextDouble() < 0.5)
+			{
 				sprites.Add(new TemporaryAnimatedSprite(362, Game1.random.Next(30, 90), 6, 1, new Vector2(Game1.player.Tile.X * 64f, Game1.player.Tile.Y * 64f), false, Game1.random.NextDouble() < 0.5));
+			}
 			else
+			{
 				sprites.Add(new TemporaryAnimatedSprite(362, Game1.random.Next(30, 90), 6, 1, new Vector2(Game1.player.Tile.X * 64f, Game1.player.Tile.Y * 64f), false, Game1.random.NextDouble() < 0.5));
+			}
 			Game1.Multiplayer.broadcastSprites(Game1.player.currentLocation, sprites);
-			if(!string.IsNullOrEmpty(Config.TransformSound))
+			if (!string.IsNullOrEmpty(Config.TransformSound))
+			{
 				Game1.player.currentLocation.playSound(Config.TransformSound);
+			}
 		}
 
 		private void ResetBat()
@@ -38,7 +50,7 @@ namespace BatForm
 			heightViewportLimit.Value = maxHeight;
 			Game1.forceSnapOnNextViewportUpdate = true;
 			Game1.game1.refreshWindowSettings();
-			if(Game1.player is not null)
+			if (Game1.player is not null)
 			{
 				Game1.player.ignoreCollisions = false;
 				Game1.player.buffs.Remove($"{SModManifest.UniqueID}.BatForm");

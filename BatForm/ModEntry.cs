@@ -17,8 +17,9 @@ namespace BatForm
 		internal static IModHelper SHelper;
 		internal static IManifest SModManifest;
 		internal static ModConfig Config;
-
 		internal static ModEntry context;
+
+		internal static IManaBarApi manaBarApi = null;
 
 		internal const string batFormKey = "aedenthorn.BatForm";
 		internal const int maxHeight = 50;
@@ -42,7 +43,6 @@ namespace BatForm
 			Config = Helper.ReadConfig<ModConfig>();
 
 			context = this;
-
 			SMonitor = Monitor;
 			SHelper = helper;
 			SModManifest = ModManifest;
@@ -53,11 +53,8 @@ namespace BatForm
 			helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
 			helper.Events.GameLoop.DayEnding += GameLoop_DayEnding;
 			helper.Events.GameLoop.ReturnedToTitle += GameLoop_ReturnedToTitle;
-
 			helper.Events.Player.Warped += Player_Warped;
-
 			helper.Events.Input.ButtonsChanged += Input_ButtonsChanged;
-
 			helper.Events.Display.RenderedWorld += Display_RenderedWorld;
 
 			// Load Harmony patches
@@ -110,14 +107,15 @@ namespace BatForm
 		{
 			if (!Config.ModEnabled || e.Player != Game1.player || BatFormStatus(e.Player) == BatForm.Inactive)
 				return;
+
 			heightViewportLimit.Value = maxHeight;
 			Game1.forceSnapOnNextViewportUpdate = true;
 			Game1.game1.refreshWindowSettings();
-			if(Config.OutdoorsOnly && !e.NewLocation.IsOutdoors)
+			if (Config.OutdoorsOnly && !e.NewLocation.IsOutdoors)
 			{
 				ResetBat();
 			}
-			if(Game1.CurrentEvent != null)
+			if (Game1.CurrentEvent != null)
 			{
 				ResetBat();
 			}
@@ -135,20 +133,34 @@ namespace BatForm
 
 		private void GameLoop_OneSecondUpdateTicked(object sender, StardewModdingAPI.Events.OneSecondUpdateTickedEventArgs e)
 		{
-			if(!Config.ModEnabled || BatFormStatus(Game1.player) != BatForm.Active || Config.StaminaUse <= 0)
+			if (!Config.ModEnabled || BatFormStatus(Game1.player) != BatForm.Active || Config.StaminaUse <= 0)
 				return;
-			if(Game1.player.Stamina <= Config.StaminaUse)
+
+			if (manaBarApi is not null && Config.UseMana)
 			{
-				TransformBat();
-				return;
+				if (manaBarApi.GetMana(Game1.player) < Config.StaminaUse)
+				{
+					TransformBat();
+					return;
+				}
+				manaBarApi.AddMana(Game1.player, -Config.StaminaUse);
 			}
-			Game1.player.Stamina -= Config.StaminaUse;
+			else
+			{
+				if (Game1.player.Stamina < Config.StaminaUse)
+				{
+					TransformBat();
+					return;
+				}
+				Game1.player.Stamina = Math.Max(0.1f, Game1.player.Stamina - Config.StaminaUse);
+			}
 		}
 
 		private void Display_RenderedWorld(object sender, StardewModdingAPI.Events.RenderedWorldEventArgs e)
 		{
 			if (!Config.ModEnabled || BatFormStatus(Game1.player) == BatForm.Inactive)
 				return;
+
 			batSprite.Value ??= new AnimatedSprite("Characters\\Monsters\\Bat");
 			e.SpriteBatch.Draw(batSprite.Value.Texture, Game1.player.getLocalPosition(Game1.viewport) + new Vector2(32f, -height.Value * 8), new Rectangle?(batSprite.Value.SourceRect), Color.White, 0f, new Vector2(8f, 16f), (1 + height.Value / 50f) * 4f, SpriteEffects.None, Game1.player.StandingPixel.Y / 10000 + 0.05f + height.Value / 750f);
 			batSprite.Value.Animate(Game1.currentGameTime, 0, 4, 80f);
@@ -164,13 +176,13 @@ namespace BatForm
 			if (!Config.ModEnabled || !Context.IsWorldReady)
 				return;
 
-			if(Game1.killScreen || Game1.player is null || Game1.player.health <= 0 || Game1.timeOfDay >= 2600 || Game1.eventUp || Game1.CurrentEvent != null)
+			if (Game1.killScreen || Game1.player is null || Game1.player.health <= 0 || Game1.timeOfDay >= 2600 || Game1.eventUp || Game1.CurrentEvent != null)
 			{
 				ResetBat();
 				return;
 			}
 
-			var status = BatFormStatus(Game1.player);
+			BatForm status = BatFormStatus(Game1.player);
 
 			if (status != BatForm.Inactive)
 			{
@@ -222,13 +234,31 @@ namespace BatForm
 
 		private void Input_ButtonsChanged(object sender, StardewModdingAPI.Events.ButtonsChangedEventArgs e)
 		{
-			if(!Config.ModEnabled || !Context.CanPlayerMove || !Config.TransformKey.JustPressed() || BatFormStatus(Game1.player) == BatForm.SwitchingFrom || BatFormStatus(Game1.player) == BatForm.SwitchingTo || (Config.NightOnly && Game1.timeOfDay < 1800) || (Config.OutdoorsOnly && !Game1.player.currentLocation.IsOutdoors) || (!Config.ActionsEnabled && Game1.player.isRidingHorse()))
+			if (!Config.ModEnabled || !Context.CanPlayerMove || !Config.TransformKey.JustPressed() || BatFormStatus(Game1.player) == BatForm.SwitchingFrom || BatFormStatus(Game1.player) == BatForm.SwitchingTo || (Config.NightOnly && Game1.timeOfDay < 1800) || (Config.OutdoorsOnly && !Game1.player.currentLocation.IsOutdoors) || (!Config.ActionsEnabled && Game1.player.isRidingHorse()))
 				return;
-			TransformBat();
+
+			if (manaBarApi is not null && Config.UseMana)
+			{
+				if (manaBarApi.GetMana(Game1.player) >= Config.StaminaUse)
+				{
+					TransformBat();
+				}
+			}
+			else
+			{
+				if (Game1.player.Stamina >= Config.StaminaUse)
+				{
+					TransformBat();
+				}
+			}
 		}
 
 		private void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
 		{
+			if (CompatibilityUtility.IsManaBarLoaded)
+			{
+				manaBarApi = context.Helper.ModRegistry.GetApi<IManaBarApi>("spacechase0.ManaBar");
+			}
 			if (CompatibilityUtility.IsZoomLevelLoaded)
 			{
 				Config.ZoomOutEnabled = false;
@@ -308,10 +338,22 @@ namespace BatForm
 			);
 			configMenu.AddNumberOption(
 				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.StaminaUse.Name"),
+				name: () => CompatibilityUtility.IsManaBarLoaded ? SHelper.Translation.Get("GMCM.StaminaManaUse.Name") : SHelper.Translation.Get("GMCM.StaminaUse.Name"),
 				getValue: () => Config.StaminaUse,
 				setValue: value => Config.StaminaUse = value
 			);
+
+			if (CompatibilityUtility.IsManaBarLoaded)
+			{
+				configMenu.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.UseMana.Name"),
+					tooltip: () => SHelper.Translation.Get("GMCM.UseMana.Tooltip"),
+					getValue: () => Config.UseMana,
+					setValue: value => Config.UseMana = value
+				);
+			}
+
 			configMenu.AddTextOption(
 				mod: ModManifest,
 				name: () => SHelper.Translation.Get("GMCM.TransformSound.Name"),

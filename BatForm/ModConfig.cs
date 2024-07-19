@@ -13,6 +13,7 @@ namespace BatForm
 		public string TransformSound { get; set; } = "cowboy_explosion";
 		public int MoveSpeed { get; set; } = 10;
 		public int StaminaUse { get; set; } = 0;
+		public bool UseMana { get; set; } = true;
 		public bool ZoomOutEnabled { get; set; } = true;
 	}
 }
