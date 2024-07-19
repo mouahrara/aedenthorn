@@ -1,22 +1,13 @@
 ﻿{
-	"Name": "MayoMart",
+	"Name": "Mayo Mart",
 	"Author": "aedenthorn",
-	"Version": "0.1.0",
-	"Description": "MayoMart.",
+	"Version": "0.1.1-unofficial.1-mouahrara",
+	"Description": "Replaces the terrible Joja Corporation with the more benevolent Mayo Corporation.",
 	"UniqueID": "aedenthorn.MayoMart",
 	"EntryDll": "MayoMart.dll",
-	"MinimumApiVersion": "3.15.0",
-	"ModUpdater": {
-		"Repository": "StardewValleyMods",
-		"User": "aedenthorn",
-		"Directory": "_releases",
-		"ModFolder": "MayoMart"
-	},
-	"Dependencies": [
-		{
-			"UniqueID": "Platonymous.ModUpdater",
-			"IsRequired": false
-		}
-	],
-	"UpdateKeys": [ "Nexus:17175" ]
+	"MinimumApiVersion": "4.0.0",
+	"UpdateKeys": [
+		"Nexus:17175",
+		"UpdateManifest:https://raw.githubusercontent.com/mouahrara/aedenthorn/master/update-manifest.json@MayoMart"
+	]
 }
