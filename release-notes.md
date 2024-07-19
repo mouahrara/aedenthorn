@@ -2,6 +2,12 @@
 
 # Global release notes
 
+## 20 July 2024
+* Released Bat Form version [0.3.4-unofficial.4-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BatForm/release-notes.md#034-unofficial4-mouahrara)
+* Released Fire Breath version [0.1.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/FireBreath/release-notes.md#011-unofficial2-mouahrara)
+* Released Mayo Mart version [0.1.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/MayoMart/release-notes.md#011-unofficial1-mouahrara)
+* Released Witcher Mod version [0.2.4-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/WitcherMod/release-notes.md#024-unofficial1-mouahrara)
+
 ## 6 July 2024
 * Released Animated Parrot and Perch version [0.1.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AnimatedParrotAndPerch/release-notes.md#011-unofficial2-mouahrara)
 * Released Bulk Animal Purchase version [0.2.2-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BulkAnimalPurchase/release-notes.md#022-unofficial2-mouahrara)

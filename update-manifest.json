@@ -75,7 +75,7 @@
 			"Name": "Bat Form",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#BatForm",
 			"Versions": [
-				{ "Version": "0.3.4-unofficial.3-mouahrara" }
+				{ "Version": "0.3.4-unofficial.4-mouahrara" }
 			]
 		},
 		"BedTweaks": {
@@ -250,7 +250,7 @@
 			"Name": "Fire Breath",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#FireBreath",
 			"Versions": [
-				{ "Version": "0.1.1-unofficial.1-mouahrara" }
+				{ "Version": "0.1.1-unofficial.2-mouahrara" }
 			]
 		},
 		"FishingChestsExpanded": {
@@ -321,6 +321,13 @@
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#MapTeleport",
 			"Versions": [
 				{ "Version": "0.5.1-unofficial.1-mouahrara" }
+			]
+		},
+		"MayoMart": {
+			"Name": "Mayo Mart",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#MayoMart",
+			"Versions": [
+				{ "Version": "0.1.1-unofficial.1-mouahrara" }
 			]
 		},
 		"ModifyThis": {
@@ -398,6 +405,13 @@
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#WeatherTotem",
 			"Versions": [
 				{ "Version": "0.1.1-unofficial.1-mouahrara" }
+			]
+		},
+		"WitcherMod": {
+			"Name": "Witcher Mod",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#WitcherMod",
+			"Versions": [
+				{ "Version": "0.2.4-unofficial.1-mouahrara" }
 			]
 		}
 	}
