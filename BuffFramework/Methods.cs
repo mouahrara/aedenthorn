@@ -76,12 +76,16 @@ namespace BuffFramework
 						break;
 				}
 
-				if (consume is null || !Game1.player.isEating || Game1.player.itemToEat is not Object || ((Game1.player.itemToEat as Object).QualifiedItemId != consume && (Game1.player.itemToEat as Object).ItemId != consume && (Game1.player.itemToEat as Object).Category != GetInt(consume) && (Game1.player.itemToEat as Object).Name != consume))
-					continue;
 
-				int duration = new Buff(id).millisecondsDuration;
+				if (consume is not null && Game1.player.isEating && Game1.player.itemToEat is Object @object)
+				{
+					bool isCategory = int.TryParse(consume, out int category);
 
-				CreateOrUpdateBuff(who, id, value, duration > 0 ? duration : Buff.ENDLESS);
+					if (@object.QualifiedItemId.Equals(consume) || @object.ItemId.Equals(consume) || @object.Name.Equals(consume) || (isCategory && category.Equals(consume)) || @object.HasContextTag(consume))
+					{
+						CreateOrUpdateBuff(who, id, value);
+					}
+				}
 			}
 		}
 
@@ -339,9 +343,9 @@ namespace BuffFramework
 			return id;
 		}
 
-		public static void CreateOrUpdateBuff(Farmer who, string id, Dictionary<string, object> value, int defaultDuration = Buff.ENDLESS)
+		public static void CreateOrUpdateBuff(Farmer who, string id, Dictionary<string, object> value)
 		{
-			Buff buff = CreateBuff(id, value, defaultDuration);
+			Buff buff = CreateBuff(id, value);
 			List<Buff> additionalBuffs = CreateAdditionalBuffs(buff, value);
 
 			if (who.buffs.IsApplied(buff.id))
@@ -376,11 +380,11 @@ namespace BuffFramework
 			}
 		}
 
-		private static Buff CreateBuff(string id, Dictionary<string, object> value, int defaultDuration = Buff.ENDLESS)
+		private static Buff CreateBuff(string id, Dictionary<string, object> value)
 		{
 			string iconTexture = null;
-			int duration = defaultDuration;
-			int maxDuration = defaultDuration;
+			int? duration = null;
+			int? maxDuration = null;
 
 			foreach (var p in value)
 			{
@@ -399,13 +403,24 @@ namespace BuffFramework
 				}
 			}
 
-			int millisecondsDuration = (maxDuration > 0 && maxDuration > duration && duration != Buff.ENDLESS && maxDuration != Buff.ENDLESS) ? Game1.random.Next(duration, maxDuration + 1) : duration;
+			Buff buff = new(id);
 
-			Buff buff = new(id)
+			if (duration.HasValue)
 			{
-				millisecondsDuration = millisecondsDuration,
-				totalMillisecondsDuration = millisecondsDuration
-			};
+				int millisecondsDuration = duration.Value;
+
+				if (maxDuration.HasValue && maxDuration > 0 && maxDuration > duration && duration != Buff.ENDLESS && maxDuration != Buff.ENDLESS)
+				{
+					millisecondsDuration = Game1.random.Next(duration.Value, maxDuration.Value + 1);
+				}
+				buff.millisecondsDuration = millisecondsDuration;
+				buff.totalMillisecondsDuration = millisecondsDuration;
+			}
+			else if (buff.millisecondsDuration <= 0 && buff.millisecondsDuration != Buff.ENDLESS)
+			{
+				buff.millisecondsDuration = Buff.ENDLESS;
+				buff.totalMillisecondsDuration = Buff.ENDLESS;
+			}
 
 			if (!string.IsNullOrEmpty(iconTexture))
 			{
@@ -783,7 +798,11 @@ namespace BuffFramework
 
 		public static string GetString(object value, bool tokenizable = false)
 		{
-			if (value is string s)
+			if (value is null)
+			{
+				return string.Empty;
+			}
+			else if (value is string s)
 			{
 				return tokenizable ? TokenParser.ParseText(s) : s;
 			}

@@ -2,6 +2,13 @@
 
 # Release notes
 
+## 0.6.1-unofficial.6-mouahrara
+Released on 10 August, 2024, for SMAPI 4.0.0 or later.
+* Improved the **Consume** field, which now supports ContextTags ✨
+* Fixed an issue where buffs triggered by a consumable specified by its QualifiedItemId, ItemId or Name, were also triggered by all consumable items belonging to the default category (category 0) 🔧
+* Fixed an issue where the duration field did not work as expected when applied to base game buffs 🔧
+* Fixed an issue where some optional fields could not be manually set to `null` 🔧
+
 ## 0.6.1-unofficial.5-mouahrara
 Released on 10 June, 2024, for SMAPI 4.0.0 or later.
 * The **HealthRegeneration** and **StaminaRegeneration** fields now support floating-point values ✨
