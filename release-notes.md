@@ -2,6 +2,9 @@
 
 # Global release notes
 
+## 10 August 2024
+* Released Buff Framework version [0.6.1-unofficial.6-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BuffFramework/release-notes.md#061-unofficial6-mouahrara)
+
 ## 20 July 2024
 * Released Bat Form version [0.3.4-unofficial.4-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BatForm/release-notes.md#034-unofficial4-mouahrara)
 * Released Fire Breath version [0.1.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/FireBreath/release-notes.md#011-unofficial2-mouahrara)
