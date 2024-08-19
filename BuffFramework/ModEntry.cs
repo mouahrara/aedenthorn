@@ -93,6 +93,10 @@ namespace BuffFramework
 					original: AccessTools.Method(typeof(BuffManager), nameof(BuffManager.GetValues)),
 					transpiler: new HarmonyMethod(typeof(BuffManager_GetValues_Patch), nameof(BuffManager_GetValues_Patch.Transpiler))
 				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(GameLocation), "startEvent", new Type[] { typeof(Event) }),
+					postfix: new HarmonyMethod(typeof(GameLocation_startEvent_Patch), nameof(GameLocation_startEvent_Patch.Postfix))
+				);
 			}
 			catch (Exception e)
 			{
@@ -139,7 +143,10 @@ namespace BuffFramework
 
 		public void Player_Warped(object sender, StardewModdingAPI.Events.WarpedEventArgs e)
 		{
-			HandleEventAndFestival();
+			if (!Game1.eventUp && !Game1.isFestival())
+			{
+				HandleEventAndFestivalFinished();
+			}
 			Helper.Events.GameLoop.UpdateTicking += GameLoop_UpdateTicking;
 		}
 
@@ -190,7 +197,18 @@ namespace BuffFramework
 					mod: ModManifest,
 					name: () => SHelper.Translation.Get("GMCM.ModEnabled.Name"),
 					getValue: () => Config.ModEnabled,
-					setValue: value => Config.ModEnabled = value
+					setValue: value => {
+						if (Config.ModEnabled && !value)
+						{
+							ClearAll();
+							Config.ModEnabled = value;
+						}
+						else if (!Config.ModEnabled && value)
+						{
+							Config.ModEnabled = value;
+							UpdateBuffs();
+						}
+					}
 				);
 			}
 		}

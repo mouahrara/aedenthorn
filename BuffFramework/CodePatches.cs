@@ -120,7 +120,7 @@ namespace BuffFramework
 					{
 						CodeInstruction[] replacementInstructions = new CodeInstruction[]
 						{
-							new(OpCodes.Call, typeof(BuffManager_GetValues_Patch).GetMethod(nameof(GetGlowRate), BindingFlags.Public | BindingFlags.Static))
+							new(OpCodes.Call, typeof(ModEntry).GetMethod(nameof(GetGlowRate), BindingFlags.Public | BindingFlags.Static))
 						};
 						list.InsertRange(i, replacementInstructions);
 						i += replacementInstructions.Length;
@@ -130,17 +130,17 @@ namespace BuffFramework
 				}
 				return list;
 			}
+		}
 
-			public static float GetGlowRate()
+		public class GameLocation_startEvent_Patch
+		{
+			public static void Postfix(Event evt)
 			{
-				if (GlowRateBuffs.Count == 0)
-				{
-					return Buff.glowRate;
-				}
-				else
-				{
-					return GlowRateBuffs.Values.Select(value => GetFloat(value)).Average();
-				}
+				if (!Config.ModEnabled)
+					return;
+
+				evt.onEventFinished += HandleEventAndFestivalFinished;
+				HandleEventAndFestivalStart();
 			}
 		}
 	}

@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json.Linq;
 using StardewModdingAPI;
+using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Objects;
 using StardewValley.TokenizableStrings;
@@ -16,35 +17,66 @@ namespace BuffFramework
 	public partial class ModEntry
 	{
 		internal static List<ICue> pausedSounds = new();
+		internal static PerScreen<Color> pausedGlowingColor = new();
 
-		public static void HandleEventAndFestival()
+		internal static Color PausedGlowingColor
+		{
+			get => pausedGlowingColor.Value;
+			set => pausedGlowingColor.Value = value;
+		}
+
+		public static void HandleEventAndFestivalStart()
 		{
 			if (!Config.ModEnabled)
 				return;
 
-			Game1.currentLocation.checkForEvents();
-			if (Game1.eventUp || Game1.isFestival())
+			foreach ((string, ICue) sound in soundBuffs.Values)
 			{
-				if (Game1.eventUp && Game1.CurrentEvent is not null)
+				if (sound.Item2.IsPlaying)
 				{
-					Game1.CurrentEvent.onEventFinished += HandleEventAndFestival;
+					sound.Item2.Pause();
+					pausedSounds.Add(sound.Item2);
 				}
-				foreach ((string, ICue) sound in soundBuffs.Values)
-				{
-					if (sound.Item2.IsPlaying)
-					{
-						sound.Item2.Pause();
-						pausedSounds.Add(sound.Item2);
-					}
-				}
+			}
+			if (Game1.player.isGlowing)
+			{
+				PausedGlowingColor = Game1.player.glowingColor;
+				Game1.player.stopGlowing();
+			}
+		}
+
+		public static void HandleEventAndFestivalFinished()
+		{
+			if (!Config.ModEnabled)
+				return;
+
+			foreach (ICue sound in pausedSounds)
+			{
+				float volume = sound.Volume;
+
+				sound.Resume();
+				sound.Volume = 0f;
+				DelayedAction.functionAfterDelay(() => {
+					sound.Volume = volume;
+				}, 500);
+			}
+			pausedSounds.Clear();
+			if (PausedGlowingColor != Color.White)
+			{
+				Game1.player.startGlowing(PausedGlowingColor, false, GetGlowRate());
+				PausedGlowingColor = Color.White;
+			}
+		}
+
+		public static float GetGlowRate()
+		{
+			if (!Config.ModEnabled || GlowRateBuffs.Count == 0)
+			{
+				return Buff.glowRate;
 			}
 			else
 			{
-				foreach (ICue sound in pausedSounds)
-				{
-					sound.Resume();
-				}
-				pausedSounds.Clear();
+				return GlowRateBuffs.Values.Select(value => GetFloat(value)).Average();
 			}
 		}
 
@@ -203,6 +235,9 @@ namespace BuffFramework
 
 		public static void ApplyBuffsOther()
 		{
+			if (!Config.ModEnabled)
+				return;
+
 			foreach(var kvp in buffDict)
 			{
 				var key = kvp.Key;
@@ -255,6 +290,9 @@ namespace BuffFramework
 
 		public static void UpdateBuffs()
 		{
+			if (!Config.ModEnabled)
+				return;
+
 			var oldBuffDict = buffDict;
 			SHelper.GameContent.InvalidateCache(dictKey);
 			buffDict = SHelper.GameContent.Load<Dictionary<string, Dictionary<string, object>>>(dictKey);
@@ -920,6 +958,8 @@ namespace BuffFramework
 			StaminaRegenerationBuffs.Clear();
 			GlowRateBuffs.Clear();
 			soundBuffs.Clear();
+			pausedSounds.Clear();
+			PausedGlowingColor = Color.White;
 		}
 	}
 }

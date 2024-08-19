@@ -2,6 +2,11 @@
 
 # Release notes
 
+## 0.6.1-unofficial.7-mouahrara
+Released on 26 August, 2024, for SMAPI 4.0.0 or later.
+* The glow effect of buffs is now paused during cutscenes and festivals ✨
+* Fixed an issue where the player could get stuck outside the map boundaries after skipping a cutscene 🔧
+
 ## 0.6.1-unofficial.6-mouahrara
 Released on 10 August, 2024, for SMAPI 4.0.0 or later.
 * Improved the **Consume** field, which now supports ContextTags ✨
