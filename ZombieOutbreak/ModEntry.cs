@@ -1,164 +1,313 @@
-﻿using Harmony;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using HarmonyLib;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
+using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.GameData.Objects;
+using StardewValley.GameData.Shops;
 using StardewValley.Menus;
-using System;
-using System.Collections.Generic;
-using System.IO;
+using Object = StardewValley.Object;
 
 namespace ZombieOutbreak
 {
-	public class ModEntry : Mod, IAssetEditor 
+	/// <summary>The mod entry point.</summary>
+	public partial class ModEntry : Mod
 	{
-		
-		public static ModConfig config;
-		public static IMonitor SMonitor;
-		public static Dictionary<string, Texture2D> zombieTextures = new Dictionary<string, Texture2D>();
-		public static Dictionary<string, Texture2D> zombiePortraits = new Dictionary<string, Texture2D>();
-		public static Dictionary<long, Texture2D> playerSprites = new Dictionary<long, Texture2D>();
-		public static Dictionary<long, Texture2D> playerZombies = new Dictionary<long, Texture2D>();
-		internal static List<string> curedNPCs = new List<string>();
-		internal static List<long> curedFarmers = new List<long>();
-		internal static IEnumerable<string> villagerNames;
-		private static IJsonAssetsApi JsonAssets;
+		internal static IMonitor SMonitor;
+		internal static IModHelper SHelper;
+		internal static IManifest SModManifest;
+		internal static ModConfig Config;
+		internal static ModEntry context;
+
+		internal static Dictionary<string, Texture2D> zombieNPCTextures = new();
+		internal static Dictionary<string, Texture2D> zombieNPCPortraits = new();
+		internal static Dictionary<long, Texture2D> zombieFarmerTextures = new();
+		internal static List<string> curedNPCs = new();
+		internal static List<long> curedFarmers = new();
 
 		public override void Entry(IModHelper helper)
 		{
-			config = Helper.ReadConfig<ModConfig>();
-			if (!config.EnableMod)
-				return;
-			ZombiePatches.Initialize(Helper, Monitor, config);
-			Utils.Initialize(Helper, Monitor, config);
-			
+			Config = Helper.ReadConfig<ModConfig>();
+
+			context = this;
 			SMonitor = Monitor;
+			SHelper = helper;
+			SModManifest = ModManifest;
 
 			Helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
-			Helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
 			Helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
+			Helper.Events.GameLoop.Saving += GameLoop_Saving;
 			Helper.Events.GameLoop.OneSecondUpdateTicked += GameLoop_OneSecondUpdateTicked;
+			Helper.Events.Display.MenuChanged += Display_MenuChanged;
+			helper.Events.Content.AssetRequested += Content_AssetRequested;
 
-			Helper.ConsoleCommands.Add("infect", "Infect an NPC with zombie virus. Usage: infect <npc>", new Action<string, string[]>(Utils.InfectNPC));
-			Helper.ConsoleCommands.Add("infectplayer", "Infect local player with zombie virus.", new Action<string, string[]>(Utils.InfectPlayer));
-
-
-			var harmony = HarmonyInstance.Create(ModManifest.UniqueID); 
-
-			harmony.Patch(
-				original: AccessTools.Method(typeof(NPC), nameof(NPC.draw), new Type[] { typeof(SpriteBatch), typeof(float) }),
-				prefix: new HarmonyMethod(typeof(ZombiePatches), nameof(ZombiePatches.NPC_draw_prefix))
-			);
-			
-			harmony.Patch(
-				original: AccessTools.Method(typeof(Farmer), nameof(Farmer.draw), new Type[] { typeof(SpriteBatch) }),
-				prefix: new HarmonyMethod(typeof(ZombiePatches), nameof(ZombiePatches.Farmer_draw_prefix))
-			);
-			
-			harmony.Patch(
-				original: AccessTools.Method(typeof(Farmer), nameof(Farmer.eatObject)),
-				prefix: new HarmonyMethod(typeof(ZombiePatches), nameof(ZombiePatches.Farmer_eatObject_prefix))
-			);
-			
-		   
-			harmony.Patch(
-				original: AccessTools.Constructor(typeof(DialogueBox), new Type[] { typeof(string), typeof(List<Response>), typeof(int) }),
-				prefix: new HarmonyMethod(typeof(ZombiePatches), nameof(ZombiePatches.DialogueBox_complex_prefix))
-			);
-			harmony.Patch(
-				original: AccessTools.Method(typeof(NPC), nameof(NPC.showTextAboveHead)),
-				prefix: new HarmonyMethod(typeof(ZombiePatches), nameof(ZombiePatches.NPC_showTextAboveHead_Prefix))
-			);
-			harmony.Patch(
-				original: AccessTools.Method(typeof(NPC), nameof(NPC.getHi)),
-				postfix: new HarmonyMethod(typeof(ZombiePatches), nameof(ZombiePatches.NPC_getHi_Postfix))
-			);
-			harmony.Patch(
-				original: AccessTools.Method(typeof(Dialogue), "parseDialogueString"),
-				prefix: new HarmonyMethod(typeof(ZombiePatches), nameof(ZombiePatches.Dialogue_prefix))
-			);
-
-			harmony.Patch(
-				original: AccessTools.Method(typeof(ShopMenu), nameof(ShopMenu.setUpShopOwner)),
-				postfix: new HarmonyMethod(typeof(ZombiePatches), nameof(ZombiePatches.setUpShopOwner_postfix))
-			);
-
-			harmony.Patch(
-				original: AccessTools.Method(typeof(NPC), nameof(NPC.tryToReceiveActiveObject)),
-				prefix: new HarmonyMethod(typeof(ZombiePatches), nameof(ZombiePatches.NPC_tryToReceiveActiveObject_prefix))
-			);
-		}
-
-		private void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
-		{
-			// load json assets
-
-			JsonAssets = Helper.ModRegistry.GetApi<IJsonAssetsApi>("spacechase0.JsonAssets");
-			if (JsonAssets == null)
+			// Load Harmony patches
+			try
 			{
-				Monitor.Log("Can't load Json Assets API for Zombie Outbreak mod");
+				Harmony harmony = new(ModManifest.UniqueID);
+
+				harmony.Patch(
+					original: AccessTools.Method(typeof(NPC), nameof(NPC.receiveGift)),
+					prefix: new HarmonyMethod(typeof(NPC_receiveGift_Patch), nameof(NPC_receiveGift_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Farmer), nameof(Farmer.eatObject)),
+					prefix: new HarmonyMethod(typeof(Farmer_eatObject_Patch), nameof(Farmer_eatObject_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(NPC), nameof(NPC.draw), new Type[] { typeof(SpriteBatch), typeof(float) }),
+					prefix: new HarmonyMethod(typeof(NPC_draw_Patch), nameof(NPC_draw_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(DialogueBox), nameof(DialogueBox.drawPortrait)),
+					prefix: new HarmonyMethod(typeof(DialogueBox_drawPortrait_Patch), nameof(DialogueBox_drawPortrait_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Farmer), nameof(Farmer.draw), new Type[] { typeof(SpriteBatch) }),
+					prefix: new HarmonyMethod(typeof(Farmer_draw_Patch), nameof(Farmer_draw_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Dialogue), nameof(Dialogue.getCurrentDialogue)),
+					postfix: new HarmonyMethod(typeof(Dialogue_getCurrentDialogue_Patch), nameof(Dialogue_getCurrentDialogue_Patch.Postfix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Dialogue), nameof(Dialogue.getResponseOptions)),
+					postfix: new HarmonyMethod(typeof(Dialogue_getResponseOptions_Patch), nameof(Dialogue_getResponseOptions_Patch.Postfix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(NPC), nameof(NPC.showTextAboveHead)),
+					prefix: new HarmonyMethod(typeof(NPC_showTextAboveHead_Patch), nameof(NPC_showTextAboveHead_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Constructor(typeof(ShopMenu), new Type[] {typeof(string), typeof(ShopData), typeof(ShopOwnerData), typeof(NPC), typeof(Func<ISalable, Farmer, int, bool>), typeof(Func<ISalable, bool>), typeof(bool) }),
+					postfix: new HarmonyMethod(typeof(ShopMenu_Patch), nameof(ShopMenu_Patch.Postfix))
+				);
+				harmony.Patch(
+					original: AccessTools.Constructor(typeof(DialogueBox), new Type[] { typeof(string), typeof(Response[]), typeof(int) }),
+					postfix: new HarmonyMethod(typeof(DialogueBox_Patch), nameof(DialogueBox_Patch.Postfix))
+				);
 			}
-			else
+			catch (Exception e)
 			{
-				JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, "assets/json-assets"));
+				Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
+				return;
 			}
 		}
 
-		private void GameLoop_OneSecondUpdateTicked(object sender, StardewModdingAPI.Events.OneSecondUpdateTickedEventArgs e)
+		private void Content_AssetRequested(object sender, AssetRequestedEventArgs e)
 		{
-			if (!Context.IsWorldReady)
+			if (!Config.ModEnabled)
 				return;
 
-			Utils.CheckForInfection();
+			if (e.NameWithoutLocale.IsEquivalentTo("Data/CraftingRecipes"))
+			{
+				e.Edit(asset =>
+				{
+					IDictionary<string, string> data = asset.AsDictionary<string, string>().Data;
+
+					data.Add($"{ModManifest.UniqueID}_ZombieCure", $"768 5 167 1 420 1 422 1 382 10/Home/{ModManifest.UniqueID}_ZombieCure 5/false/none");
+				});
+			}
+			if (e.NameWithoutLocale.IsEquivalentTo("Data/Objects"))
+			{
+				e.Edit(asset =>
+				{
+					IDictionary<string, ObjectData> data = asset.AsDictionary<string, ObjectData>().Data;
+
+					data.Add($"{ModManifest.UniqueID}_ZombieCure", new ObjectData() {
+						Name = "Zombie cure",
+						DisplayName = $"[{ModManifest.UniqueID}_i18n item.zombie-cure.name]",
+						Description = $"[{ModManifest.UniqueID}_i18n item.zombie-cure.description]",
+						Type = "Basic",
+						Category = Object.artisanGoodsCategory,
+						Price = 0,
+						Texture = $"{SHelper.ModContent.GetInternalAssetName("assets/zombie-cure").Name.Replace('/', '\\')}",
+						SpriteIndex = 0,
+						Edibility = 0,
+						IsDrink = false,
+						Buffs = null,
+						GeodeDropsDefaultItems = false,
+						GeodeDrops = null,
+						ArtifactSpotChances = null,
+						ExcludeFromFishingCollection = false,
+						ExcludeFromShippingCollection = false,
+						ExcludeFromRandomSale = false,
+						ContextTags = null,
+						CustomFields = null
+					});
+				});
+			}
+			if (e.NameWithoutLocale.IsEquivalentTo("Data/NPCGiftTastes"))
+			{
+				e.Edit(asset =>
+				{
+					IDictionary<string, string> data = asset.AsDictionary<string, string>().Data;
+
+					data["Universal_Hate"] += $" {ModManifest.UniqueID}_ZombieCure";
+				});
+			}
+			if (e.NameWithoutLocale.IsEquivalentTo("Data/mail"))
+			{
+				e.Edit(asset =>
+				{
+					IDictionary<string, string> data = asset.AsDictionary<string, string>().Data;
+
+					data[$"{SModManifest.UniqueID}_ZombieCure"] = Helper.Translation.Get("mail.zombie-cure", new { craftingRecipe = $"%item craftingRecipe {ModManifest.UniqueID}_ZombieCure %%" });
+				});
+			}
 		}
 
-		private void GameLoop_DayStarted(object sender, StardewModdingAPI.Events.DayStartedEventArgs e)
+		private void Display_MenuChanged(object sender, MenuChangedEventArgs e)
 		{
-			curedNPCs.Clear();
-			curedFarmers.Clear();
-			//Utils.AddZombiePlayer(Game1.player.uniqueMultiplayerID);
+			if (!Config.ModEnabled || !Context.IsWorldReady)
+				return;
 
-			if (Game1.random.NextDouble() < config.DailyZombificationChance)
-				Utils.MakeRandomZombie();
-			if (zombieTextures.Count > 0 && !Game1.player.mailReceived.Contains("ZombieCure"))
-				Game1.mailbox.Add("ZombieCure");
+			if (e.OldMenu is CharacterCustomization && e.NewMenu is not CharacterCustomization && zombieFarmerTextures.ContainsKey(Game1.player.UniqueMultiplayerID))
+			{
+				MakeZombieFarmerTexture(Game1.player.UniqueMultiplayerID);
+			}
 		}
 
-		private void GameLoop_SaveLoaded(object sender, StardewModdingAPI.Events.SaveLoadedEventArgs e)
+		private void GameLoop_OneSecondUpdateTicked(object sender, OneSecondUpdateTickedEventArgs e)
 		{
-			villagerNames = Helper.Content.Load<Dictionary<string, string>>("Data/NPCDispositions", ContentSource.GameContent).Keys;
+			if (!Config.ModEnabled || !Context.IsWorldReady)
+				return;
 
-			zombieTextures.Clear();
-			playerZombies.Clear();
+			CheckForInfection();
+		}
+
+		private void GameLoop_Saving(object sender, SavingEventArgs e)
+		{
+			if (!Config.ModEnabled)
+				return;
+
+			Helper.Data.WriteSaveData("zombiesNPC", zombieNPCTextures.Keys.ToList());
+			Helper.Data.WriteSaveData("zombiesFarmers", zombieFarmerTextures.Keys.ToList());
+			foreach (string npcName in zombieNPCTextures.Keys)
+			{
+				RemoveZombieNPC(npcName);
+			}
+			foreach (long farmerId in zombieFarmerTextures.Keys)
+			{
+				RemoveZombieFarmer(farmerId);
+			}
+			ClearAll();
+		}
+
+		private void GameLoop_DayStarted(object sender, DayStartedEventArgs e)
+		{
+			if (!Config.ModEnabled)
+				return;
+
+			List<string> zombiesNPC = Helper.Data.ReadSaveData<List<string>>("zombiesNPC") ?? new List<string>();
+			List<long> zombiesFarmers = Helper.Data.ReadSaveData<List<long>>("zombiesFarmers") ?? new List<long>();
+
 			Monitor.Log($"Loading zombie textures");
-			List<string> zombies = Helper.Data.ReadSaveData<List<string>>("zombies") ?? new List<string>();
-			List<long> zombiePlayers = Helper.Data.ReadSaveData<List<long>>("zombiePlayers") ?? new List<long>();
-			foreach(string z in zombies)
+			ClearAll();
+			foreach (string npcName in zombiesNPC)
 			{
-				Utils.MakeZombieTexture(z);
+				AddZombieNPC(npcName);
 			}
-			foreach(long z in zombiePlayers)
+			foreach (long farmerId in zombiesFarmers)
 			{
-				Utils.MakeZombiePlayer(z);
+				AddZombieFarmer(farmerId);
 			}
-			Monitor.Log($"Got {zombieTextures.Count} zombie(s)");
-			Monitor.Log($"Got {zombiePlayers.Count} zombie player(s)");
+			Monitor.Log($"Got {zombieNPCTextures.Count} zombie NPC(s)");
+			Monitor.Log($"Got {zombiesFarmers.Count} zombie farmer(s)");
+
+			if (Game1.random.NextDouble() < Config.DailyZombificationChance / 100f)
+			{
+				MakeRandomZombie();
+			}
+			if (zombieNPCTextures.Count > 0 && !Game1.player.mailReceived.Contains($"{SModManifest.UniqueID}_ZombieCure"))
+			{
+				Game1.mailbox.Add($"{SModManifest.UniqueID}_ZombieCure");
+			}
 		}
 
+		private void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
+		{
+			RegisterConsoleCommands();
+			TokensUtility.Register();
 
-		public bool CanEdit<T>(IAssetInfo asset)
-		{
-			if (!config.EnableMod)
-				return false;
-			if (asset.AssetNameEquals("Data/mail"))
-			{
-				return true;
-			}
-			return false;
-		}
-		public void Edit<T>(IAssetData asset)
-		{
-			if (asset.AssetNameEquals("Data/mail"))
-				asset.AsDictionary<string, string>().Data["ZombieCure"] = Helper.Translation.Get("zombie-cure-letter");
+			// get Generic Mod Config Menu's API (if it's installed)
+			var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+			if (configMenu is null)
+				return;
+
+			// register mod
+			configMenu.Register(
+				mod: ModManifest,
+				reset: () => Config = new ModConfig(),
+				save: () => {
+					SHelper.GameContent.InvalidateCache(asset => asset.NameWithoutLocale.IsEquivalentTo("Data/CraftingRecipes"));
+					SHelper.GameContent.InvalidateCache(asset => asset.NameWithoutLocale.IsEquivalentTo("Data/Objects"));
+					SHelper.GameContent.InvalidateCache(asset => asset.NameWithoutLocale.IsEquivalentTo("Data/NPCGiftTastes"));
+					SHelper.GameContent.InvalidateCache(asset => asset.NameWithoutLocale.IsEquivalentTo("Data/mail"));
+					Helper.WriteConfig(Config);
+				}
+			);
+
+			configMenu.AddBoolOption(
+				mod: ModManifest,
+				name: () => Helper.Translation.Get("GMCM.ModEnabled.Name"),
+				getValue: () => Config.ModEnabled,
+				setValue: value => {
+					if (Context.IsWorldReady && Config.ModEnabled && !value)
+					{
+						foreach (string npcName in zombieNPCTextures.Keys)
+						{
+							RemoveZombieNPC(npcName);
+						}
+						foreach (long farmerId in zombieFarmerTextures.Keys)
+						{
+							RemoveZombieFarmer(farmerId);
+						}
+						zombieNPCTextures.Clear();
+						zombieNPCPortraits.Clear();
+						zombieFarmerTextures.Clear();
+						curedNPCs.Clear();
+						curedFarmers.Clear();
+						Helper.Data.WriteSaveData<List<string>>("zombiesNPC", null);
+						Helper.Data.WriteSaveData<List<long>>("zombiesFarmers", null);
+					}
+					Config.ModEnabled = value;
+				}
+			);
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => Helper.Translation.Get("GMCM.DailyZombificationChance.Name"),
+				getValue: () => Config.DailyZombificationChance,
+				setValue: value => Config.DailyZombificationChance = value,
+				min: 0,
+				max: 100
+			);
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => Helper.Translation.Get("GMCM.InfectionRadius.Name"),
+				getValue: () => Config.InfectionRadius,
+				setValue: value => Config.InfectionRadius = value,
+				min: 0
+			);
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => Helper.Translation.Get("GMCM.InfectionChancePerSecond.Name"),
+				getValue: () => Config.InfectionChancePerSecond,
+				setValue: value => Config.InfectionChancePerSecond = value,
+				min: 0,
+				max: 100
+			);
+			configMenu.AddNumberOption(
+				mod: ModManifest,
+				name: () => Helper.Translation.Get("GMCM.GreenTint.Name"),
+				getValue: () => Config.GreenTint,
+				setValue: value => Config.GreenTint = value,
+				min: 0,
+				max: 100
+			);
 		}
 	}
 }
