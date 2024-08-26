@@ -124,7 +124,7 @@
 			"Name": "Buff Framework",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#BuffFramework",
 			"Versions": [
-				{ "Version": "0.6.1-unofficial.6-mouahrara" }
+				{ "Version": "0.6.1-unofficial.7-mouahrara" }
 			]
 		},
 		"BulkAnimalPurchase": {
@@ -410,6 +410,20 @@
 		"WitcherMod": {
 			"Name": "Witcher Mod",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#WitcherMod",
+			"Versions": [
+				{ "Version": "0.2.4-unofficial.1-mouahrara" }
+			]
+		},
+		"YetAnotherJumpMod": {
+			"Name": "Yet Another Jump Mod",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#YetAnotherJumpMod",
+			"Versions": [
+				{ "Version": "0.7.2-unofficial.1-mouahrara" }
+			]
+		},
+		"ZombieOutbreak": {
+			"Name": "Zombie Outbreak",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#ZombieOutbreak",
 			"Versions": [
 				{ "Version": "0.2.4-unofficial.1-mouahrara" }
 			]

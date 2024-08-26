@@ -2,6 +2,11 @@
 
 # Global release notes
 
+## 26 August 2024
+* Released Buff Framework version [0.6.1-unofficial.7-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BuffFramework/release-notes.md#061-unofficial7-mouahrara)
+* Released Yet Another Jump Mod version [0.7.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/YetAnotherJumpMod/release-notes.md#072-unofficial1-mouahrara)
+* Released Zombie Outbreak version [0.2.4-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/ZombieOutbreak/release-notes.md#024-unofficial1-mouahrara)
+
 ## 10 August 2024
 * Released Buff Framework version [0.6.1-unofficial.6-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BuffFramework/release-notes.md#061-unofficial6-mouahrara)
 
