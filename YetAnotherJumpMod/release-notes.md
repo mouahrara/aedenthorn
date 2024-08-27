@@ -2,6 +2,10 @@
 
 # Release notes
 
+## 0.7.2-unofficial.2-mouahrara
+Released on 1 September, 2024, for SMAPI 4.0.0 or later.
+* Fixed an issue that could cause the game to crash 🔧
+
 ## 0.7.2-unofficial.1-mouahrara
 Released on 26 August, 2024, for SMAPI 4.0.0 or later.
 * Migrated to 1.6.0 and project cleanup 🚀

@@ -24,7 +24,6 @@ namespace YetAnotherJumpMod
 		private static readonly PerScreen<float>	lastYJumpVelocity = new();
 		private static readonly PerScreen<bool>		playerJumpingWithHorse = new();
 		private static readonly PerScreen<bool>		blockedJump = new();
-		private static Texture2D horse;
 		private static Texture2D horseShadow;
 
 		internal static float VelX
@@ -95,7 +94,6 @@ namespace YetAnotherJumpMod
 				Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
 				return;
 			}
-			horse = Helper.ModContent.Load<Texture2D>(Path.Combine("assets", "horse.png"));
 			horseShadow = Helper.ModContent.Load<Texture2D>(Path.Combine("assets", "horse_shadow.png"));
 		}
 
@@ -135,9 +133,7 @@ namespace YetAnotherJumpMod
 
 			if (e.NameWithoutLocale.IsEquivalentTo("Animals/horse"))
 			{
-				e.Edit((IAssetData data) => {
-					data.AsImage().ReplaceWith(horse);
-				});
+				e.LoadFromModFile<Texture2D>(Path.Combine("assets", "horse.png"), AssetLoadPriority.Medium);
 			}
 		}
 
