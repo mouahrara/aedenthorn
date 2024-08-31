@@ -2,6 +2,11 @@
 
 # Global release notes
 
+## 1 September 2024
+* Released Weapons Ignore Grass version [0.1.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/WeaponsIgnoreGrass/release-notes.md#011-unofficial1-mouahrara)
+* Released Wiki Links version [0.1.3-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/WikiLinks/release-notes.md#013-unofficial1-mouahrara)
+* Released Yet Another Jump Mod version [0.7.2-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/YetAnotherJumpMod/release-notes.md#072-unofficial2-mouahrara)
+
 ## 26 August 2024
 * Released Buff Framework version [0.6.1-unofficial.7-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BuffFramework/release-notes.md#061-unofficial7-mouahrara)
 * Released Yet Another Jump Mod version [0.7.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/YetAnotherJumpMod/release-notes.md#072-unofficial1-mouahrara)

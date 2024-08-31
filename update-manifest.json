@@ -400,11 +400,25 @@
 				{ "Version": "0.1.2-unofficial.1-mouahrara" }
 			]
 		},
+		"WeaponsIgnoreGrass": {
+			"Name": "Weapons Ignore Grass",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#WeaponsIgnoreGrass",
+			"Versions": [
+				{ "Version": "0.1.1-unofficial.1-mouahrara" }
+			]
+		},
 		"WeatherTotem": {
 			"Name": "Weather Totem",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#WeatherTotem",
 			"Versions": [
 				{ "Version": "0.1.1-unofficial.1-mouahrara" }
+			]
+		},
+		"WikiLinks": {
+			"Name": "Wiki Links",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#WikiLinks",
+			"Versions": [
+				{ "Version": "0.1.3-unofficial.1-mouahrara" }
 			]
 		},
 		"WitcherMod": {
@@ -418,7 +432,7 @@
 			"Name": "Yet Another Jump Mod",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#YetAnotherJumpMod",
 			"Versions": [
-				{ "Version": "0.7.2-unofficial.1-mouahrara" }
+				{ "Version": "0.7.2-unofficial.2-mouahrara" }
 			]
 		},
 		"ZombieOutbreak": {
