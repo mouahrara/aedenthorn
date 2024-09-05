@@ -1,22 +1,18 @@
-﻿using HarmonyLib;
-using Microsoft.Xna.Framework;
+﻿using System;
+using HarmonyLib;
 using StardewModdingAPI;
 using StardewValley;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
 
 namespace NightEventChanceTweak
 {
 	/// <summary>The mod entry point.</summary>
 	public partial class ModEntry : Mod
 	{
-
-		public static IMonitor SMonitor;
-		public static IModHelper SHelper;
-		public static ModConfig Config;
-
-		public static ModEntry context;
+		internal static IMonitor SMonitor;
+		internal static IModHelper SHelper;
+		internal static IManifest SModManifest;
+		internal static ModConfig Config;
+		internal static ModEntry context;
 
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
 		/// <param name="helper">Provides simplified APIs for writing mods.</param>
@@ -24,24 +20,31 @@ namespace NightEventChanceTweak
 		{
 			Config = Helper.ReadConfig<ModConfig>();
 
-			if (!Config.EnableMod)
-				return;
-
 			context = this;
-
 			SMonitor = Monitor;
 			SHelper = helper;
-			helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
+			SModManifest = ModManifest;
 
+			Helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
 
-			var harmony = new Harmony(ModManifest.UniqueID);
+			// Load Harmony patches
+			try
+			{
+				Harmony harmony = new(ModManifest.UniqueID);
 
-			harmony.Patch(
-			   original: AccessTools.Method(typeof(Utility), nameof(Utility.pickFarmEvent)),
-			   postfix: new HarmonyMethod(typeof(ModEntry), nameof(ModEntry.Utility_pickFarmEvent_Postfix))
-			);
-
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Utility), nameof(Utility.pickFarmEvent)),
+					prefix: new HarmonyMethod(typeof(Utility_pickFarmEvent_Patch), nameof(Utility_pickFarmEvent_Patch.Prefix)),
+					postfix: new HarmonyMethod(typeof(Utility_pickFarmEvent_Patch), nameof(Utility_pickFarmEvent_Patch.Postfix))
+				);
+			}
+			catch (Exception e)
+			{
+				Monitor.Log($"Issue with Harmony patching: {e}", LogLevel.Error);
+				return;
+			}
 		}
+
 		private void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
 		{
 			// get Generic Mod Config Menu's API (if it's installed)
@@ -58,46 +61,66 @@ namespace NightEventChanceTweak
 
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => "Mod Enabled?",
-				getValue: () => Config.EnableMod,
-				setValue: value => Config.EnableMod = value
+				name: () => Helper.Translation.Get("GMCM.ModEnabled.Name"),
+				getValue: () => Config.ModEnabled,
+				setValue: value => Config.ModEnabled = value
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => "Cumulative Chance?",
-				tooltip: () => "Check all events at once",
+				name: () => Helper.Translation.Get("GMCM.IgnoreEventConditions.Name"),
+				getValue: () => Config.IgnoreEventConditions,
+				setValue: value => Config.IgnoreEventConditions = value
+			);
+			configMenu.AddBoolOption(
+				mod: ModManifest,
+				name: () => Helper.Translation.Get("GMCM.CumulativeChance.Name"),
 				getValue: () => Config.CumulativeChance,
 				setValue: value => Config.CumulativeChance = value
 			);
-			configMenu.AddTextOption(
+			configMenu.AddNumberOption(
 				mod: ModManifest,
-				name: () => "Crop Fairy Chance",
-				getValue: () => ""+Config.FairyChance,
-				setValue: delegate(string value) { try { Config.FairyChance = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+				name: () => Helper.Translation.Get("GMCM.CropFairyChance.Name"),
+				getValue: () => Config.CropFairyChance,
+				setValue: value => Config.CropFairyChance = value,
+				min: 0f,
+				max: 100f,
+				interval: 0.1f
 			);
-			configMenu.AddTextOption(
+			configMenu.AddNumberOption(
 				mod: ModManifest,
-				name: () => "Witch Chance",
-				getValue: () => ""+Config.WitchChance,
-				setValue: delegate(string value) { try { Config.WitchChance = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+				name: () => Helper.Translation.Get("GMCM.WitchChance.Name"),
+				getValue: () => Config.WitchChance,
+				setValue: value => Config.WitchChance = value,
+				min: 0f,
+				max: 100f,
+				interval: 0.1f
 			);
-			configMenu.AddTextOption(
+			configMenu.AddNumberOption(
 				mod: ModManifest,
-				name: () => "Meteor Chance",
-				getValue: () => ""+Config.MeteorChance,
-				setValue: delegate(string value) { try { Config.MeteorChance = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+				name: () => Helper.Translation.Get("GMCM.MeteorChance.Name"),
+				getValue: () => Config.MeteorChance,
+				setValue: value => Config.MeteorChance = value,
+				min: 0f,
+				max: 100f,
+				interval: 0.1f
 			);
-			configMenu.AddTextOption(
+			configMenu.AddNumberOption(
 				mod: ModManifest,
-				name: () => "Owl Event Chance",
-				getValue: () => ""+Config.OwlChance,
-				setValue: delegate(string value) { try { Config.OwlChance = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+				name: () => Helper.Translation.Get("GMCM.StoneOwlChance.Name"),
+				getValue: () => Config.StoneOwlChance,
+				setValue: value => Config.StoneOwlChance = value,
+				min: 0f,
+				max: 100f,
+				interval: 0.1f
 			);
-			configMenu.AddTextOption(
+			configMenu.AddNumberOption(
 				mod: ModManifest,
-				name: () => "Capsule Event Chance",
-				getValue: () => ""+Config.CapsuleChance,
-				setValue: delegate(string value) { try { Config.CapsuleChance = float.Parse(value, CultureInfo.InvariantCulture); } catch { } }
+				name: () => Helper.Translation.Get("GMCM.StrangeCapsuleChance.Name"),
+				getValue: () => Config.StrangeCapsuleChance,
+				setValue: value => Config.StrangeCapsuleChance = value,
+				min: 0f,
+				max: 100f,
+				interval: 0.1f
 			);
 		}
 	}
