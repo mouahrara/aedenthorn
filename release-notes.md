@@ -2,6 +2,11 @@
 
 # Global release notes
 
+## 7 September 2024
+* Released Dreamscape version [0.1.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/Dreamscape/release-notes.md#011-unofficial1-mouahrara)
+* Released Meteor Defence version [0.1.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/MeteorDefence/release-notes.md#012-unofficial1-mouahrara)
+* Released Night Event Chance Tweak version [0.1.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/NightEventChanceTweak/release-notes.md#011-unofficial1-mouahrara)
+
 ## 1 September 2024
 * Released Weapons Ignore Grass version [0.1.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/WeaponsIgnoreGrass/release-notes.md#011-unofficial1-mouahrara)
 * Released Wiki Links version [0.1.3-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/WikiLinks/release-notes.md#013-unofficial1-mouahrara)
