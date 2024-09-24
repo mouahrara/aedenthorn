@@ -8,9 +8,7 @@ namespace AdvancedFluteBlocks
 		public bool EnableMod { get; set; } = true;
 		public SButton ToneModKey { get; set; } = SButton.LeftAlt;
 		public SButton PitchModKey { get; set; } = SButton.LeftShift;
-		public string CurrentTone { get; set; } = "flute";
 		public int PitchStep { get; set; } = 100;
-		public int CurrentPitch { get; set; } = 0;
-		public string ToneList { get; set; } = "flute,toyPiano,crystal,clam_tone,telephone_buttonPush,miniharp_note,newArtifact,select,toolCharge,dustMeep,Duck,pig";
+		public string ToneList { get; set; } = "flute,toyPiano,crystal,clam_tone,toolCharge,telephone_buttonPush,miniharp_note,newArtifact,select,dustMeep,Duck,pig";
 	}
 }

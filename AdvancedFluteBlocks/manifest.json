@@ -1,7 +1,7 @@
 ﻿{
 	"Name": "Advanced Flute Blocks",
 	"Author": "aedenthorn",
-	"Version": "0.2.1-unofficial.2-mouahrara",
+	"Version": "0.2.1-unofficial.3-mouahrara",
 	"Description": "Provides advanced control over flute blocks.",
 	"UniqueID": "aedenthorn.AdvancedFluteBlocks",
 	"EntryDll": "AdvancedFluteBlocks.dll",

@@ -31,10 +31,10 @@ namespace AdvancedFluteBlocks
 						list.InsertRange(i, replacementInstructions);
 						i += replacementInstructions.Length;
 						list.RemoveAt(i);
-						}
 					}
-					return list;
 				}
+				return list;
+			}
 			catch (Exception e)
 			{
 				SMonitor.Log($"There was an issue modifying the instructions for {typeof(Object)}.{original.Name}: {e}", LogLevel.Error);
@@ -49,7 +49,7 @@ namespace AdvancedFluteBlocks
 
 		private static string FluteCueNameOverride(Object __instance, string flute)
 		{
-			if(Config.EnableMod && __instance.modData.TryGetValue("aedenthorn.AdvancedFluteBlocks/tone", out string tone))
+			if (Config.EnableMod && __instance.modData.TryGetValue(advancedFluteBlocksKey, out string tone))
 			{
 				return tone;
 			}

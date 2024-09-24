@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using HarmonyLib;
 using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Audio;
@@ -15,11 +13,11 @@ namespace AdvancedFluteBlocks
 	{
 		internal static IMonitor SMonitor;
 		internal static IModHelper SHelper;
+		internal static IManifest SModManifest;
 		internal static ModConfig Config;
-
-		internal static Dictionary<string, Texture2D> textureDict = new();
-
 		internal static ModEntry context;
+
+		const string advancedFluteBlocksKey = "aedenthorn.AdvancedFluteBlocks/tone";
 
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
 		/// <param name="helper">Provides simplified APIs for writing mods.</param>
@@ -27,13 +25,10 @@ namespace AdvancedFluteBlocks
 		{
 			Config = Helper.ReadConfig<ModConfig>();
 
-			if (!Config.EnableMod)
-				return;
-
 			context = this;
-
 			SMonitor = Monitor;
 			SHelper = helper;
+			SModManifest = ModManifest;
 
 			Helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
 			Helper.Events.Input.MouseWheelScrolled += Input_MouseWheelScrolled;
@@ -94,7 +89,7 @@ namespace AdvancedFluteBlocks
 				string[] tones = Config.ToneList.Split(',');
 				string result = null;
 
-				if (!obj.modData.TryGetValue("aedenthorn.AdvancedFluteBlocks/tone", out string tone))
+				if (!obj.modData.TryGetValue(advancedFluteBlocksKey, out string tone))
 				{
 					tone = tones[0];
 				}
@@ -103,6 +98,7 @@ namespace AdvancedFluteBlocks
 					if (tone == tones[i])
 					{
 						int resultIndex = (i + (e.Delta < 0 ? -1 : 1)) % tones.Length;
+
 						if (resultIndex < 0)
 						{
 							resultIndex += tones.Length;
@@ -112,11 +108,10 @@ namespace AdvancedFluteBlocks
 				}
 				if (result != null)
 				{
-					obj.modData["aedenthorn.AdvancedFluteBlocks/tone"] = result;
+					obj.modData[advancedFluteBlocksKey] = result;
 					obj.internalSound?.Stop(AudioStopOptions.Immediate);
 					obj.lastNoteBlockSoundTime = 0;
 					obj.farmerAdjacentAction(Game1.player);
-					Config.CurrentTone = result;
 				}
 			}
 		}
