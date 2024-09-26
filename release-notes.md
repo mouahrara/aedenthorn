@@ -2,6 +2,12 @@
 
 # Global release notes
 
+## 27 September 2024
+* Released Advanced Flute Blocks version [0.2.1-unofficial.3-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AdvancedFluteBlocks/release-notes.md#021-unofficial3-mouahrara)
+* Released Enhanced Loot Magnet version [1.2.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/EnhancedLootMagnet/release-notes.md#121-unofficial1-mouahrara)
+* Released Rainbow Trail version [0.1.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/RainbowTrail/release-notes.md#012-unofficial1-mouahrara)
+* Released Trash Cans On Horse version [0.1.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/TrashCansOnHorse/release-notes.md#012-unofficial1-mouahrara)
+
 ## 7 September 2024
 * Released Dreamscape version [0.1.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/Dreamscape/release-notes.md#011-unofficial1-mouahrara)
 * Released Meteor Defence version [0.1.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/MeteorDefence/release-notes.md#012-unofficial1-mouahrara)

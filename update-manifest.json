@@ -3,462 +3,483 @@
 	"Mods": {
 		"AdditionalMineMaps": {
 			"Name": "Additional Mine Maps",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#AdditionalMineMaps",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#AdditionalMineMaps",
 			"Versions": [
 				{ "Version": "0.2.2-unofficial.1-mouahrara" }
 			]
 		},
 		"AdvancedCooking": {
 			"Name": "Advanced Cooking",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#AdvancedCooking",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#AdvancedCooking",
 			"Versions": [
 				{ "Version": "0.1.5-unofficial.1-mouahrara" }
 			]
 		},
 		"AdvancedFluteBlocks": {
 			"Name": "Advanced Flute Blocks",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#AdvancedFluteBlocks",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#AdvancedFluteBlocks",
 			"Versions": [
-				{ "Version": "0.2.1-unofficial.2-mouahrara" }
+				{ "Version": "0.2.1-unofficial.3-mouahrara" }
 			]
 		},
 		"AdvancedLootFramework": {
 			"Name": "Advanced Loot Framework",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#AdvancedLootFramework",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#AdvancedLootFramework",
 			"Versions": [
 				{ "Version": "0.4.2-unofficial.1-mouahrara" }
 			]
 		},
 		"AdvancedMenuPositioning": {
 			"Name": "Advanced Menu Positioning",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#AdvancedMenuPositioning",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#AdvancedMenuPositioning",
 			"Versions": [
 				{ "Version": "0.2.1-unofficial.2-mouahrara" }
 			]
 		},
 		"AFKPause": {
 			"Name": "AFK Pause",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#AFKPause",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#AFKPause",
 			"Versions": [
 				{ "Version": "0.7.1-unofficial.1-mouahrara" }
 			]
 		},
 		"Alarms": {
 			"Name": "Alarms",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#Alarms",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#Alarms",
 			"Versions": [
 				{ "Version": "0.1.4-unofficial.1-mouahrara" }
 			]
 		},
 		"AllChestsMenu": {
 			"Name": "All Chests Menu",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#AllChestsMenu",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#AllChestsMenu",
 			"Versions": [
 				{ "Version": "0.3.2-unofficial.2-mouahrara" }
 			]
 		},
 		"AnimatedParrotAndPerch": {
 			"Name": "Animated Parrot and Perch",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#AnimatedParrotAndPerch",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#AnimatedParrotAndPerch",
 			"Versions": [
 				{ "Version": "0.1.1-unofficial.2-mouahrara" }
 			]
 		},
 		"AprilBugFixSuite": {
 			"Name": "April Bug Fix Suite",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#AprilBugFixSuite",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#AprilBugFixSuite",
 			"Versions": [
 				{ "Version": "0.1.7-unofficial.1-mouahrara" }
 			]
 		},
 		"BatForm": {
 			"Name": "Bat Form",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#BatForm",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#BatForm",
 			"Versions": [
 				{ "Version": "0.3.4-unofficial.4-mouahrara" }
 			]
 		},
 		"BedTweaks": {
 			"Name": "Bed Tweaks",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#BedTweaks",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#BedTweaks",
 			"Versions": [
 				{ "Version": "0.3.1-unofficial.1-mouahrara" }
 			]
 		},
 		"BeePaths": {
 			"Name": "Bee Paths",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#BeePaths",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#BeePaths",
 			"Versions": [
 				{ "Version": "0.2.1-unofficial.3-mouahrara" }
 			]
 		},
 		"BetterElevator": {
 			"Name": "Better Elevator",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#BetterElevator",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#BetterElevator",
 			"Versions": [
 				{ "Version": "0.2.5-unofficial.1-mouahrara" }
 			]
 		},
 		"BirthdayBuff": {
 			"Name": "Birthday Buff",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#BirthdayBuff",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#BirthdayBuff",
 			"Versions": [
 				{ "Version": "0.1.1-unofficial.1-mouahrara" }
 			]
 		},
 		"BirthdayKnowledgeFriendship": {
 			"Name": "Birthday Knowledge Friendship",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#BirthdayKnowledgeFriendship",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#BirthdayKnowledgeFriendship",
 			"Versions": [
 				{ "Version": "0.1.1-unofficial.1-mouahrara" }
 			]
 		},
 		"BossCreatures": {
 			"Name": "Boss Creatures",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#BossCreatures",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#BossCreatures",
 			"Versions": [
 				{ "Version": "1.5.1-unofficial.1-mouahrara" }
 			]
 		},
 		"BuffFramework": {
 			"Name": "Buff Framework",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#BuffFramework",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#BuffFramework",
 			"Versions": [
 				{ "Version": "0.6.1-unofficial.7-mouahrara" }
 			]
 		},
 		"BulkAnimalPurchase": {
 			"Name": "Bulk Animal Purchase",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#BulkAnimalPurchase",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#BulkAnimalPurchase",
 			"Versions": [
 				{ "Version": "0.2.2-unofficial.2-mouahrara" }
 			]
 		},
 		"CatalogueFilter": {
 			"Name": "Catalogue Filter",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#CatalogueFilter",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#CatalogueFilter",
 			"Versions": [
 				{ "Version": "0.2.1-unofficial.1-mouahrara" }
 			]
 		},
 		"ChessBoards": {
 			"Name": "Chess Boards",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#ChessBoards",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#ChessBoards",
 			"Versions": [
 				{ "Version": "0.1.1-unofficial.1-mouahrara" }
 			]
 		},
 		"ConnectedGardenPots": {
 			"Name": "Connected Garden Pots",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#ConnectedGardenPots",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#ConnectedGardenPots",
 			"Versions": [
 				{ "Version": "0.1.1-unofficial.1-mouahrara" }
 			]
 		},
 		"CooperativeEggHunt": {
 			"Name": "Cooperative Egg Hunt",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#CooperativeEggHunt",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#CooperativeEggHunt",
 			"Versions": [
 				{ "Version": "0.1.1-unofficial.2-mouahrara" }
 			]
 		},
 		"CraftableButterflyHutches": {
 			"Name": "Craftable Butterfly Hutches",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#CraftableButterflyHutches",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#CraftableButterflyHutches",
 			"Versions": [
 				{ "Version": "0.1.1-unofficial.1-mouahrara" }
 			]
 		},
 		"CraftableTerrarium": {
 			"Name": "Craftable Terrarium",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#CraftableTerrarium",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#CraftableTerrarium",
 			"Versions": [
 				{ "Version": "0.1.3-unofficial.2-mouahrara" }
 			]
 		},
 		"CropGrowthInfo": {
 			"Name": "Crop Growth Info",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#CropGrowthInfo",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#CropGrowthInfo",
 			"Versions": [
 				{ "Version": "0.1.1-unofficial.1-mouahrara" }
 			]
 		},
 		"CropHarvestBubbles": {
 			"Name": "Crop Harvest Bubbles",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#CropHarvestBubbles",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#CropHarvestBubbles",
 			"Versions": [
 				{ "Version": "0.3.1-unofficial.1-mouahrara" }
 			]
 		},
 		"CropHat": {
 			"Name": "Crop Hat",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#CropHat",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#CropHat",
 			"Versions": [
 				{ "Version": "0.1.4-unofficial.1-mouahrara" }
 			]
 		},
 		"CropMarkers": {
 			"Name": "Crop Markers",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#CropMarkers",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#CropMarkers",
 			"Versions": [
 				{ "Version": "0.2.1-unofficial.2-mouahrara" }
 			]
 		},
 		"CropsSurviveSeasonChange": {
 			"Name": "Crops Survive Season Change",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#CropsSurviveSeasonChange",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#CropsSurviveSeasonChange",
 			"Versions": [
 				{ "Version": "0.1.3-unofficial.3-mouahrara" }
 			]
 		},
 		"CropWateringBubbles": {
 			"Name": "Crop Watering Bubbles",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#CropWateringBubbles",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#CropWateringBubbles",
 			"Versions": [
 				{ "Version": "0.2.5-unofficial.1-mouahrara" }
 			]
 		},
 		"CustomHay": {
 			"Name": "Custom Hay",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#CustomHay",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#CustomHay",
 			"Versions": [
 				{ "Version": "0.1.1-unofficial.1-mouahrara" }
 			]
 		},
 		"CustomStarterPackage": {
 			"Name": "Custom Starter Package",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#CustomStarterPackage",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#CustomStarterPackage",
 			"Versions": [
 				{ "Version": "0.2.1-unofficial.2-mouahrara" }
 			]
 		},
 		"CustomToolbar": {
 			"Name": "Custom Toolbar",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#CustomToolbar",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#CustomToolbar",
 			"Versions": [
 				{ "Version": "0.1.2-unofficial.1-mouahrara" }
 			]
 		},
 		"Dreamscape": {
 			"Name": "Dreamscape",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#Dreamscape",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#Dreamscape",
 			"Versions": [
 				{ "Version": "0.1.1-unofficial.1-mouahrara" }
 			]
 		},
 		"DynamicMapTiles": {
 			"Name": "Dynamic Map Tiles",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#DynamicMapTiles",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#DynamicMapTiles",
 			"Versions": [
 				{ "Version": "0.9.7-unofficial.1-mouahrara" }
 			]
 		},
+		"EnhancedLootMagnet": {
+			"Name": "Enhanced Loot Magnet",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#EnhancedLootMagnet",
+			"Versions": [
+				{ "Version": "1.2.1-unofficial.1-mouahrara" }
+			]
+		},
 		"FireBreath": {
 			"Name": "Fire Breath",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#FireBreath",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#FireBreath",
 			"Versions": [
 				{ "Version": "0.1.1-unofficial.2-mouahrara" }
 			]
 		},
 		"FishingChestsExpanded": {
 			"Name": "Fishing Chests Expanded",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#FishingChestsExpanded",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#FishingChestsExpanded",
 			"Versions": [
 				{ "Version": "0.4.3-unofficial.3-mouahrara" }
 			]
 		},
 		"FishSpotBait": {
 			"Name": "Fish Spot Bait",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#FishSpotBait",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#FishSpotBait",
 			"Versions": [
 				{ "Version": "0.1.2-unofficial.1-mouahrara" }
 			]
 		},
 		"FloatingGardenPots": {
 			"Name": "Floating Garden Pots",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#FloatingGardenPots",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#FloatingGardenPots",
 			"Versions": [
 				{ "Version": "0.1.1-unofficial.1-mouahrara" }
 			]
 		},
 		"GalaxyWeaponChoice": {
 			"Name": "Galaxy Weapon Choice",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#GalaxyWeaponChoice",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#GalaxyWeaponChoice",
 			"Versions": [
 				{ "Version": "0.1.1-unofficial.1-mouahrara" }
 			]
 		},
 		"GenieLamp": {
 			"Name": "Genie Lamp",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#GenieLamp",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#GenieLamp",
 			"Versions": [
 				{ "Version": "0.1.2-unofficial.1-mouahrara" }
 			]
 		},
 		"HereFishy": {
 			"Name": "Here Fishy",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#HereFishy",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#HereFishy",
 			"Versions": [
 				{ "Version": "0.4.1-unofficial.1-mouahrara" }
 			]
 		},
 		"InfallibleFishing": {
 			"Name": "Infallible Fishing",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#InfallibleFishing",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#InfallibleFishing",
 			"Versions": [
 				{ "Version": "0.1.2-unofficial.1-mouahrara" }
 			]
 		},
 		"LikeADuckToWater": {
 			"Name": "Like a Duck to Water",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#LikeADuckToWater",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#LikeADuckToWater",
 			"Versions": [
 				{ "Version": "0.4.5-unofficial.1-mouahrara" }
 			]
 		},
 		"LivestockChoices": {
 			"Name": "Livestock Choices",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#LivestockChoices",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#LivestockChoices",
 			"Versions": [
 				{ "Version": "0.2.2-unofficial.1-mouahrara" }
 			]
 		},
 		"MapTeleport": {
 			"Name": "Map Teleport",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#MapTeleport",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#MapTeleport",
 			"Versions": [
 				{ "Version": "0.5.1-unofficial.1-mouahrara" }
 			]
 		},
 		"MayoMart": {
 			"Name": "Mayo Mart",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#MayoMart",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#MayoMart",
 			"Versions": [
 				{ "Version": "0.1.1-unofficial.1-mouahrara" }
 			]
 		},
 		"MeteorDefence": {
 			"Name": "Meteor Defence",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#MeteorDefence",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#MeteorDefence",
 			"Versions": [
 				{ "Version": "0.1.2-unofficial.1-mouahrara" }
 			]
 		},
 		"ModifyThis": {
 			"Name": "Modify This",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#ModifyThis",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#ModifyThis",
 			"Versions": [
 				{ "Version": "0.9.1-unofficial.1-mouahrara" }
 			]
 		},
 		"MoveableMailbox": {
 			"Name": "Moveable Mailbox",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#MoveableMailbox",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#MoveableMailbox",
 			"Versions": [
 				{ "Version": "0.2.1-unofficial.2-mouahrara" }
 			]
 		},
 		"NapalmMummies": {
 			"Name": "Napalm Mummies",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#NapalmMummies",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#NapalmMummies",
 			"Versions": [
 				{ "Version": "0.1.4-unofficial.1-mouahrara" }
 			]
 		},
 		"NightEventChanceTweak": {
 			"Name": "Night Event Chance Tweak",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#NightEventChanceTweak",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#NightEventChanceTweak",
 			"Versions": [
 				{ "Version": "0.1.1-unofficial.1-mouahrara" }
 			]
 		},
 		"OverworldChests": {
 			"Name": "Overworld Chests",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#OverworldChests",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#OverworldChests",
 			"Versions": [
 				{ "Version": "0.5.4-unofficial.2-mouahrara" }
 			]
 		},
 		"PartialHearts": {
 			"Name": "Partial Hearts",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#PartialHearts",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#PartialHearts",
 			"Versions": [
 				{ "Version": "0.2.2-unofficial.1-mouahrara" }
 			]
 		},
+		"RainbowTrail": {
+			"Name": "Rainbow Trail",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#RainbowTrail",
+			"Versions": [
+				{ "Version": "0.1.2-unofficial.1-mouahrara" }
+			]
+		},
 		"StatueShorts": {
 			"Name": "Statue Shorts",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#StatueShorts",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#StatueShorts",
 			"Versions": [
 				{ "Version": "0.1.1-unofficial.1-mouahrara" }
 			]
 		},
 		"SubmergedCrabPots": {
 			"Name": "Submerged Crab Pots",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#SubmergedCrabPots",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#SubmergedCrabPots",
 			"Versions": [
 				{ "Version": "0.2.2-unofficial.1-mouahrara" }
 			]
 		},
 		"Trampoline": {
 			"Name": "Trampoline",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#Trampoline",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#Trampoline",
+			"Versions": [
+				{ "Version": "0.1.2-unofficial.1-mouahrara" }
+			]
+		},
+		"TrashCansOnHorse": {
+			"Name": "Trash Cans On Horse",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#TrashCansOnHorse",
 			"Versions": [
 				{ "Version": "0.1.2-unofficial.1-mouahrara" }
 			]
 		},
 		"TreasureChestsExpanded": {
 			"Name": "Treasure Chests Expanded",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#TreasureChestsExpanded",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#TreasureChestsExpanded",
 			"Versions": [
 				{ "Version": "0.3.1-unofficial.1-mouahrara" }
 			]
 		},
 		"WallPlanters": {
 			"Name": "Wall Planters",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#WallPlanters",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#WallPlanters",
 			"Versions": [
 				{ "Version": "0.1.2-unofficial.1-mouahrara" }
 			]
 		},
 		"WeaponsIgnoreGrass": {
 			"Name": "Weapons Ignore Grass",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#WeaponsIgnoreGrass",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#WeaponsIgnoreGrass",
 			"Versions": [
 				{ "Version": "0.1.1-unofficial.1-mouahrara" }
 			]
 		},
 		"WeatherTotem": {
 			"Name": "Weather Totem",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#WeatherTotem",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#WeatherTotem",
 			"Versions": [
 				{ "Version": "0.1.1-unofficial.1-mouahrara" }
 			]
 		},
 		"WikiLinks": {
 			"Name": "Wiki Links",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#WikiLinks",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#WikiLinks",
 			"Versions": [
 				{ "Version": "0.1.3-unofficial.1-mouahrara" }
 			]
 		},
 		"WitcherMod": {
 			"Name": "Witcher Mod",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#WitcherMod",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#WitcherMod",
 			"Versions": [
 				{ "Version": "0.2.4-unofficial.1-mouahrara" }
 			]
 		},
 		"YetAnotherJumpMod": {
 			"Name": "Yet Another Jump Mod",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#YetAnotherJumpMod",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#YetAnotherJumpMod",
 			"Versions": [
 				{ "Version": "0.7.2-unofficial.2-mouahrara" }
 			]
 		},
 		"ZombieOutbreak": {
 			"Name": "Zombie Outbreak",
-			"ModPageUrl": "https://github.com/mouahrara/aedenthorn/blob/master/README.md#ZombieOutbreak",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#ZombieOutbreak",
 			"Versions": [
 				{ "Version": "0.2.4-unofficial.1-mouahrara" }
 			]
