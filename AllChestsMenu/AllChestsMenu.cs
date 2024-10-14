@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -19,7 +20,8 @@ namespace AllChestsMenu
 {
 	public class AllChestsMenu : IClickableMenu
 	{
-		public const string chestsAnywhereKey = "Pathoschild.ChestsAnywhere/Name";
+		public const string chestsAnywhereNameKey = "Pathoschild.ChestsAnywhere/Name";
+		public const string CSIndexKey = "aedenthorn.AllChestsMenu/CustomSortIndex";
 		internal const int windowWidth = 64 * 26;
 		internal const int xSpace = 64;
 
@@ -36,7 +38,8 @@ namespace AllChestsMenu
 			CA,
 			CD,
 			IA,
-			ID
+			ID,
+			CS
 		}
 		public Sort currentSort = Sort.LA;
 		public List<ChestData> allChestDataList = new();
@@ -107,7 +110,6 @@ namespace AllChestsMenu
 
 			playerInventoryMenu = new InventoryMenu((Game1.uiViewport.Width - 64 * columns) / 2, Game1.uiViewport.Height - 64 * 3 - borderWidth / 2, false, Game1.player.Items, null, capacity, rows);
 			SetPlayerInventoryNeighbours();
-
 			trashCan = new ClickableTextureComponent(new Rectangle(playerInventoryMenu.xPositionOnScreen + playerInventoryMenu.width + 64 + 32 + 8, playerInventoryMenu.yPositionOnScreen + 64 + 16, 64, 104), Game1.mouseCursors, new Rectangle(564 + Game1.player.trashCanLevel * 18, 102, 18, 26), 4f, false)
 			{
 				myID = 4 * ccMagnitude + 2,
@@ -167,12 +169,13 @@ namespace AllChestsMenu
 
 			string[] s = Enum.GetNames(typeof(Sort));
 
-			for(int i = 0; i < s.Length; i++)
+			for (int i = 0; i < s.Length - 1; i++)
 			{
 				int row = i % 2;
 				string name = s[i];
-				sortNames[name] = ModEntry.SHelper.Translation.Get("sort-" + name);
 				int idx = 5 * ccMagnitude;
+
+				sortNames[name] = ModEntry.SHelper.Translation.Get("sort-" + name);
 				sortCCList.Add(new ClickableComponent(new Rectangle(organizeButton.bounds.X + 156 + i / 2 * 48 + 32, organizeButton.bounds.Y + 64 + row * 48 + 16, 32, 32), name, name)
 				{
 					myID = idx + i,
@@ -203,7 +206,6 @@ namespace AllChestsMenu
 
 			chestLocation = Game1.currentLocation.Name;
 			allChestDataList.Clear();
-
 			AddChestsFromLocation(Game1.currentLocation);
 			if (!ModEntry.Config.LimitToCurrentLocation)
 			{
@@ -217,7 +219,7 @@ namespace AllChestsMenu
 					{
 						foreach (Building building in location.buildings)
 						{
-							if (building is not ShippingBin && building.indoors.Value is not null)
+							if (building.indoors.Value is not null)
 							{
 								if (building.indoors.Value != Game1.currentLocation)
 								{
@@ -243,8 +245,7 @@ namespace AllChestsMenu
 						locationDisplayName = TokenParser.ParseText(building.GetData().Name);
 					}
 				}
-
-				if (location is FarmHouse)
+				if (location is FarmHouse && ModEntry.Config.IncludeFridge)
 				{
 					FarmHouse farmhouse = location as FarmHouse;
 
@@ -254,7 +255,7 @@ namespace AllChestsMenu
 						Chest fridge = farmhouse.fridge.Value;
 
 						RestoreNulls(fridge);
-						if (!fridge.modData.TryGetValue(chestsAnywhereKey, out string fridgeName) || string.IsNullOrEmpty(fridgeName))
+						if (!fridge.modData.TryGetValue(chestsAnywhereNameKey, out string fridgeName) || string.IsNullOrEmpty(fridgeName))
 						{
 							label = $"{locationDisplayName} ({fridgeString})";
 							fridgeName = fridgeString;
@@ -282,7 +283,7 @@ namespace AllChestsMenu
 						}
 					}
 				}
-				if (!shippingBinAlreadyAdded && ModEntry.Config.IncludeShippingBin && location.Name.Equals("IslandWest") && Game1.MasterPlayer.hasOrWillReceiveMail("Island_UpgradeHouse"))
+				if (!shippingBinAlreadyAdded && ModEntry.Config.IncludeShippingBin && location.Name.Equals("IslandWest") && Game1.MasterPlayer.hasOrWillReceiveMail("Island_UpgradeHouse") && !CompatibilityUtility.IsBuildableGingerIslandFarmLoaded)
 				{
 					string label = $"{Game1.content.LoadString("Strings\\Buildings:ShippingBin_Name")} ({90},{39})";
 					ShippingBinChest shippingBin = new();
@@ -297,13 +298,13 @@ namespace AllChestsMenu
 					Object obj = kvp.Value;
 					Chest chest;
 
-					if (obj is Chest && (obj as Chest).playerChest.Value && (obj as Chest).CanBeGrabbed)
+					if (obj is Chest objAsChest && objAsChest.playerChest.Value && objAsChest.CanBeGrabbed && (!objAsChest.fridge.Value || ModEntry.Config.IncludeMiniFridges) && (objAsChest.SpecialChestType != Chest.SpecialChestTypes.MiniShippingBin || ModEntry.Config.IncludeMiniShippingBins) && (objAsChest.SpecialChestType != Chest.SpecialChestTypes.JunimoChest || ModEntry.Config.IncludeJunimoChests))
 					{
-						chest = obj as Chest;
+						chest = objAsChest;
 					}
-					else if (obj.heldObject.Value is Chest)
+					else if (obj.heldObject.Value is Chest objHeldObjectAsChest && ModEntry.Config.IncludeAutoGrabbers)
 					{
-						chest = obj.heldObject.Value as Chest;
+						chest = objHeldObjectAsChest;
 					}
 					else
 					{
@@ -323,9 +324,8 @@ namespace AllChestsMenu
 						globalInventoryKeys.Add("JunimoChests");
 						chest.netItems.Value = Game1.player.team.GetOrCreateGlobalInventory("JunimoChests");
 					}
-
 					RestoreNulls(chest);
-					if (obj.modData.TryGetValue(chestsAnywhereKey, out string chestName) && !string.IsNullOrEmpty(chestName))
+					if (chest.modData.TryGetValue(chestsAnywhereNameKey, out string chestName) && !string.IsNullOrEmpty(chestName))
 					{
 						label = $"{chestName} ({kvp.Key.X},{kvp.Key.Y})";
 					}
@@ -336,6 +336,7 @@ namespace AllChestsMenu
 					allChestDataList.Add(new ChestData() { chest = chest, name = chestName, location = location.NameOrUniqueName, tile = new Vector2(kvp.Key.X, kvp.Key.Y), label = label, originalIndex = allChestDataList.Count, index = allChestDataList.Count });
 				}
 			}
+
 			SortAllChestDataList();
 		}
 
@@ -350,23 +351,24 @@ namespace AllChestsMenu
 			for (int i = 0; i < allChestDataList.Count; i++)
 			{
 				allChestDataList[i].index = i;
-				var chestData = allChestDataList[i];
+
+				ChestData chestData = allChestDataList[i];
 
 				if (!string.IsNullOrEmpty(whichLocation) && !chestData.label.ToLower().Contains(whichLocation.ToLower()))
+				{
 					continue;
+				}
 
 				int columns = 12;
-				int rows =(int)Math.Ceiling(chestData.chest.GetActualCapacity() / (float)columns);
+				int rows = (int)Math.Ceiling(chestData.chest.GetActualCapacity() / (float)columns);
 
 				chestData.menu = new ChestMenu(xPositionOnScreen + borderWidth + (even ? (64 * 13) : 0), yPositionOnScreen - scrolled * scrollInterval + borderWidth + 64 + 64 * rowsAlready + xSpace * (1 + menusAlready), false, chestData.chest.Items, null, chestData.chest.GetActualCapacity(), rows);
-
 				if (chestData.chest is ShippingBinChest && !ModEntry.Config.UnrestrictedShippingBin)
 				{
 					chestData.menu.highlightMethod = (Item i) => {
 						return i == Game1.getFarm().lastItemShipped;
 					};
 				}
-
 				if (!even)
 				{
 					oddRows = !chestData.collapsed ? Math.Max(chestData.menu.rows, 3) : 0;
@@ -386,21 +388,20 @@ namespace AllChestsMenu
 			}
 			inventoryButtons.Clear();
 			inventoryCells.Clear();
-
 			for (int i = 0; i < chestDataList.Count; i++)
 			{
 				const int columns = 12;
-				var chestData = chestDataList[i];
-				var count = chestData.menu.inventory.Count;
-				var lastCount = i > 0 ? chestDataList[i - 1].menu.inventory.Count : 0;
-				// var nextCount = i < chestDataList.Count - 1 ? chestDataList[i + 1].menu.inventory.Count : 0;
-				var lastLastCount = i > 1 ? chestDataList[i - 2].menu.inventory.Count : 0;
-				var nextNextCount = i < chestDataList.Count - 2 ? chestDataList[i + 2].menu.inventory.Count : 0;
-				var index = ccMagnitude + i * ccMagnitude / 1000;
-				var lastIndex = ccMagnitude + (i - 1) * ccMagnitude / 1000;
-				var nextIndex = ccMagnitude + (i + 1) * ccMagnitude / 1000;
-				var lastLastIndex = ccMagnitude + (i - 2) * ccMagnitude / 1000;
-				var nextNextIndex = ccMagnitude + (i + 2) * ccMagnitude / 1000;
+				ChestData chestData = chestDataList[i];
+				int count = chestData.menu.inventory.Count;
+				int lastCount = i > 0 ? chestDataList[i - 1].menu.inventory.Count : 0;
+				// int nextCount = i < chestDataList.Count - 1 ? chestDataList[i + 1].menu.inventory.Count : 0;
+				int lastLastCount = i > 1 ? chestDataList[i - 2].menu.inventory.Count : 0;
+				int nextNextCount = i < chestDataList.Count - 2 ? chestDataList[i + 2].menu.inventory.Count : 0;
+				int index = ccMagnitude + i * ccMagnitude / 1000;
+				int lastIndex = ccMagnitude + (i - 1) * ccMagnitude / 1000;
+				int nextIndex = ccMagnitude + (i + 1) * ccMagnitude / 1000;
+				int lastLastIndex = ccMagnitude + (i - 2) * ccMagnitude / 1000;
+				int nextNextIndex = ccMagnitude + (i + 2) * ccMagnitude / 1000;
 
 				for (int j = 0; j < count; j++)
 				{
@@ -416,21 +417,21 @@ namespace AllChestsMenu
 
 							if (chestDataList[i - 1].chest is ShippingBinChest)
 							{
-								if (rowIndex == 0)
-									widgetIndex = 0;
-								else
-									widgetIndex = widgetText.Length - 1;
+								widgetIndex = rowIndex switch
+								{
+									0 => 0,
+									_ => widgetText.Length - 1
+								};
 							}
 							else
 							{
-								if (rowIndex == 0)
-									widgetIndex = 0;
-								else if (rowIndex == 1)
-									widgetIndex = 2;
-								else if (rowIndex == 2)
-									widgetIndex = 4;
-								else
-									widgetIndex = widgetText.Length - 1;
+								widgetIndex = rowIndex switch
+								{
+									0 => 0,
+									1 => 2,
+									2 => 4,
+									_ => widgetText.Length - 1
+								};
 							}
 							chestData.menu.inventory[j].leftNeighborID = lastIndex + lastCount + widgetIndex;
 						}
@@ -449,21 +450,21 @@ namespace AllChestsMenu
 
 						if (chestData.chest is ShippingBinChest)
 						{
-							if (rowIndex == 0)
-								widgetIndex = 0;
-							else
-								widgetIndex = widgetText.Length - 1;
+							widgetIndex = rowIndex switch
+							{
+								0 => 0,
+								_ => widgetText.Length - 1
+							};
 						}
 						else
 						{
-							if (rowIndex == 0)
-								widgetIndex = 0;
-							else if (rowIndex == 1)
-								widgetIndex = 2;
-							else if (rowIndex == 2)
-								widgetIndex = 4;
-							else
-								widgetIndex = widgetText.Length - 1;
+							widgetIndex = rowIndex switch
+							{
+								0 => 0,
+								1 => 2,
+								2 => 4,
+								_ => widgetText.Length - 1
+							};
 						}
 						chestData.menu.inventory[j].rightNeighborID = index + count + widgetIndex;
 					}
@@ -473,7 +474,7 @@ namespace AllChestsMenu
 					}
 					if (j >= count - columns)
 					{
-						if(i < chestDataList.Count - 2)
+						if (i < chestDataList.Count - 2)
 						{
 							chestData.menu.inventory[j].downNeighborID = nextNextIndex + columnIndex;
 						}
@@ -532,7 +533,7 @@ namespace AllChestsMenu
 					{
 						int LeftRowIndex = Math.Min(j / 2, (int)Math.Ceiling((double)count / columns) - 1);
 						int RightRowIndex = i < chestDataList.Count - 1 ? Math.Min(j / 2, (int)Math.Ceiling((double)chestDataList[i + 1].menu.inventory.Count / columns) - 1) : -1;
-						var cc = new ClickableTextureComponent("", GetWidgetRectangle(chestData, j), "", widgetText[k], Game1.mouseCursors, widgetSources[k], 32f / widgetSources[k].Width, false)
+						ClickableTextureComponent cc = new("", GetWidgetRectangle(chestData, j), "", widgetText[k], Game1.mouseCursors, widgetSources[k], 32f / widgetSources[k].Width, false)
 						{
 							myID = index + count + k,
 							downNeighborID = k < widgetTextLength - 1 ? index + count + k + 5 : (i < chestDataList.Count - 2 ? nextNextIndex + nextNextCount : -1),
@@ -540,6 +541,7 @@ namespace AllChestsMenu
 							rightNeighborID = i < chestDataList.Count - 1 ? nextIndex + RightRowIndex * columns : -1,
 							upNeighborID = k > 0 ? index + count + k - 5: (i > 1 ? lastLastIndex + lastLastCount + widgetTextLength - 1: -1)
 						};
+
 						chestData.inventoryButtons.Add(cc);
 						inventoryButtons.Add(cc);
 					}
@@ -550,7 +552,7 @@ namespace AllChestsMenu
 					{
 						int LeftRowIndex = Math.Min(j / 2, (int)Math.Ceiling((double)count / columns) - 1);
 						int RightRowIndex = i < chestDataList.Count - 1 ? Math.Min(j / 2, (int)Math.Ceiling((double)chestDataList[i + 1].menu.inventory.Count / columns) - 1) : -1;
-						var cc = new ClickableTextureComponent("", GetWidgetRectangle(chestData, j), "", widgetText[j], Game1.mouseCursors, widgetSources[j], 32f / widgetSources[j].Width, false)
+						ClickableTextureComponent cc = new("", GetWidgetRectangle(chestData, j), "", widgetText[j], Game1.mouseCursors, widgetSources[j], 32f / widgetSources[j].Width, false)
 						{
 							myID = index + count + j,
 							downNeighborID = j < widgetText.Length - 1 ? index + count + j + 1 : (i < chestDataList.Count - 2 ? nextNextIndex + nextNextCount : -1),
@@ -558,6 +560,7 @@ namespace AllChestsMenu
 							rightNeighborID = i < chestDataList.Count - 1 ? nextIndex + RightRowIndex * columns : -1,
 							upNeighborID = j > 0 ? index + count + j - 1: (i > 1 ? lastLastIndex + lastLastCount + widgetText.Length - 1: -1)
 						};
+
 						chestData.inventoryButtons.Add(cc);
 						inventoryButtons.Add(cc);
 					}
@@ -609,18 +612,19 @@ namespace AllChestsMenu
 		public override void draw(SpriteBatch b)
 		{
 			Game1.drawDialogueBox(xPositionOnScreen, yPositionOnScreen, width, height, false, true, null, false, true);
-
 			canScroll = (chestDataList.Count > 0 && chestDataList[^1].menu.yPositionOnScreen + Math.Max(chestDataList[^1].menu.rows, 3) * 64 + borderWidth > cutoff) || (chestDataList.Count > 1 && chestDataList[^2].menu.yPositionOnScreen + Math.Max(chestDataList[^2].menu.rows, 3) * 64 + borderWidth > cutoff);
-
 			for (int i = 0; i < chestDataList.Count; i++)
 			{
-				var chestData = chestDataList[i];
+				ChestData chestData = chestDataList[i];
+
 				if (canScroll && chestData.menu.yPositionOnScreen - 48 > cutoff + 64 * 4)
 				{
 					break;
 				}
 				if (i == heldMenu - (chestDataList[i].index - i))
+				{
 					continue;
+				}
 				SpriteText.drawString(b, chestData.label, chestData.menu.xPositionOnScreen, chestData.menu.yPositionOnScreen - 48);
 				if (!chestData.collapsed)
 				{
@@ -642,7 +646,7 @@ namespace AllChestsMenu
 				okButton.draw(b);
 			}
 			SpriteText.drawStringHorizontallyCenteredAt(b, sortString, organizeButton.bounds.X + 156 + 32 * 2 + 24 + 32, organizeButton.bounds.Y + 16);
-			foreach(var cc in sortCCList)
+			foreach (ClickableComponent cc in sortCCList)
 			{
 				b.DrawString(Game1.smallFont, cc.label, cc.bounds.Location.ToVector2() + new Vector2(-1, 1), currentSort.ToString() == cc.label ? Color.Green : Color.Black);
 				b.DrawString(Game1.smallFont, cc.label, cc.bounds.Location.ToVector2(), currentSort.ToString() == cc.label ? Color.LightGreen : Color.White);
@@ -650,7 +654,6 @@ namespace AllChestsMenu
 			trashCan.draw(b);
 			organizeButton.draw(b);
 			storeAlikeButton.draw(b);
-
 			b.Draw(Game1.mouseCursors, new Vector2(trashCan.bounds.X + 60, trashCan.bounds.Y + 40), new Rectangle?(new Rectangle(564 + Game1.player.trashCanLevel * 18, 129, 18, 10)), Color.White, trashCanLidRotation, new Vector2(16f, 10f), 4f, SpriteEffects.None, 0.86f);
 			Game1.spriteBatch.Draw(Game1.menuTexture, new Rectangle(xPositionOnScreen + 16, -4, 24, 16), new Rectangle(16, 16, 24, 16), Color.White);
 			Game1.spriteBatch.Draw(Game1.menuTexture, new Rectangle(xPositionOnScreen + width - 32, -4, 16, 16), new Rectangle(225, 16, 16, 16), Color.White);
@@ -690,6 +693,7 @@ namespace AllChestsMenu
 		{
 			Item held = heldItem;
 			Rectangle rect;
+
 			renameBox.Selected = false;
 			locationText.Selected = false;
 			if (y >= cutoff)
@@ -704,7 +708,7 @@ namespace AllChestsMenu
 					if (heldItem != null)
 					{
 						Game1.playSound("bigSelect");
-						if(targetChest is not null)
+						if (targetChest is not null)
 						{
 							Item lastItemShipped = heldItem;
 
@@ -731,7 +735,6 @@ namespace AllChestsMenu
 					}
 				}
 				locationText.Update();
-
 				if (trashCan != null && trashCan.containsPoint(x, y) && heldItem != null && heldItem.canBeTrashed())
 				{
 					Utility.trashItem(heldItem);
@@ -747,15 +750,15 @@ namespace AllChestsMenu
 				if (storeAlikeButton.containsPoint(x, y))
 				{
 					Game1.playSound("Ship");
-					foreach (var s in chestDataList)
+					foreach (ChestData s in chestDataList)
 					{
 						SwapContents(Game1.player.Items, s, true);
 					}
 					return;
 				}
-				foreach (var cc in sortCCList)
+				foreach (ClickableComponent cc in sortCCList)
 				{
-					if(cc.containsPoint(x, y))
+					if (cc.containsPoint(x, y))
 					{
 						Game1.playSound("bigSelect");
 						currentSort = (Sort)Enum.Parse(typeof(Sort), cc.name);
@@ -771,7 +774,7 @@ namespace AllChestsMenu
 			{
 				for (int i = 0; i < chestDataList.Count; i++)
 				{
-					for(int j = 0; j < chestDataList[i].inventoryButtons.Count; j++)
+					for (int j = 0; j < chestDataList[i].inventoryButtons.Count; j++)
 					{
 						if (chestDataList[i].inventoryButtons[j].containsPoint(x, y))
 						{
@@ -780,12 +783,24 @@ namespace AllChestsMenu
 						}
 					}
 					rect = new Rectangle(chestDataList[i].menu.xPositionOnScreen, chestDataList[i].menu.yPositionOnScreen - 48, (width - borderWidth * 2 - 64) / 2, 48);
-					if (rect.Contains(new Point(x, y)) || (heldMenu > -1 && chestDataList[i].menu.isWithinBounds(x, y)))
+
+					static bool isWithinBounds(int x, int y, ChestMenu chestMenu, int otherChestMenuHeight)
+					{
+						if (x - chestMenu.xPositionOnScreen < chestMenu.width && x - chestMenu.xPositionOnScreen >= 0 && y - chestMenu.yPositionOnScreen < Math.Max(208, Math.Max(chestMenu.height, otherChestMenuHeight)))
+						{
+							return y - chestMenu.yPositionOnScreen >= 0;
+						}
+						return false;
+					}
+
+					int otherChestMenuIndex = i % 2 == 0 ? i + 1 : i - 1;
+					bool otherChestIsInRange = 0 <= otherChestMenuIndex && otherChestMenuIndex < chestDataList.Count;
+
+					if (rect.Contains(new Point(x, y)) || (heldMenu > -1 && isWithinBounds(x, y, chestDataList[i].menu, otherChestIsInRange ? chestDataList[otherChestMenuIndex].menu.height : 0)))
 					{
 						if (heldMenu > -1)
 						{
 							SwapMenus(heldMenu, chestDataList[i].index);
-							Game1.playSound("bigDeSelect");
 						}
 						else
 						{
@@ -795,8 +810,10 @@ namespace AllChestsMenu
 						return;
 					}
 					if (chestDataList[i].collapsed || heldMenu > -1)
+					{
 						continue;
-					heldItem = chestDataList[i].menu.leftClick(x, y, heldItem, false, chestDataList[i].chest is ShippingBinChest, chestDataList[i].chest.specialChestType.Value == Chest.SpecialChestTypes.MiniShippingBin);
+					}
+					heldItem = chestDataList[i].menu.LeftClick(x, y, heldItem, false, chestDataList[i].chest is ShippingBinChest, chestDataList[i].chest.specialChestType.Value == Chest.SpecialChestTypes.MiniShippingBin);
 					if (heldItem != held)
 					{
 						if (heldItem != null)
@@ -822,16 +839,22 @@ namespace AllChestsMenu
 		{
 			if (heldMenu > -1)
 				return;
+
 			Item held = heldItem;
-			if(y >= cutoff)
+
+			if (y >= cutoff)
 			{
 				heldItem = playerInventoryMenu.rightClick(x, y, heldItem, false);
 				if (heldItem != held)
 				{
 					if (heldItem != null)
+					{
 						Game1.playSound("bigSelect");
+					}
 					else
+					{
 						Game1.playSound("bigDeSelect");
+					}
 					return;
 				}
 			}
@@ -843,9 +866,13 @@ namespace AllChestsMenu
 					if (heldItem != held)
 					{
 						if (heldItem != null)
+						{
 							Game1.playSound("bigSelect");
+						}
 						else
+						{
 							Game1.playSound("bigDeSelect");
+						}
 						return;
 					}
 				}
@@ -859,7 +886,7 @@ namespace AllChestsMenu
 				return;
 			}
 			scrollInterval = 64;
-			if(direction < 0)
+			if (direction < 0)
 			{
 				if (!canScroll)
 					return;
@@ -899,7 +926,7 @@ namespace AllChestsMenu
 			}
 			if (key.Equals(Keys.Enter) && renameBox.Selected)
 			{
-				if(renamingChest is not null)
+				if (renamingChest is not null)
 				{
 					RenameChest();
 				}
@@ -911,6 +938,7 @@ namespace AllChestsMenu
 		{
 			if (!Game1.options.snappyMenus || !Game1.options.gamepadControls)
 				return;
+
 			if (currentlySnappedComponent == null)
 			{
 				if (focusBottom)
@@ -938,7 +966,8 @@ namespace AllChestsMenu
 			if (currentlySnappedComponent != null)
 			{
 				ClickableComponent next;
-				var old = currentlySnappedComponent;
+				ClickableComponent old = currentlySnappedComponent;
+
 				switch (direction)
 				{
 					case 0:
@@ -958,7 +987,8 @@ namespace AllChestsMenu
 							{
 								if (next.bounds.Y < 0)
 								{
-									var id = currentlySnappedComponent.myID;
+									int id = currentlySnappedComponent.myID;
+
 									scrolled -= (int)Math.Round(64f / scrollInterval);
 									PopulateMenus(false);
 									currentlySnappedComponent = getComponentWithID(id);
@@ -984,14 +1014,15 @@ namespace AllChestsMenu
 						next = getComponentWithID(currentlySnappedComponent.downNeighborID);
 						if (!focusBottom && next is not null && next.bounds.Y + next.bounds.Height > cutoff)
 						{
-							var id = currentlySnappedComponent.myID;
+							int id = currentlySnappedComponent.myID;
+
 							scrolled += (int)Math.Round(64f / scrollInterval);
 							PopulateMenus(false);
 							currentlySnappedComponent = getComponentWithID(id);
 							snapCursorToCurrentSnappedComponent();
 							break;
 						}
-						if(focusBottom && currentlySnappedComponent.myID < playerInventoryMenu.inventory.Count)
+						if (focusBottom && currentlySnappedComponent.myID < playerInventoryMenu.inventory.Count)
 						{
 							base.applyMovementKey(direction);
 							SetPlayerInventoryNeighbours();
@@ -1021,7 +1052,7 @@ namespace AllChestsMenu
 		public override void update(GameTime time)
 		{
 			base.update(time);
-			if(whichLocation?.ToLower() != locationText.Text.ToLower())
+			if (whichLocation?.ToLower() != locationText.Text.ToLower())
 			{
 				whichLocation = locationText.Text;
 				scrolled = 0;
@@ -1042,7 +1073,9 @@ namespace AllChestsMenu
 			hoveredItem = null;
 			hoverText = "";
 			base.performHoverAction(x, y);
+
 			Item item_grab_hovered_item;
+
 			if (Game1.getMousePosition().Y >= cutoff)
 			{
 				item_grab_hovered_item = playerInventoryMenu.hover(x, y, heldItem);
@@ -1064,7 +1097,6 @@ namespace AllChestsMenu
 					return;
 				}
 				hoverAmount = 0;
-
 				if (trashCan.containsPoint(x, y))
 				{
 					if (trashCanLidRotation <= 0f)
@@ -1084,8 +1116,7 @@ namespace AllChestsMenu
 					trashCanLidRotation = Math.Max(trashCanLidRotation - 0.06544985f, 0f);
 				}
 				locationText.Hover(x, y);
-
-				foreach (var cc in sortCCList)
+				foreach (ClickableComponent cc in sortCCList)
 				{
 					if (cc.containsPoint(x, y))
 					{
@@ -1108,7 +1139,9 @@ namespace AllChestsMenu
 						}
 					}
 					if (chestDataList[i].collapsed)
+					{
 						continue;
+					}
 					item_grab_hovered_item = chestDataList[i].menu.hover(x, y, heldItem);
 					if (item_grab_hovered_item != null)
 					{
@@ -1121,18 +1154,87 @@ namespace AllChestsMenu
 
 		public void SwapMenus(int idx1, int idx2)
 		{
+			if (allChestDataList[idx1].chest is ShippingBinChest || allChestDataList[idx2].chest is ShippingBinChest)
+				return;
+
 			if (ModEntry.SHelper.Input.IsDown(ModEntry.Config.ModKey))
 			{
 				SwapContents(allChestDataList[idx1], allChestDataList[idx2]);
-				heldMenu = -1;
-				return;
 			}
-			ChestData ChestData = allChestDataList[idx1];
-			allChestDataList[idx1] = allChestDataList[idx2];
+			else
+			{
+				SwapPositions(idx1, idx2);
+			}
+			heldMenu = -1;
+			Game1.playSound("bigDeSelect");
+		}
+
+		public void SwapPositions(int idx1, int idx2)
+		{
+			if (allChestDataList[idx1].chest is ShippingBinChest || allChestDataList[idx2].chest is ShippingBinChest)
+				return;
+
+			(allChestDataList[idx1], allChestDataList[idx2]) = (allChestDataList[idx2], allChestDataList[idx1]);
 			allChestDataList[idx1].index = idx1;
-			allChestDataList[idx2] = ChestData;
 			allChestDataList[idx2].index = idx2;
-			if(targetChest is not null)
+			if (ModEntry.Config.CurrentSort != Sort.CS)
+			{
+				foreach (GameLocation location in Game1.locations)
+				{
+					if (location.IsBuildableLocation())
+					{
+						foreach (Building building in location.buildings)
+						{
+							if (building.indoors.Value is not null)
+							{
+								ClearCSIndexKeysFromLocation(building.indoors.Value);
+							}
+						}
+					}
+					ClearCSIndexKeysFromLocation(location);
+				}
+				foreach (ChestData chestData in allChestDataList)
+				{
+					chestData.chest.modData[CSIndexKey] = $"{chestData.index}";
+				}
+				currentSort = Sort.CS;
+				ModEntry.Config.CurrentSort = Sort.CS;
+				ModEntry.SHelper.WriteConfig(ModEntry.Config);
+			}
+			allChestDataList[idx1].chest.modData[CSIndexKey] = $"{allChestDataList[idx1].index}";
+			allChestDataList[idx2].chest.modData[CSIndexKey] = $"{allChestDataList[idx2].index}";
+
+			static void ClearCSIndexKeysFromLocation(GameLocation location)
+			{
+				GameLocation parentLocation = location.GetParentLocation();
+
+				if (location is FarmHouse)
+				{
+					FarmHouse farmhouse = location as FarmHouse;
+
+					if (farmhouse.upgradeLevel > 0)
+					{
+						Chest fridge = farmhouse.fridge.Value;
+
+						fridge.modData.Remove(CSIndexKey);
+					}
+				}
+				foreach (KeyValuePair<Vector2, Object> kvp in location.objects.Pairs)
+				{
+					Object obj = kvp.Value;
+
+					if (obj is Chest objAsChest && objAsChest.playerChest.Value && objAsChest.CanBeGrabbed)
+					{
+						objAsChest.modData.Remove(CSIndexKey);
+					}
+					else if (obj.heldObject.Value is Chest objHeldObjectAsChest && ModEntry.Config.IncludeAutoGrabbers)
+					{
+						objHeldObjectAsChest.modData.Remove(CSIndexKey);
+					}
+				}
+			}
+
+			if (targetChest is not null)
 			{
 				if (targetChest.index == idx1)
 				{
@@ -1144,7 +1246,6 @@ namespace AllChestsMenu
 				}
 			}
 			PopulateMenus(false);
-			heldMenu = -1;
 		}
 
 		public static void SwapContents(Inventory inventory, ChestData chestData, bool same = false)
@@ -1173,21 +1274,23 @@ namespace AllChestsMenu
 
 		public static void SwapContents(Inventory inventory1, Inventory inventory2, bool same = false)
 		{
-			if(!same)
+			if (!same)
 			{
 				same = ModEntry.SHelper.Input.IsDown(ModEntry.Config.ModKey2);
 			}
 			for (int i = 0; i < inventory1.Count; i++)
 			{
-				var item = inventory1[i];
+				Item item = inventory1[i];
 
 				if (item is null)
+				{
 					continue;
+				}
 				if (same)
 				{
 					bool contains = false;
 
-					foreach (var m in inventory2)
+					foreach (Item m in inventory2)
 					{
 						if (m is not null && m.Name == item.Name)
 						{
@@ -1196,10 +1299,12 @@ namespace AllChestsMenu
 						}
 					}
 					if (!contains)
+					{
 						continue;
+					}
 				}
 
-				var newItem = AddItemToInventory(inventory2, item);
+				Item newItem = AddItemToInventory(inventory2, item);
 
 				if (newItem is null)
 				{
@@ -1231,7 +1336,7 @@ namespace AllChestsMenu
 					}
 				}
 			}
-			for(int i = 0; i < inventory.Count; i++)
+			for (int i = 0; i < inventory.Count; i++)
 			{
 				if (inventory[i] is null)
 				{
@@ -1288,32 +1393,38 @@ namespace AllChestsMenu
 
 			void open()
 			{
+				exitThisMenu(false);
 				Game1.playSound("bigSelect");
 				ChestData.chest.ShowMenu();
 			}
+
 			void organize()
 			{
 				Game1.playSound("Ship");
 				ItemGrabMenu.organizeItemsInList(ChestData.chest.Items);
 			}
+
 			void put()
 			{
 				Game1.playSound("stoneStep");
 				SwapContents(Game1.player.Items, ChestData);
 			}
+
 			void take()
 			{
 				Game1.playSound("stoneStep");
 				SwapContents(ChestData, Game1.player.Items);
 			}
+
 			void rename()
 			{
 				Game1.playSound("bigSelect");
 				Rename(ChestData);
 			}
+
 			void target()
 			{
-				if(targetChest?.index == ChestData.index)
+				if (targetChest?.index == ChestData.index)
 				{
 					Game1.playSound("bigDeSelect");
 					targetChest = null;
@@ -1330,7 +1441,7 @@ namespace AllChestsMenu
 		{
 			renamingChest = ChestData;
 			renameBox.Selected = true;
-			renameBox.Text = ChestData.chest.modData.TryGetValue(chestsAnywhereKey, out string name) ? name : "";
+			renameBox.Text = ChestData.chest.modData.TryGetValue(chestsAnywhereNameKey, out string name) ? name : "";
 			if (currentlySnappedComponent is not null)
 			{
 				focusBottom = true;
@@ -1356,18 +1467,17 @@ namespace AllChestsMenu
 					locationDisplayName = TokenParser.ParseText(building.GetData().Name);
 				}
 			}
-
 			if (location is FarmHouse && ReferenceEquals(ChestData.chest, (location as FarmHouse).fridge.Value))
 			{
 				if (string.IsNullOrEmpty(renameBox.Text))
 				{
-					ChestData.chest.modData[chestsAnywhereKey] = "";
+					ChestData.chest.modData[chestsAnywhereNameKey] = "";
 					ChestData.name = "";
 					ChestData.label = $"{locationDisplayName} ({fridgeString})";
 				}
 				else
 				{
-					ChestData.chest.modData[chestsAnywhereKey] = renameBox.Text;
+					ChestData.chest.modData[chestsAnywhereNameKey] = renameBox.Text;
 					ChestData.name = renameBox.Text;
 					ChestData.label = $"{ChestData.name} ({fridgeString})";
 				}
@@ -1376,13 +1486,13 @@ namespace AllChestsMenu
 			{
 				if (string.IsNullOrEmpty(renameBox.Text))
 				{
-					ChestData.chest.modData[chestsAnywhereKey] = "";
+					ChestData.chest.modData[chestsAnywhereNameKey] = "";
 					ChestData.name = "";
 					ChestData.label = $"{locationDisplayName} ({ChestData.tile.X},{ChestData.tile.Y})";
 				}
 				else
 				{
-					ChestData.chest.modData[chestsAnywhereKey] = renameBox.Text;
+					ChestData.chest.modData[chestsAnywhereNameKey] = renameBox.Text;
 					ChestData.name = renameBox.Text;
 					ChestData.label = $"{ChestData.name} ({ChestData.tile.X},{ChestData.tile.Y})";
 				}
@@ -1405,10 +1515,45 @@ namespace AllChestsMenu
 
 		private void SortAllChestDataList()
 		{
+			static int CompareLabels(string labelA, string labelB)
+			{
+				static (bool, int, int) ExtractCoordinates(string label)
+				{
+					var match = Regex.Match(label, @"\((\d+),(\d+)\)$");
+					if (match.Success)
+					{
+						int x = int.Parse(match.Groups[1].Value);
+						int y = int.Parse(match.Groups[2].Value);
+						return (true, x, y);
+					}
+					return (false, 0, 0);
+				}
+
+				var (hasCoordsA, xA, yA) = ExtractCoordinates(labelA);
+				var (hasCoordsB, xB, yB) = ExtractCoordinates(labelB);
+				string labelWithoutCoordsA = hasCoordsA ? labelA[..labelA.LastIndexOf('(')].Trim() : labelA;
+				string labelWithoutCoordsB = hasCoordsB ? labelB[..labelB.LastIndexOf('(')].Trim() : labelB;
+				int labelComparison = labelWithoutCoordsA.CompareTo(labelWithoutCoordsB);
+
+				if (labelComparison != 0)
+				{
+					return labelComparison;
+				}
+				if (hasCoordsA && hasCoordsB)
+				{
+					int xComparison = ModEntry.Config.SecondarySortingPriority == "Y" ? yA.CompareTo(yB) : xA.CompareTo(xB);
+
+					if (xComparison != 0)
+					{
+						return xComparison;
+					}
+					return ModEntry.Config.SecondarySortingPriority == "Y" ? xA.CompareTo(xB) : yA.CompareTo(yB);
+				}
+				return hasCoordsA.CompareTo(hasCoordsB);
+			}
+
 			allChestDataList.Sort(delegate (ChestData a, ChestData b)
 			{
-				string sa;
-				string sb;
 				int result = 0;
 
 				if (a.chest is ShippingBinChest)
@@ -1419,33 +1564,24 @@ namespace AllChestsMenu
 				switch (currentSort)
 				{
 					case Sort.LA:
-						if (a.location == b.location)
-							result = a.name.CompareTo(b.name);
-						else
-							result = a.location.CompareTo(b.location);
+						result = a.location.CompareTo(b.location);
+						if (result == 0)
+						{
+							result = CompareLabels(a.label, b.label);
+						}
 						break;
 					case Sort.LD:
-						if (a.location == b.location)
-							result = b.name.CompareTo(a.name);
 						result = b.location.CompareTo(a.location);
+						if (result == 0)
+						{
+							result = CompareLabels(b.label, a.label);
+						}
 						break;
 					case Sort.NA:
-						sa = a.name;
-						sb = b.name;
-						if (string.IsNullOrEmpty(sa))
-							sa = a.location;
-						if (string.IsNullOrEmpty(sb))
-							sb = b.location;
-						result = sa.CompareTo(sb);
+						result = CompareLabels(a.label, b.label);
 						break;
 					case Sort.ND:
-						sa = a.name;
-						sb = b.name;
-						if (string.IsNullOrEmpty(sa))
-							sa = a.location;
-						if (string.IsNullOrEmpty(sb))
-							sb = b.location;
-						result = sb.CompareTo(sa);
+						result = CompareLabels(b.label, a.label);
 						break;
 					case Sort.CA:
 						result = a.chest.Items.Count.CompareTo(b.chest.Items.Count);
@@ -1459,8 +1595,24 @@ namespace AllChestsMenu
 					case Sort.ID:
 						result = b.chest.Items.Where(i => i is not null).Count().CompareTo(a.chest.Items.Where(i => i is not null).Count());
 						break;
+					case Sort.CS:
+						bool csa = a.chest.modData.ContainsKey(CSIndexKey);
+						bool csb = b.chest.modData.ContainsKey(CSIndexKey);
+
+						result = (csa, csb) switch
+						{
+							(false, false) => 0,
+							(true, false) => -1,
+							(false, true) => 1,
+							(true, true) => int.Parse(a.chest.modData[CSIndexKey]) - int.Parse(b.chest.modData[CSIndexKey])
+						};
+						if (result == 0)
+						{
+							result = CompareLabels(a.label, b.label);
+						}
+						break;
 				}
-				if(result == 0)
+				if (result == 0)
 				{
 					result = a.originalIndex.CompareTo(b.originalIndex);
 				}
@@ -1489,14 +1641,12 @@ namespace AllChestsMenu
 
 		public virtual void DropHeldItem()
 		{
-			if (heldItem == null)
+			if (heldItem is not null)
 			{
-				return;
+				Game1.playSound("throwDownITem");
+				Game1.createItemDebris(heldItem, Game1.player.getStandingPosition(), Game1.player.facingDirection.Value, null, -1);
+				heldItem = null;
 			}
-			Game1.playSound("throwDownITem");
-			int drop_direction = Game1.player.facingDirection.Value;
-			Game1.createItemDebris(heldItem, Game1.player.getStandingPosition(), drop_direction, null, -1);
-			heldItem = null;
 		}
 
 		public override void emergencyShutDown()

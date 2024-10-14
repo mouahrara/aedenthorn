@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
+using StardewModdingAPI.Events;
 using StardewValley;
 
 namespace AllChestsMenu
@@ -10,8 +11,8 @@ namespace AllChestsMenu
 	{
 		internal static IMonitor SMonitor;
 		internal static IModHelper SHelper;
+		internal static IManifest SModManifest;
 		internal static ModConfig Config;
-
 		internal static ModEntry context;
 
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
@@ -20,35 +21,34 @@ namespace AllChestsMenu
 		{
 			Config = Helper.ReadConfig<ModConfig>();
 
-			if (!Config.ModEnabled)
-				return;
-
 			context = this;
-
 			SMonitor = Monitor;
 			SHelper = helper;
+			SModManifest = ModManifest;
 
 			Helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
 			Helper.Events.Input.ButtonPressed += Input_ButtonPressed;
 		}
 
-		public void Input_ButtonPressed(object sender, StardewModdingAPI.Events.ButtonPressedEventArgs e)
+		public void Input_ButtonPressed(object sender, ButtonPressedEventArgs e)
 		{
 			if (!Config.ModEnabled)
 				return;
 
-			if (Game1.activeClickableMenu is AllChestsMenu)
+			if (Game1.activeClickableMenu is AllChestsMenu allChestsMenu)
 			{
 				if (Game1.options.snappyMenus && Game1.options.gamepadControls && e.Button == Config.SwitchButton)
 				{
 					Game1.playSound("shwip");
-					if (!(Game1.activeClickableMenu as AllChestsMenu).focusBottom)
-						(Game1.activeClickableMenu as AllChestsMenu).lastTopSnappedCC = Game1.activeClickableMenu.currentlySnappedComponent;
-					(Game1.activeClickableMenu as AllChestsMenu).focusBottom = !(Game1.activeClickableMenu as AllChestsMenu).focusBottom;
+					if (!allChestsMenu.focusBottom)
+					{
+						allChestsMenu.lastTopSnappedCC = Game1.activeClickableMenu.currentlySnappedComponent;
+					}
+					allChestsMenu.focusBottom = !allChestsMenu.focusBottom;
 					Game1.activeClickableMenu.currentlySnappedComponent = null;
 					Game1.activeClickableMenu.snapToDefaultClickableComponent();
 				}
-				if (((Game1.activeClickableMenu as AllChestsMenu).locationText.Selected || (Game1.activeClickableMenu as AllChestsMenu).renameBox.Selected) && e.Button.ToString().Length == 1)
+				if ((allChestsMenu.locationText.Selected || allChestsMenu.renameBox.Selected) && e.Button.ToString().Length == 1)
 				{
 					SHelper.Input.Suppress(e.Button);
 				}
@@ -59,7 +59,7 @@ namespace AllChestsMenu
 			}
 		}
 
-		public void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
+		public void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
 		{
 			var phoneAPI = Helper.ModRegistry.GetApi<IMobilePhoneApi>("aedenthorn.MobilePhone");
 
@@ -91,7 +91,19 @@ namespace AllChestsMenu
 			);
 			configMenu.AddBoolOption(
 				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.ShippingBin.Name"),
+				name: () => SHelper.Translation.Get("GMCM.IncludeFridge.Name"),
+				getValue: () => Config.IncludeFridge,
+				setValue: value => Config.IncludeFridge = value
+			);
+			configMenu.AddBoolOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.IncludeMiniFridges.Name"),
+				getValue: () => Config.IncludeMiniFridges,
+				setValue: value => Config.IncludeMiniFridges = value
+			);
+			configMenu.AddBoolOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.IncludeShippingBin.Name"),
 				getValue: () => Config.IncludeShippingBin,
 				setValue: value => Config.IncludeShippingBin = value
 			);
@@ -101,6 +113,31 @@ namespace AllChestsMenu
 				tooltip: () => SHelper.Translation.Get("GMCM.UnrestrictedShippingBin.Tooltip"),
 				getValue: () => Config.UnrestrictedShippingBin,
 				setValue: value => Config.UnrestrictedShippingBin = value
+			);
+			configMenu.AddBoolOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.IncludeMiniShippingBins.Name"),
+				getValue: () => Config.IncludeMiniShippingBins,
+				setValue: value => Config.IncludeMiniShippingBins = value
+			);
+			configMenu.AddBoolOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.IncludeJunimoChests.Name"),
+				getValue: () => Config.IncludeJunimoChests,
+				setValue: value => Config.IncludeJunimoChests = value
+			);
+			configMenu.AddBoolOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.IncludeAutoGrabbers.Name"),
+				getValue: () => Config.IncludeAutoGrabbers,
+				setValue: value => Config.IncludeAutoGrabbers = value
+			);
+			configMenu.AddTextOption(
+				mod: ModManifest,
+				name: () => SHelper.Translation.Get("GMCM.SecondarySortingPriority.Name"),
+				getValue: () => Config.SecondarySortingPriority,
+				setValue: value => Config.SecondarySortingPriority = value,
+				allowedValues: new string[] { "X", "Y" }
 			);
 			configMenu.AddKeybind(
 				mod: ModManifest,

@@ -7,11 +7,11 @@ namespace AllChestsMenu
 	{
 		public static void OpenMenu()
 		{
-			if (Config.ModEnabled && Context.IsPlayerFree)
-			{
-				Game1.activeClickableMenu = new AllChestsMenu();
-				Game1.playSound("bigSelect");
-			}
+			if (!Config.ModEnabled || !Context.IsPlayerFree)
+				return;
+
+			Game1.activeClickableMenu = new AllChestsMenu();
+			Game1.playSound("bigSelect");
 		}
 	}
 }

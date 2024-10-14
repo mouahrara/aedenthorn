@@ -1,5 +1,3 @@
-using System.Reflection;
-using Netcode;
 using StardewValley;
 using StardewValley.Inventories;
 using StardewValley.Menus;
@@ -24,6 +22,7 @@ namespace AllChestsMenu
 		public override void ShowMenu()
 		{
 			ItemGrabMenu itemGrabMenu = new(null, reverseGrab: true, showReceivingMenu: false, Utility.highlightShippableObjects, Game1.getFarm().shipItem, "", null, snapToBottom: true, canBeExitedWithKey: true, playRightClickSound: false, allowRightClick: true, showOrganizeButton: false, 0, null, -1, this);
+
 			itemGrabMenu.initializeUpperRightCloseButton();
 			itemGrabMenu.setBackgroundTransparency(b: false);
 			itemGrabMenu.setDestroyItemOnClick(b: true);

@@ -2,6 +2,15 @@
 
 # Release notes
 
+## 0.3.2-unofficial.3-mouahrara
+Released on 16 October, 2024, for SMAPI 4.0.0 or later.
+* Manual reordering of chests is now persistent ✨
+* Sorting by name is now based on the labels of the chests rather than their internal names. Additionally, secondary sorting will use the coordinates of the chests with a configurable priority in X or Y (default), which should display the chests in a more intuitive order ✨
+* Added **Include Fridge**, **Include Mini-Fridges**, **Include Mini-Shipping Bins**, **Include Junimo Chests**, **Include Auto-Grabbers** and **Secondary Sorting Priority** options ✨
+* Fixed an issue where the held item was lost when the menu of a chest was opened from the All Chests Menu 🔧
+* Fixed an issue where renaming Auto-Grabbers wasn't persistent 🔧
+* Fixed minor bugs 🔧
+
 ## 0.3.2-unofficial.2-mouahrara
 Released on 2 April, 2024, for SMAPI 4.0.0 or later.
 * Added support for all types of chests (Junimo Chest, Big Chest, Custom chest from other mods...) ✨
@@ -9,8 +18,8 @@ Released on 2 April, 2024, for SMAPI 4.0.0 or later.
 * Added **Unrestricted Shipping Bin** option to retrieve items from the shipping bin without being restricted to only the last item placed ✨
 * Renaming a chest will now reposition it if the selected sorting option is ascending by name (NA) or descending by name (ND) ✨
 * Improved controller support 🎮
-* Fixed a bug with renaming Auto-Grabbers 🔧
-* Fixed a bug with chest sorting systems 🔧
+* Fixed an issue with renaming Auto-Grabbers 🔧
+* Fixed an issue with chest sorting systems 🔧
 * Removed harmony patches 🗑️
 * Removed **Chest Rows** option 🗑️
 

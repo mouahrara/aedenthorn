@@ -41,7 +41,7 @@ namespace AllChestsMenu
 		{
 			for (int i = 0; i < inventory.Count; i++)
 			{
-				if (_iconShakeTimer.TryGetValue(i, out var value) && Game1.currentGameTime.TotalGameTime.TotalSeconds >= value)
+				if (_iconShakeTimer.TryGetValue(i, out double value) && Game1.currentGameTime.TotalGameTime.TotalSeconds >= value)
 				{
 					_iconShakeTimer.Remove(i);
 				}
@@ -105,6 +105,7 @@ namespace AllChestsMenu
 				if (actualInventory.Count > l && actualInventory[l] != null)
 				{
 					bool flag = highlightMethod(actualInventory[l]);
+
 					if (_iconShakeTimer.ContainsKey(l))
 					{
 						location2 += 1f * new Vector2(Game1.random.Next(-1, 2), Game1.random.Next(-1, 2));
@@ -117,6 +118,7 @@ namespace AllChestsMenu
 		public new List<Vector2> GetSlotDrawPositions()
 		{
 			List<Vector2> list = new();
+
 			for (int i = 0; i < capacity; i++)
 			{
 				int rowIndex = i / columns;
@@ -130,6 +132,7 @@ namespace AllChestsMenu
 		public new List<ClickableComponent> GetBorder(BorderSide side)
 		{
 			List<ClickableComponent> list = new();
+
 			switch (side)
 			{
 				case BorderSide.Bottom:
@@ -180,7 +183,7 @@ namespace AllChestsMenu
 			return list;
 		}
 
-		public Item leftClick(int x, int y, Item toPlace, bool playSound = true, bool isShippingBinChest = false, bool isMiniShippingBinChest = false)
+		public Item LeftClick(int x, int y, Item toPlace, bool playSound = true, bool isShippingBinChest = false, bool isMiniShippingBinChest = false)
 		{
 			if ((isShippingBinChest || isMiniShippingBinChest) && toPlace is not null && !Utility.highlightShippableObjects(toPlace))
 				return toPlace;
@@ -191,7 +194,9 @@ namespace AllChestsMenu
 				{
 					continue;
 				}
+
 				int num = Convert.ToInt32(item.name);
+
 				if (num >= actualInventory.Count || (actualInventory[num] != null && !highlightMethod(actualInventory[num]) && !actualInventory[num].canStackWith(toPlace)))
 				{
 					continue;
@@ -201,7 +206,9 @@ namespace AllChestsMenu
 					if (toPlace != null)
 					{
 						if (isShippingBinChest && !ModEntry.Config.UnrestrictedShippingBin)
+						{
 							continue;
+						}
 						if (playSound)
 						{
 							Game1.playSound("stoneStep");
