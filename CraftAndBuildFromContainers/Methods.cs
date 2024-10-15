@@ -1,236 +1,244 @@
-﻿using HarmonyLib;
-using Microsoft.Xna.Framework;
-using Netcode;
-using Newtonsoft.Json;
+﻿using System.Collections.Generic;
 using StardewValley;
+using StardewValley.Buildings;
+using StardewValley.Inventories;
 using StardewValley.Locations;
 using StardewValley.Menus;
-using StardewValley.Monsters;
 using StardewValley.Objects;
-using StardewValley.TerrainFeatures;
-using StardewValley.Tools;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using xTile.Dimensions;
 using Object = StardewValley.Object;
-using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
-namespace CraftFromContainers
+namespace CraftAndBuildFromContainers
 {
 	public partial class ModEntry
 	{
-		public static bool skip = false;
+		internal static List<IInventory> cachedContainers;
+
 		private static bool IsValidToPull()
 		{
-			if (skip)
-				return false;
 			if (Config.EnableEverywhere)
 				return true;
-			if (Config.EnableForBuilding && Game1.activeClickableMenu is CarpenterMenu)
+			if (Config.EnableForShopTrading && Game1.activeClickableMenu is ShopMenu)
 				return true;
 			if (Config.EnableForCrafting && Game1.activeClickableMenu is GameMenu && (Game1.activeClickableMenu as GameMenu).GetCurrentPage() is CraftingPage)
 				return true;
+			if (Config.EnableForBuilding && Game1.activeClickableMenu is CarpenterMenu)
+				return true;
 			return false;
 		}
-		private static void ConsumeAll(List<KeyValuePair<int, int>> list, List<Chest> additional_materials)
-		{
-			Dictionary<int, int> missing = new();
-			for (int i = list.Count - 1; i >= 0; i--)
-			{
-				var index = list[i].Key;
-				int required_count = list[i].Value;
-				bool foundInBackpack = false;
-				for (int j = Game1.player.Items.Count - 1; j >= 0; j--)
-				{
-					if (Game1.player.Items[j] != null && Game1.player.Items[j] is Object && !(Game1.player.Items[j] as Object).bigCraftable.Value && (((Object)Game1.player.Items[j]).ParentSheetIndex == index || ((Object)Game1.player.Items[j]).Category == index || CraftingRecipe.isThereSpecialIngredientRule((Object)Game1.player.Items[j], index)))
-					{
-						int toRemove = required_count;
-						required_count -= Game1.player.Items[j].Stack;
-						Game1.player.Items[j].Stack -= toRemove;
-						if (Game1.player.Items[j].Stack <= 0)
-						{
-							Game1.player.Items[j] = null;
-						}
-						if (required_count <= 0)
-						{
-							foundInBackpack = true;
-							break;
-						}
-					}
-				}
-				if (additional_materials != null && !foundInBackpack)
-				{
-					for (int c = 0; c < additional_materials.Count; c++)
-					{
-						Chest chest = additional_materials[c];
-						if (chest != null)
-						{
-							bool removedItem = false;
-							for (int k = chest.items.Count - 1; k >= 0; k--)
-							{
-								if (chest.items[k] != null && chest.items[k] is Object && (((Object)chest.items[k]).ParentSheetIndex == index || ((Object)chest.items[k]).Category == index || CraftingRecipe.isThereSpecialIngredientRule((Object)chest.items[k], index)))
-								{
-									int removed_count = Math.Min(required_count, chest.items[k].Stack);
-									required_count -= removed_count;
-									chest.items[k].Stack -= removed_count;
-									if (chest.items[k].Stack <= 0)
-									{
-										chest.items[k] = null;
-										removedItem = true;
-									}
-									if (required_count <= 0)
-									{
-										break;
-									}
-								}
-							}
-							if (removedItem)
-							{
-								chest.clearNulls();
-							}
-							if (required_count <= 0)
-							{
-								break;
-							}
-						}
-					}
-				}
-				if (required_count > 0)
-				{
-					missing.Add(index, required_count);
-				}
-			}
-			ConsumeMissing(missing);
-		}
 
-		private static void ConsumeMissing(Dictionary<int, int> missing)
+		public static List<IInventory> GetContainers()
 		{
-			foreach (var kvp in missing)
-			{
-				int found = 0;
-				foreach (NetObjectList<Item> items in GetContainers())
-				{
-					var amount = Game1.player.getItemCountInList(items, kvp.Key, 0);
-					if (amount <= 0)
-						continue;
-					var min = Math.Min(kvp.Value, amount);
-					SMonitor.Log($"Consuming {kvp.Key}x{min}");
-					ConsumeObject(items, kvp.Key, min);
-					found += amount;
-					if (found >= kvp.Value)
-					{
-						break;
-					}
-				}
-			}
-		}
-
-		private static void ConsumeObject(IList<Item> items, int index, int quantity)
-		{
-			for (int i = items.Count - 1; i >= 0; i--)
-			{
-				if (items[i] != null && items[i] is Object && ((Object)items[i]).ParentSheetIndex == index)
-				{
-					int toRemove = quantity;
-					quantity -= items[i].Stack;
-					items[i].Stack -= toRemove;
-					if (items[i].Stack <= 0)
-					{
-						items[i] = null;
-					}
-					if (quantity <= 0)
-					{
-						return;
-					}
-				}
-			}
-		}
-		private static bool CheckAmount(int itemIndex, int quantity, int minPrice)
-		{
-			int found = 0;
-			foreach (var items in GetContainers())
-			{
-				found += Game1.player.getItemCountInList(items, itemIndex, minPrice);
-				if (found >= quantity)
-				{
-					return true;
-				}
-			}
-			return false;
-		}
-		private static bool CheckAllAmounts(List<KeyValuePair<int, int>> recipeList, IList<Item> extraToCheck)
-		{
-			foreach (KeyValuePair<int, int> kvp in recipeList)
-			{
-				int required_count = kvp.Value;
-				required_count -= Game1.player.getItemCount(kvp.Key, 5);
-				if (required_count > 0)
-				{
-					if (extraToCheck != null)
-					{
-						required_count -= Game1.player.getItemCountInList(extraToCheck, kvp.Key, 5);
-						if (required_count <= 0)
-						{
-							continue;
-						}
-					}
-					if (!CheckAmount(kvp.Key, required_count, 5))
-						return false;
-				}
-			}
-			return true;
-		}
-
-		public static List<NetObjectList<Item>> GetContainers()
-		{
-			if(cachedContainers is not null)
+			if (cachedContainers is not null)
 				return cachedContainers;
-			var list = new List<NetObjectList<Item>>();
 
-			foreach (var l in Game1.locations)
+			List<IInventory> list = new();
+
+			void AddContainersFromLocation(GameLocation location)
 			{
-				foreach (Object obj in l.objects.Values)
+				if (location is FarmHouse && Config.IncludeFridge)
+				{
+					FarmHouse farmhouse = location as FarmHouse;
+
+					if (farmhouse.upgradeLevel > 0)
+					{
+						list.Add(farmhouse.fridge.Value.Items);
+					}
+				}
+				if (location is Farm farm && Config.IncludeShippingBin)
+				{
+					if (Config.UnrestrictedShippingBin)
+					{
+						list.Add(farm.getShippingBin(Game1.player));
+					}
+					else
+					{
+						list.Add(new Inventory() { Game1.getFarm().lastItemShipped });
+					}
+				}
+				foreach (Object obj in location.objects.Values)
 				{
 					if (obj is not null)
 					{
-						if (obj is StorageFurniture)
+						if (obj is Chest objAsChest && objAsChest.playerChest.Value && objAsChest.CanBeGrabbed && (!objAsChest.fridge.Value || Config.IncludeMiniFridges) && (objAsChest.SpecialChestType != Chest.SpecialChestTypes.MiniShippingBin || Config.IncludeMiniShippingBins) && (objAsChest.SpecialChestType != Chest.SpecialChestTypes.JunimoChest || Config.IncludeJunimoChests))
 						{
-							list.Add((obj as StorageFurniture).heldItems);
+							list.Add(objAsChest.Items);
 						}
-						else if (obj is Chest)
+						else if (obj.heldObject.Value is Chest objHeldObjectAsChest && Config.IncludeAutoGrabbers)
 						{
-							list.Add((obj as Chest).items);
+							list.Add(objHeldObjectAsChest.Items);
 						}
 					}
 				}
-				if (l is BuildableGameLocation)
+			}
+
+			foreach (GameLocation location in Game1.locations)
+			{
+				AddContainersFromLocation(location);
+				if (location.IsBuildableLocation())
 				{
-					foreach (var building in (l as BuildableGameLocation).buildings)
+					foreach (Building building in location.buildings)
 					{
 						if (building.indoors.Value is not null)
 						{
-							foreach (Object obj in building.indoors.Value.objects.Values)
-							{
-								if (obj is not null)
-								{
-									if (obj is StorageFurniture)
-									{
-										list.Add((obj as StorageFurniture).heldItems);
-									}
-									else if (obj is Chest)
-									{
-										list.Add((obj as Chest).items);
-									}
-								}
-							}
-
+							AddContainersFromLocation(building.indoors.Value);
 						}
 					}
 				}
 			}
 			cachedContainers = list;
 			return cachedContainers;
+		}
+
+		#pragma warning disable CS0618
+		private static bool DoesFarmerHaveIngredientsInInventoryOrContainers(List<KeyValuePair<string, int>> recipeList, IList<Item> extraToCheck = null)
+		{
+			foreach (KeyValuePair<string, int> recipe in recipeList)
+			{
+				int value = recipe.Value;
+
+				value -= Game1.player.getItemCount(recipe.Key);
+				if (value <= 0)
+				{
+					continue;
+				}
+				if (extraToCheck != null)
+				{
+					value -= Game1.player.getItemCountInList(extraToCheck, recipe.Key);
+					if (value <= 0)
+					{
+						continue;
+					}
+				}
+				value -= GetItemCountInContainers(recipe.Key);
+				if (value <= 0)
+				{
+					continue;
+				}
+				return false;
+			}
+			return true;
+		}
+
+		private static int GetItemCountInContainers(string itemId)
+		{
+			List<IInventory> containers = GetContainers();
+			int value = 0;
+
+			foreach (IInventory items in containers)
+			{
+				value += Game1.player.getItemCountInList(items, itemId);
+			}
+			return value;
+		}
+
+		public static void AddAdditionalCraftingItemsFromContainers(List<KeyValuePair<string, int>> recipeList, ref IList<Item> additionalCraftingItems)
+		{
+			List<IInventory> containers = GetContainers();
+
+			additionalCraftingItems ??= new List<Item>();
+			foreach (KeyValuePair<string, int> recipe in recipeList)
+			{
+				foreach (IInventory items in containers)
+				{
+					int value = Game1.player.getItemCountInList(items, recipe.Key);
+
+					if (value <= 0)
+					{
+						continue;
+					}
+					additionalCraftingItems.Add(new Object(recipe.Key, value));
+				}
+			}
+		}
+		#pragma warning restore CS0618
+
+		private static void ConsumeIngredientsFromInventoryOrContainers(List<KeyValuePair<string, int>> recipeItems, List<IInventory> additionalMaterials = null)
+		{
+			foreach (KeyValuePair<string, int> recipe in recipeItems)
+			{
+				int value = recipe.Value;
+
+				value -= ConsumeFromPlayerInventory(recipe.Key, value);
+				if (value <= 0)
+				{
+					continue;
+				}
+				if (additionalMaterials != null)
+				{
+					value -= ConsumeFromAdditionalMaterials(additionalMaterials, recipe.Key, value);
+					if (value <= 0)
+					{
+						continue;
+					}
+				}
+				value -= ConsumeFromContainers(recipe.Key, value);
+				if (value <= 0)
+				{
+					continue;
+				}
+				SMonitor.Log($"Missing {value} of item {recipe.Key}.");
+			}
+			RestoreShippingBinNulls();
+		}
+
+		private static int ConsumeFromPlayerInventory(string itemId, int count)
+		{
+			return Game1.player.Items.ReduceId(itemId, count);
+		}
+
+		private static int ConsumeFromAdditionalMaterials(List<IInventory> additionalMaterials, string itemId, int count)
+		{
+			int consumedCount = 0;
+
+			foreach (IInventory items in additionalMaterials)
+			{
+				int value = items.ReduceId(itemId, count);
+
+				consumedCount += value;
+				count -= value;
+				if (count <= 0)
+				{
+					break;
+				}
+			}
+			return consumedCount;
+		}
+
+		private static int ConsumeFromContainers(string itemId, int count)
+		{
+			List<IInventory> containers = GetContainers();
+			int consumedCount = 0;
+
+			foreach (IInventory items in containers)
+			{
+				int value = items.ReduceId(itemId, count);
+
+				consumedCount += value;
+				count -= value;
+				if (count <= 0)
+				{
+					break;
+				}
+			}
+			return consumedCount;
+		}
+
+		private static void RestoreShippingBinNulls()
+		{
+			IInventory shippingBin = Game1.getFarm().getShippingBin(Game1.player);
+
+			if (Game1.getFarm().lastItemShipped is not null && Game1.getFarm().lastItemShipped.Stack <= 0)
+			{
+				Game1.getFarm().lastItemShipped = null;
+			}
+			for (int i = shippingBin.Count - 1; i >= 0; i--)
+			{
+				if (shippingBin[i] is null || shippingBin[i].Stack <= 0)
+				{
+					shippingBin.RemoveAt(i);
+				}
+			}
+			shippingBin.Add(null);
 		}
 	}
 }
