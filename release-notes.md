@@ -2,6 +2,11 @@
 
 # Global release notes
 
+## 16 October 2024
+* Released All Chests Menu version [0.3.2-unofficial.3-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AllChestsMenu/release-notes.md#032-unofficial3-mouahrara)
+* Released Craft and Build from Containers version [0.3.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CraftAndBuildFromContainers/release-notes.md#032-unofficial1-mouahrara)
+* Released Instant Building Construction and Upgrade version [0.2.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/InstantBuildingConstructionAndUpgrade/release-notes.md#021-unofficial1-mouahrara)
+
 ## 27 September 2024
 * Released Advanced Flute Blocks version [0.2.1-unofficial.3-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AdvancedFluteBlocks/release-notes.md#021-unofficial3-mouahrara)
 * Released Enhanced Loot Magnet version [1.2.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/EnhancedLootMagnet/release-notes.md#121-unofficial1-mouahrara)
