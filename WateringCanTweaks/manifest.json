@@ -1,22 +1,13 @@
 ﻿{
 	"Name": "Watering Can Tweaks",
 	"Author": "aedenthorn",
-	"Version": "0.3.1",
-	"Description": "Watering Can Tweaks.",
+	"Version": "0.3.2-unofficial.1-mouahrara",
+	"Description": "Tweaks watering cans to water connected tiles when charging.",
 	"UniqueID": "aedenthorn.WateringCanTweaks",
 	"EntryDll": "WateringCanTweaks.dll",
-	"MinimumApiVersion": "3.13.0",
-	"ModUpdater": {
-		"Repository": "StardewValleyMods",
-		"User": "aedenthorn",
-		"Directory": "_releases",
-		"ModFolder": "WateringCanTweaks"
-	},
-	"UpdateKeys": [ "Nexus:10947" ],
-	"Dependencies": [
-		{
-			"UniqueID": "Platonymous.ModUpdater",
-			"IsRequired": false
-		}
+	"MinimumApiVersion": "4.0.0",
+	"UpdateKeys": [
+		"Nexus:10947",
+		"UpdateManifest:https://raw.githubusercontent.com/mouahrara/aedenthorn/master/update-manifest.json@WateringCanTweaks"
 	]
 }
