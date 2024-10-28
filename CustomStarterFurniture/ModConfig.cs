@@ -1,7 +1,4 @@
-﻿using StardewModdingAPI;
-using System.Collections.Generic;
-
-namespace CustomStarterFurniture
+﻿namespace CustomStarterFurniture
 {
 	public class ModConfig
 	{
