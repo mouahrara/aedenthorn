@@ -2,6 +2,10 @@
 
 # Global release notes
 
+## 28 October 2024
+* Released Custom Starter Furniture version [0.1.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CustomStarterFurniture/release-notes.md#011-unofficial1-mouahrara)
+* Released Watering Can Tweaks version [0.3.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/WateringCanTweaks/release-notes.md#032-unofficial1-mouahrara)
+
 ## 16 October 2024
 * Released All Chests Menu version [0.3.2-unofficial.3-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AllChestsMenu/release-notes.md#032-unofficial3-mouahrara)
 * Released Craft and Build from Containers version [0.3.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CraftAndBuildFromContainers/release-notes.md#032-unofficial1-mouahrara)
