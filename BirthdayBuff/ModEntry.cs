@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using StardewModdingAPI;
+﻿using StardewModdingAPI;
+using StardewModdingAPI.Events;
 using StardewValley;
 
 namespace BirthdayBuff
@@ -9,9 +9,10 @@ namespace BirthdayBuff
 	{
 		internal static IMonitor SMonitor;
 		internal static IModHelper SHelper;
+		internal static IManifest SModManifest;
 		internal static ModConfig Config;
-
 		internal static ModEntry context;
+
 		internal const string BuffFrameworkKey = "aedenthorn.BuffFramework/dictionary";
 		internal static object HappyBirthdayAPI;
 		internal static IBuffFrameworkAPI BuffFrameworkAPI;
@@ -24,69 +25,40 @@ namespace BirthdayBuff
 			Config = Helper.ReadConfig<ModConfig>();
 
 			context = this;
-
 			SMonitor = Monitor;
 			SHelper = helper;
+			SModManifest = ModManifest;
 
 			Helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
-			Helper.Events.GameLoop.UpdateTicked += GameLoop_UpdateTicked;
 			Helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
 			Helper.Events.GameLoop.DayEnding += GameLoop_DayEnding;
+			Helper.Events.GameLoop.ReturnedToTitle += GameLoop_ReturnedToTitle;
 		}
 
-		private void GameLoop_DayStarted(object sender, StardewModdingAPI.Events.DayStartedEventArgs e)
+		private void GameLoop_DayStarted(object sender, DayStartedEventArgs e)
 		{
 			if (!Config.ModEnabled)
 				return;
 
 			cachedResult = IsBirthdayDay();
+			AddBirthdayBuff();
 		}
 
-		private void GameLoop_DayEnding(object sender, StardewModdingAPI.Events.DayEndingEventArgs e)
+		private void GameLoop_DayEnding(object sender, DayEndingEventArgs e)
 		{
 			cachedResult = false;
 		}
 
-		private void GameLoop_UpdateTicked(object sender, StardewModdingAPI.Events.UpdateTickedEventArgs e)
+		private void GameLoop_ReturnedToTitle(object sender, ReturnedToTitleEventArgs e)
 		{
-			if (Game1.ticks <= 1)
-				return;
-
-			HappyBirthdayAPI = Helper.ModRegistry.GetApi("Omegasis.HappyBirthday");
-			BuffFrameworkAPI = Helper.ModRegistry.GetApi<IBuffFrameworkAPI>("aedenthorn.BuffFramework");
-
-			BuffFrameworkAPI.Add($"{ModManifest.UniqueID}/HappyBirthday", new Dictionary<string, object>()
-				{
-					{ "buffId", $"{ModManifest.UniqueID}/HappyBirthday" },
-					{ "description", SHelper.Translation.Get("birthday-buff-description") },
-					{ "source", ModManifest.UniqueID },
-					{ "displaySource", SHelper.Translation.Get("birthday-buff-displaySource") },
-					{ "texturePath", "Maps/springobjects" },
-					{ "textureX", "80" },
-					{ "textureY", "144" },
-					{ "textureWidth", "16" },
-					{ "textureHeight", "16" },
-					{ "farming", Config.Farming },
-					{ "mining", Config.Mining },
-					{ "foraging", Config.Foraging },
-					{ "fishing", Config.Fishing },
-					{ "attack", Config.Attack },
-					{ "defense", Config.Defense },
-					{ "speed", Config.Speed },
-					{ "magneticRadius", Config.MagneticRadius },
-					{ "luck", Config.Luck },
-					{ "maxStamina", Config.MaxStamina },
-					{ "sound", Config.Sound },
-					{ "glow", Config.GlowColor },
-					{ "glowRate", Config.GlowRate }
-				}, () => {
-					return cachedResult;
-				});
-			Helper.Events.GameLoop.UpdateTicked -= GameLoop_UpdateTicked;
+			cachedResult = false;
 		}
 
-		private void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
+		private void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
 		{
+			HappyBirthdayAPI = SHelper.ModRegistry.GetApi("Omegasis.HappyBirthday");
+			BuffFrameworkAPI = SHelper.ModRegistry.GetApi<IBuffFrameworkAPI>("aedenthorn.BuffFramework");
+
 			// get Generic Mod Config Menu's API (if it's installed)
 			var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
 
@@ -96,7 +68,16 @@ namespace BirthdayBuff
 				configMenu.Register(
 					mod: ModManifest,
 					reset: () => Config = new ModConfig(),
-					save: () => Helper.WriteConfig(Config)
+					save: () => {
+						RemoveBirthdayBuff();
+						if (Config.ModEnabled)
+						{
+							cachedResult = IsBirthdayDay();
+							AddBirthdayBuff();
+						}
+						BuffFrameworkAPI.UpdateBuffs();
+						Helper.WriteConfig(Config);
+					}
 				);
 
 				configMenu.AddBoolOption(
