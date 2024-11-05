@@ -298,7 +298,7 @@ namespace AllChestsMenu
 					Object obj = kvp.Value;
 					Chest chest;
 
-					if (obj is Chest objAsChest && objAsChest.playerChest.Value && objAsChest.CanBeGrabbed && (!objAsChest.fridge.Value || ModEntry.Config.IncludeMiniFridges) && (objAsChest.SpecialChestType != Chest.SpecialChestTypes.MiniShippingBin || ModEntry.Config.IncludeMiniShippingBins) && (objAsChest.SpecialChestType != Chest.SpecialChestTypes.JunimoChest || ModEntry.Config.IncludeJunimoChests))
+					if (obj is Chest objAsChest && objAsChest.playerChest.Value && objAsChest.CanBeGrabbed && (!objAsChest.fridge.Value || ModEntry.Config.IncludeMiniFridges) && (objAsChest.SpecialChestType != Chest.SpecialChestTypes.MiniShippingBin || ModEntry.Config.IncludeMiniShippingBins) && (objAsChest.SpecialChestType != Chest.SpecialChestTypes.JunimoChest || ModEntry.Config.IncludeJunimoChests) && !objAsChest.modData.ContainsKey("aedenthorn.AdvancedLootFramework/IsAdvancedLootFrameworkChest"))
 					{
 						chest = objAsChest;
 					}
@@ -314,6 +314,7 @@ namespace AllChestsMenu
 					{
 						if (globalInventoryKeys.Contains(chest.GlobalInventoryId))
 							continue;
+
 						globalInventoryKeys.Add(chest.GlobalInventoryId);
 						chest.netItems.Value = Game1.player.team.GetOrCreateGlobalInventory(chest.GlobalInventoryId);
 					}
@@ -321,6 +322,7 @@ namespace AllChestsMenu
 					{
 						if (globalInventoryKeys.Contains("JunimoChests"))
 							continue;
+
 						globalInventoryKeys.Add("JunimoChests");
 						chest.netItems.Value = Game1.player.team.GetOrCreateGlobalInventory("JunimoChests");
 					}

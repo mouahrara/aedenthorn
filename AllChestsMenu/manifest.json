@@ -1,11 +1,11 @@
 ﻿{
 	"Name": "All Chests Menu",
 	"Author": "aedenthorn",
-	"Version": "0.3.2-unofficial.3-mouahrara",
+	"Version": "0.3.2-unofficial.4-mouahrara",
 	"Description": "Provides access to a menu displaying inventories of all player chests and the player backpack.",
 	"UniqueID": "aedenthorn.AllChestsMenu",
 	"EntryDll": "AllChestsMenu.dll",
-	"MinimumApiVersion": "4.0.0",
+	"MinimumApiVersion": "4.1.0",
 	"UpdateKeys": [
 		"Nexus:14494",
 		"UpdateManifest:https://raw.githubusercontent.com/mouahrara/aedenthorn/master/update-manifest.json@AllChestsMenu"
