@@ -2,6 +2,10 @@
 
 # Release notes
 
+## 0.1.1-unofficial.3-mouahrara
+Released on 5 November, 2024, for SMAPI 4.1.0 or later.
+* Fixed an issue where parrots could drop seeds as gifts 🔧
+
 ## 0.1.1-unofficial.2-mouahrara
 Released on 6 July, 2024, for SMAPI 4.0.0 or later.
 * Fixed Nexus Mods Id in the manifest 📝

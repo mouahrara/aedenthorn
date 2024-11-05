@@ -10,7 +10,7 @@ namespace AnimatedParrotAndPerch
 		{
 			public static void Postfix(Object __instance, GameLocation location)
 			{
-				if(__instance.bigCraftable.Value && IsPerch(__instance))
+				if (__instance.bigCraftable.Value && IsPerch(__instance))
 				{
 					ShowParrots(location);
 				}
@@ -45,14 +45,14 @@ namespace AnimatedParrotAndPerch
 							break;
 						}
 					}
-					if(sprite is not null && sprite is PerchParrot)
+					if (sprite is not null && sprite is PerchParrot)
 					{
 						context.Monitor.Log($"Animating perch parrot for tile {__instance.TileLocation}");
 						if (sprite.shakeIntensity == 0f)
 						{
 							(sprite as PerchParrot).doAction();
 						}
-						if(who.CurrentItem is Object && (who.CurrentItem as Object).Type.Contains("Seed"))
+						if (who.CurrentItem is Object && (who.CurrentItem as Object).Type.Contains("Seed"))
 						{
 							if (Game1.random.NextDouble() < Config.DropGiftChance)
 							{

@@ -12,16 +12,16 @@ namespace AnimatedParrotAndPerch
 {
 	public partial class ModEntry : Mod
 	{
-		internal static ModEntry context;
-
-		internal static ModConfig Config;
 		internal static IMonitor SMonitor;
 		internal static IModHelper SHelper;
+		internal static IManifest SModManifest;
+		internal static ModConfig Config;
+		internal static ModEntry context;
+
 		private static IAdvancedLootFrameworkApi advancedLootFrameworkApi = null;
 		private static List<object> giftList = new();
 		private static readonly Dictionary<string, int> possibleGifts = new()
 		{
-			{ "Seed", 100 },
 			{ "BasicObject", 50 },
 			{ "Fish", 10 },
 			{ "Cooking", 20 },
@@ -38,11 +38,12 @@ namespace AnimatedParrotAndPerch
 		/// <param name="helper">Provides simplified APIs for writing mods.</param>
 		public override void Entry(IModHelper helper)
 		{
-			context = this;
 			Config = Helper.ReadConfig<ModConfig>();
 
+			context = this;
 			SMonitor = Monitor;
-			SHelper = Helper;
+			SHelper = helper;
+			SModManifest = ModManifest;
 
 			helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
 			helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
@@ -118,6 +119,11 @@ namespace AnimatedParrotAndPerch
 			}
 		}
 
+		private void Player_Warped(object sender, WarpedEventArgs e)
+		{
+			ShowParrots(e.NewLocation);
+		}
+
 		private void GameLoop_DayStarted(object sender, DayStartedEventArgs e)
 		{
 			ShowParrots(Game1.player.currentLocation);
@@ -156,11 +162,6 @@ namespace AnimatedParrotAndPerch
 				max: 100,
 				interval: 1
 			);
-		}
-
-		private void Player_Warped(object sender, WarpedEventArgs e)
-		{
-			ShowParrots(e.NewLocation);
 		}
 	}
 }
