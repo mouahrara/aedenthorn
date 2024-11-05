@@ -13,8 +13,8 @@ namespace CatalogueFilter
 	{
 		internal static IMonitor SMonitor;
 		internal static IModHelper SHelper;
+		internal static IManifest SModManifest;
 		internal static ModConfig Config;
-
 		internal static ModEntry context;
 
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
@@ -23,13 +23,11 @@ namespace CatalogueFilter
 		{
 			Config = Helper.ReadConfig<ModConfig>();
 
-			if (!Config.ModEnabled)
-				return;
-
 			context = this;
-
 			SMonitor = Monitor;
 			SHelper = helper;
+			SModManifest = ModManifest;
+
 			helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
 
 			// Load Harmony patches
@@ -38,7 +36,7 @@ namespace CatalogueFilter
 				Harmony harmony = new(ModManifest.UniqueID);
 
 				harmony.Patch(
-					original: AccessTools.Constructor(typeof(ShopMenu), new Type[] { typeof(string), typeof(ShopData), typeof(ShopOwnerData), typeof(NPC), typeof(Func<ISalable, Farmer, int, bool>), typeof(Func<ISalable, bool>), typeof(bool) }),
+					original: AccessTools.Constructor(typeof(ShopMenu), new Type[] { typeof(string), typeof(ShopData), typeof(ShopOwnerData), typeof(NPC), typeof(ShopMenu.OnPurchaseDelegate), typeof(Func<ISalable, bool>), typeof(bool) }),
 					postfix: new HarmonyMethod(typeof(ShopMenu_Patch), nameof(ShopMenu_Patch.Postfix))
 				);
 				harmony.Patch(
@@ -94,7 +92,7 @@ namespace CatalogueFilter
 			configMenu.AddTextOption(
 				mod: ModManifest,
 				name: () => SHelper.Translation.Get("GMCM.LabelColor.Name"),
-				getValue: () => Config.LabelColor.ToString(),
+				getValue: () => $"#{Config.LabelColor.R:X2}{Config.LabelColor.G:X2}{Config.LabelColor.B:X2}",
 				setValue: value => Config.LabelColor = Utility.StringToColor(value) ?? Color.White
 			);
 		}

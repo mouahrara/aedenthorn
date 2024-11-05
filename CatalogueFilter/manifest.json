@@ -1,11 +1,11 @@
 ﻿{
 	"Name": "Catalogue Filter",
 	"Author": "aedenthorn",
-	"Version": "0.2.1-unofficial.1-mouahrara",
+	"Version": "0.2.1-unofficial.2-mouahrara",
 	"Description": "Adds a filter field for shop menus and catalogues that lets you filter shown items based on text input.",
 	"UniqueID": "aedenthorn.CatalogueFilter",
 	"EntryDll": "CatalogueFilter.dll",
-	"MinimumApiVersion": "4.0.0",
+	"MinimumApiVersion": "4.1.0",
 	"UpdateKeys": [
 		"Nexus:13137",
 		"UpdateManifest:https://raw.githubusercontent.com/mouahrara/aedenthorn/master/update-manifest.json@CatalogueFilter"
