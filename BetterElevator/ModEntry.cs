@@ -12,8 +12,8 @@ namespace BetterElevator
 	{
 		internal static IMonitor SMonitor;
 		internal static IModHelper SHelper;
+		internal static IManifest SModManifest;
 		internal static ModConfig Config;
-
 		internal static ModEntry context;
 
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
@@ -22,13 +22,10 @@ namespace BetterElevator
 		{
 			Config = Helper.ReadConfig<ModConfig>();
 
-			if (!Config.ModEnabled)
-				return;
-
 			context = this;
-
 			SMonitor = Monitor;
 			SHelper = helper;
+			SModManifest = ModManifest;
 
 			helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
 

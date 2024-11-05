@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewValley;
+using StardewValley.Extensions;
 using StardewValley.Locations;
 using StardewValley.Menus;
 
@@ -10,11 +11,24 @@ namespace BetterElevator
 {
 	public class BetterElevatorMenu : IClickableMenu
 	{
-		public int levelToGoto;
+		internal bool isSkullCave;
+		internal int lowestLevel;
+		internal int levelToGoto;
+		internal static int drawTicks;
 
 		public BetterElevatorMenu() : base(0, 0, 0, 0, true)
 		{
-			width = 484 + borderWidth * 2;
+			isSkullCave = IsSkullCave();
+			lowestLevel = !isSkullCave ? Math.Min(MineShaft.lowestLevelReached, 120) : Math.Max(0, MineShaft.lowestLevelReached - 120);
+
+			(int localizedBaseWidth, int localizedDigitWidth) = ModEntry.SHelper.Translation.Locale switch
+			{
+				string locale when locale.EqualsIgnoreCase("fr-FR") => (494, 18),
+				string locale when locale.EqualsIgnoreCase("ru-RU") => (354, 12),
+				_ => (404, 18)
+			};
+
+			width = localizedBaseWidth + lowestLevel.ToString().Length * localizedDigitWidth + borderWidth * 2;
 			height = 54 + borderWidth * 3;
 			xPositionOnScreen = Game1.uiViewport.Width / 2 - width / 2;
 			yPositionOnScreen = Game1.uiViewport.Height / 2 - height / 2;
@@ -76,10 +90,12 @@ namespace BetterElevator
 					AddNumber(9);
 					break;
 				case Keys.Enter:
-					if(levelToGoto > 0)
+					if (levelToGoto > 0)
 					{
-						if (IsSkullCave())
+						if (isSkullCave)
+						{
 							levelToGoto += 120;
+						}
 						Game1.player.currentLocation.playSound("stairsdown");
 						ModEntry.SMonitor.Log($"Entering mine level {levelToGoto}");
 						Game1.enterMine(levelToGoto);
@@ -87,9 +103,10 @@ namespace BetterElevator
 					Game1.exitActiveMenu();
 					break;
 				case Keys.Back:
-					if(levelToGoto > 0)
+					if (levelToGoto > 0)
 					{
 						string ls = levelToGoto.ToString();
+
 						if (ls.Length == 1)
 						{
 							levelToGoto = 0;
@@ -122,7 +139,7 @@ namespace BetterElevator
 			{
 				newLevel = int.MaxValue;
 			}
-			if (IsSkullCave())
+			if (isSkullCave)
 			{
 				if (!ModEntry.Config.Unrestricted)
 				{
@@ -160,34 +177,24 @@ namespace BetterElevator
 		{
 		}
 
-		internal static int drawTicks;
-
 		public override void draw(SpriteBatch b)
 		{
+			string level = levelToGoto > 0 ? levelToGoto.ToString() : "";
+			int offset = 48;
+			int blinkRate = 16;
+
 			b.Draw(Game1.fadeToBlackRect, Game1.graphics.GraphicsDevice.Viewport.Bounds, Color.Black * 0.4f);
 			Game1.drawDialogueBox(xPositionOnScreen, yPositionOnScreen - 64 + 8, width + 21, height + 64, false, true, null, false, true, -1, -1, -1);
 			base.draw(b);
-
-			int lowestLevel = MineShaft.lowestLevelReached;
-			if (IsSkullCave())
-			{
-				lowestLevel = Math.Max(0, lowestLevel - 120);
-			}
-			else
-			{
-				lowestLevel = Math.Min(120, lowestLevel);
-			}
-
-			string level = levelToGoto > 0 ? levelToGoto.ToString() : "";
-
-			int blinkRate = 16;
 			drawTicks++;
 			if (drawTicks < blinkRate)
+			{
 				level += "_";
+			}
 			else if (drawTicks > blinkRate * 2)
+			{
 				drawTicks = 0;
-
-			int offset = 48;
+			}
 			b.DrawString(Game1.dialogueFont, string.Format(ModEntry.SHelper.Translation.Get("level-reached-x"), lowestLevel), new Vector2(xPositionOnScreen + offset, yPositionOnScreen + offset), Game1.textColor);
 			b.DrawString(Game1.dialogueFont, string.Format(ModEntry.SHelper.Translation.Get("enter-level")) + " " + level, new Vector2(xPositionOnScreen + offset, yPositionOnScreen + offset * 2), Game1.textColor);
 			drawMouse(b, false, -1);

@@ -22,7 +22,9 @@ namespace BetterElevator
 				if (action == "SkullDoor")
 				{
 					if (!who.hasSkullKey || !who.hasUnlockedSkullDoor)
+					{
 						return true;
+					}
 				}
 				else if (action == "Mine" && actionParams.Length > 1 && actionParams[1] == "77377")
 				{
@@ -48,13 +50,19 @@ namespace BetterElevator
 				Tile tile = __instance.map.GetLayer("Buildings").PickTile(new Location(tileLocation.X * 64, tileLocation.Y * 64), viewport.Size);
 
 				if (tile == null)
+				{
 					return true;
+				}
 				if (tile.TileIndex == 115)
 				{
 					if (!SHelper.Input.IsDown(Config.ModKey))
+					{
 						return true;
+					}
 					if (__instance.mineLevel == 77377)
+					{
 						return true;
+					}
 					Game1.activeClickableMenu = new BetterElevatorMenu();
 					__result = true;
 					return false;
@@ -86,8 +94,11 @@ namespace BetterElevator
 			{
 				if (!Config.ModEnabled)
 					return;
+
 				if (__instance.mineLevel == int.MaxValue)
+				{
 					__result = false;
+				}
 			}
 		}
 	}

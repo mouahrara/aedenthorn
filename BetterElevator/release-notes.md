@@ -2,6 +2,11 @@
 
 # Release notes
 
+## 0.2.5-unofficial.2-mouahrara
+Released on 5 November, 2024, for SMAPI 4.1.0 or later.
+* Fixed an issue where text could overflow the menu 🔧
+* Fixed a minor bug 🔧
+
 ## 0.2.5-unofficial.1-mouahrara
 Released on 24 March, 2024, for SMAPI 4.0.0 or later.
 * Migrated to 1.6.0 and project cleanup 🚀
