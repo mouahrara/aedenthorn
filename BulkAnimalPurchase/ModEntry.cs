@@ -18,9 +18,10 @@ namespace BulkAnimalPurchase
 	{
 		internal static IMonitor SMonitor;
 		internal static IModHelper SHelper;
+		internal static IManifest SModManifest;
 		internal static ModConfig Config;
-
 		internal static ModEntry context;
+
 		private static ClickableTextureComponent minusButton;
 		private static ClickableTextureComponent plusButton;
 		private static int animalsToBuy;
@@ -34,6 +35,7 @@ namespace BulkAnimalPurchase
 			context = this;
 			SMonitor = Monitor;
 			SHelper = helper;
+			SModManifest = ModManifest;
 
 			helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
 			helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;

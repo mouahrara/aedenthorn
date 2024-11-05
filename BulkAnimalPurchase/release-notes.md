@@ -2,6 +2,10 @@
 
 # Release notes
 
+## 0.2.2-unofficial.3-mouahrara
+Released on 5 November, 2024, for SMAPI 4.1.0 or later.
+* Fixed an issue where the Initial Friendship and Adult Animals options did not apply to the last purchased animal 🔧
+
 ## 0.2.2-unofficial.2-mouahrara
 Released on 6 July, 2024, for SMAPI 4.0.0 or later.
 * Added **Initial Friendship** option ✨

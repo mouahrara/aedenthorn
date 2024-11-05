@@ -126,10 +126,15 @@ namespace BulkAnimalPurchase
 		{
 			public static bool Prefix(PurchaseAnimalsMenu __instance)
 			{
-				if (!Config.EnableMod || animalsToBuy <= 1)
+				if (!Config.EnableMod)
 					return true;
 
 				ApplyConfiguration(__instance.animalBeingPurchased);
+
+				if (animalsToBuy <= 1)
+				{
+					return true;
+				}
 				animalsToBuy--;
 				Game1.addHUDMessage(new HUDMessage(__instance.animalBeingPurchased.isMale() ? Game1.content.LoadString("Strings\\StringsFromCSFiles:PurchaseAnimalsMenu.cs.11311", __instance.animalBeingPurchased.displayName) : Game1.content.LoadString("Strings\\StringsFromCSFiles:PurchaseAnimalsMenu.cs.11314", __instance.animalBeingPurchased.displayName), 1));
 				__instance.namingAnimal = false;

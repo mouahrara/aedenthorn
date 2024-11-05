@@ -1,11 +1,11 @@
 ﻿{
 	"Name": "Bulk Animal Purchase",
 	"Author": "aedenthorn",
-	"Version": "0.2.2-unofficial.2-mouahrara",
+	"Version": "0.2.2-unofficial.3-mouahrara",
 	"Description": "Lets you buy and place multiple farm animals without leaving the placement screen. ",
 	"UniqueID": "aedenthorn.BulkAnimalPurchase",
 	"EntryDll": "BulkAnimalPurchase.dll",
-	"MinimumApiVersion": "4.0.0",
+	"MinimumApiVersion": "4.1.0",
 	"UpdateKeys": [
 		"Nexus:11539",
 		"UpdateManifest:https://raw.githubusercontent.com/mouahrara/aedenthorn/master/update-manifest.json@BulkAnimalPurchase"
