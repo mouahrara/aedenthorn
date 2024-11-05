@@ -82,7 +82,7 @@ namespace ZombieOutbreak
 					prefix: new HarmonyMethod(typeof(NPC_showTextAboveHead_Patch), nameof(NPC_showTextAboveHead_Patch.Prefix))
 				);
 				harmony.Patch(
-					original: AccessTools.Constructor(typeof(ShopMenu), new Type[] {typeof(string), typeof(ShopData), typeof(ShopOwnerData), typeof(NPC), typeof(Func<ISalable, Farmer, int, bool>), typeof(Func<ISalable, bool>), typeof(bool) }),
+					original: AccessTools.Constructor(typeof(ShopMenu), new Type[] {typeof(string), typeof(ShopData), typeof(ShopOwnerData), typeof(NPC), typeof(ShopMenu.OnPurchaseDelegate), typeof(Func<ISalable, bool>), typeof(bool) }),
 					postfix: new HarmonyMethod(typeof(ShopMenu_Patch), nameof(ShopMenu_Patch.Postfix))
 				);
 				harmony.Patch(

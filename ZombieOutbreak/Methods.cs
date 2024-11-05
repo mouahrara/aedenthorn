@@ -25,7 +25,7 @@ namespace ZombieOutbreak
 
 			string[] strs = dialogue.Split('#');
 
-			for(int i = 0; i < strs.Length; i++)
+			for (int i = 0; i < strs.Length; i++)
 			{
 				string str = strs[i];
 
@@ -238,7 +238,7 @@ namespace ZombieOutbreak
 
 		public static void RemoveZombieFarmer(long id)
 		{
-			Farmer farmer = Game1.getFarmer(id);
+			Farmer farmer = Game1.GetPlayer(id, true);
 
 			zombieFarmerTextures.Remove(id);
 			curedFarmers.Add(id);
@@ -306,7 +306,7 @@ namespace ZombieOutbreak
 
 		public static void MakeZombieFarmerTexture(long id)
 		{
-			Farmer farmer = Game1.getFarmer(id);
+			Farmer farmer = Game1.GetPlayer(id, true);
 
 			if (farmer is null)
 			{
