@@ -26,7 +26,7 @@
 			"Name": "Advanced Loot Framework",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#AdvancedLootFramework",
 			"Versions": [
-				{ "Version": "0.4.2-unofficial.1-mouahrara" }
+				{ "Version": "0.4.2-unofficial.2-mouahrara" }
 			]
 		},
 		"AdvancedMenuPositioning": {
@@ -54,14 +54,14 @@
 			"Name": "All Chests Menu",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#AllChestsMenu",
 			"Versions": [
-				{ "Version": "0.3.2-unofficial.3-mouahrara" }
+				{ "Version": "0.3.2-unofficial.4-mouahrara" }
 			]
 		},
 		"AnimatedParrotAndPerch": {
 			"Name": "Animated Parrot and Perch",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#AnimatedParrotAndPerch",
 			"Versions": [
-				{ "Version": "0.1.1-unofficial.2-mouahrara" }
+				{ "Version": "0.1.1-unofficial.3-mouahrara" }
 			]
 		},
 		"AprilBugFixSuite": {
@@ -96,14 +96,14 @@
 			"Name": "Better Elevator",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#BetterElevator",
 			"Versions": [
-				{ "Version": "0.2.5-unofficial.1-mouahrara" }
+				{ "Version": "0.2.5-unofficial.2-mouahrara" }
 			]
 		},
 		"BirthdayBuff": {
 			"Name": "Birthday Buff",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#BirthdayBuff",
 			"Versions": [
-				{ "Version": "0.1.1-unofficial.1-mouahrara" }
+				{ "Version": "0.1.1-unofficial.2-mouahrara" }
 			]
 		},
 		"BirthdayKnowledgeFriendship": {
@@ -117,7 +117,7 @@
 			"Name": "Boss Creatures",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#BossCreatures",
 			"Versions": [
-				{ "Version": "1.5.1-unofficial.1-mouahrara" }
+				{ "Version": "1.5.1-unofficial.2-mouahrara" }
 			]
 		},
 		"BuffFramework": {
@@ -131,14 +131,14 @@
 			"Name": "Bulk Animal Purchase",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#BulkAnimalPurchase",
 			"Versions": [
-				{ "Version": "0.2.2-unofficial.2-mouahrara" }
+				{ "Version": "0.2.2-unofficial.3-mouahrara" }
 			]
 		},
 		"CatalogueFilter": {
 			"Name": "Catalogue Filter",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#CatalogueFilter",
 			"Versions": [
-				{ "Version": "0.2.1-unofficial.1-mouahrara" }
+				{ "Version": "0.2.1-unofficial.2-mouahrara" }
 			]
 		},
 		"ChessBoards": {
@@ -257,7 +257,7 @@
 			"Name": "Dreamscape",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#Dreamscape",
 			"Versions": [
-				{ "Version": "0.1.1-unofficial.1-mouahrara" }
+				{ "Version": "0.1.1-unofficial.2-mouahrara" }
 			]
 		},
 		"DynamicMapTiles": {
@@ -509,7 +509,7 @@
 			"Name": "Zombie Outbreak",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#ZombieOutbreak",
 			"Versions": [
-				{ "Version": "0.2.4-unofficial.1-mouahrara" }
+				{ "Version": "0.2.4-unofficial.2-mouahrara" }
 			]
 		}
 	}

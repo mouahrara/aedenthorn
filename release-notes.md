@@ -2,6 +2,18 @@
 
 # Global release notes
 
+## 5 November 2024
+* Released Advanced Loot Framework version [0.4.2-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AdvancedLootFramework/release-notes.md#042-unofficial2-mouahrara)
+* Released All Chests Menu version [0.3.2-unofficial.4-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AllChestsMenu/release-notes.md#032-unofficial4-mouahrara)
+* Released Animated Parrot and Perch version [0.1.1-unofficial.3-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AnimatedParrotAndPerch/release-notes.md#011-unofficial3-mouahrara)
+* Released Better Elevator version [0.2.5-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BetterElevator/release-notes.md#025-unofficial2-mouahrara)
+* Released Birthday Buff version [0.1.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BirthdayBuff/release-notes.md#011-unofficial2-mouahrara)
+* Released Boss Creatures version [1.5.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BossCreatures/release-notes.md#151-unofficial2-mouahrara)
+* Released Bulk Animal Purchase version [0.2.2-unofficial.3-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BulkAnimalPurchase/release-notes.md#022-unofficial3-mouahrara)
+* Released Catalogue Filter version [0.2.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CatalogueFilter/release-notes.md#021-unofficial2-mouahrara)
+* Released Dreamscape version [0.1.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/Dreamscape/release-notes.md#011-unofficial2-mouahrara)
+* Released Zombie Outbreak version [0.2.4-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/ZombieOutbreak/release-notes.md#024-unofficial2-mouahrara)
+
 ## 28 October 2024
 * Released Custom Starter Furniture version [0.1.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CustomStarterFurniture/release-notes.md#011-unofficial1-mouahrara)
 * Released Watering Can Tweaks version [0.3.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/WateringCanTweaks/release-notes.md#032-unofficial1-mouahrara)
