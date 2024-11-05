@@ -22,9 +22,9 @@ namespace Dreamscape
 
 		public class EmilysParrot_doAction_Patch
 		{
-			public static bool Prefix()
+			public static bool Prefix(EmilysParrot __instance)
 			{
-				if (!Config.ModEnabled)
+				if (!Config.ModEnabled || __instance.GetType() != typeof(EmilysParrot))
 					return true;
 
 				if (Game1.player.CanMove)
