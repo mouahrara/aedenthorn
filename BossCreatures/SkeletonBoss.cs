@@ -18,8 +18,6 @@ namespace BossCreatures
 		private readonly float unhitableHeight;
 		private readonly float hitableHeight;
 		private readonly int throwBurst = 10;
-		private readonly NetBool throwing = new();
-		private bool spottedPlayer;
 		private int controllerAttemptTimer;
 		private int throwTimer = 0;
 		private int throws = 0;
@@ -38,14 +36,11 @@ namespace BossCreatures
 			Scale = ModEntry.Config.SkeletonBossScale;
 			unhitableHeight = Scale * height * 2 / 3;
 			hitableHeight = Scale * height - unhitableHeight;
-
 			this.difficulty = difficulty;
-
 			Health = (int)Math.Round(Health * 20 * difficulty);
 			MaxHealth = Health;
 			DamageToFarmer = (int)Math.Round(damageToFarmer.Value * 2 * difficulty);
 			farmerPassesThrough = true;
-
 			moveTowardPlayerThreshold.Value = 20;
 		}
 
@@ -99,8 +94,10 @@ namespace BossCreatures
 					throwing.Value = false;
 					Sprite.currentFrame = 0;
 					faceDirection(2);
+
 					Vector2 v = Utility.getVelocityTowardPlayer(new Point((int)Position.X + (int)projectileOffsetX, (int)Position.Y + (int)projectileOffsetY), 8f, Player);
-					if(Health < MaxHealth / 2)
+
+					if (Health < MaxHealth / 2)
 					{
 						currentLocation.projectiles.Add(new BasicProjectile(DamageToFarmer, 4, 0, 0, 0.196349546f, v.X, v.Y, new Vector2(Position.X + projectileOffsetX, Position.Y + projectileOffsetY), "", "", "", false, false, currentLocation, this));
 						currentLocation.projectiles.Add(new BasicProjectile(DamageToFarmer, 10, 0, 4, 0.196349546f, v.X, v.Y, new Vector2(Position.X + projectileOffsetX, Position.Y + projectileOffsetY), "", "", "fireball", true, false, currentLocation, this));
@@ -117,6 +114,7 @@ namespace BossCreatures
 					else
 					{
 						BasicProjectile projectile = new(DamageToFarmer, 4, 0, 0, 0.196349546f, v.X, v.Y, new Vector2(Position.X + projectileOffsetX, Position.Y + projectileOffsetY), "skeletonHit", "", "skeletonStep", false, false, currentLocation, this);
+
 						projectile.collisionBehavior = (location, xPosition, yPosition, who) =>
 						{
 							projectile.piercesLeft.Value = 0;
@@ -131,7 +129,6 @@ namespace BossCreatures
 						{
 							throwTimer = 10;
 						}
-
 					}
 				}
 			}
@@ -197,6 +194,7 @@ namespace BossCreatures
 		public override int takeDamage(int damage, int xTrajectory, int yTrajectory, bool isBomb, double addedPrecision, Farmer who)
 		{
 			int result = base.takeDamage(damage, xTrajectory, yTrajectory, isBomb, addedPrecision, who);
+
 			if (Health <= 0)
 			{
 				ModEntry.BossDeath(currentLocation, this, difficulty);

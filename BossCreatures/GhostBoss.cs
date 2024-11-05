@@ -33,14 +33,11 @@ namespace BossCreatures
 			Scale = ModEntry.Config.GhostBossScale;
 			unhitableHeight = 0;
 			hitableHeight = Scale * height - unhitableHeight;
-
 			this.difficulty = difficulty;
-
 			Health = (int)Math.Round(Health * 20 * difficulty);
 			MaxHealth = Health;
 			DamageToFarmer = (int)Math.Round(DamageToFarmer * difficulty);
 			MaxGhosts = 4;
-
 			moveTowardPlayerThreshold.Value = 20;
 		}
 
@@ -58,15 +55,14 @@ namespace BossCreatures
 			{
 				return;
 			}
-
 			lastGhost = Math.Max(0f, lastGhost - time.ElapsedGameTime.Milliseconds);
 			lastDebuff = Math.Max(0f, lastDebuff - time.ElapsedGameTime.Milliseconds);
-
 			if (withinPlayerThreshold(10))
 			{
-				if(lastDebuff == 0f)
+				if (lastDebuff == 0f)
 				{
 					Vector2 velocityTowardPlayer = Utility.getVelocityTowardPlayer(GetBoundingBox().Center, 15f, Player);
+
 					if (ModEntry.IsLessThanHalfHealth(this))
 					{
 						for (int i = 0; i < 12; i++)
@@ -84,6 +80,7 @@ namespace BossCreatures
 				if (lastGhost == 0f)
 				{
 					int ghosts = 0;
+
 					using (List<NPC>.Enumerator enumerator = currentLocation.characters.GetEnumerator())
 					{
 						while (enumerator.MoveNext())
@@ -119,15 +116,14 @@ namespace BossCreatures
 
 		public override void drawAboveAllLayers(SpriteBatch b)
 		{
-			int offset = (int)GetType().BaseType.GetField("yOffset", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(this);
-
-			b.Draw(Sprite.Texture, getLocalPosition(Game1.viewport) + new Vector2(width*2, 21 + offset), new Microsoft.Xna.Framework.Rectangle?(Sprite.SourceRect), Color.White, 0f, new Vector2(width/2, width), scale.Value * 4f, flip ? SpriteEffects.FlipHorizontally : SpriteEffects.None, Math.Max(0f, drawOnTop ? 0.991f : (StandingPixel.Y / 10000f)));
-			b.Draw(Game1.shadowTexture, getLocalPosition(Game1.viewport) + new Vector2(width*2, width*4), new Microsoft.Xna.Framework.Rectangle?(Game1.shadowTexture.Bounds), Color.White, 0f, new Vector2((float)Game1.shadowTexture.Bounds.Center.X, (float)Game1.shadowTexture.Bounds.Center.Y), 3f + offset / 20f * width/16, SpriteEffects.None, (StandingPixel.Y - 1) / 10000f);
+			b.Draw(Sprite.Texture, getLocalPosition(Game1.viewport) + new Vector2(width * 2, 21 + yOffset), new Microsoft.Xna.Framework.Rectangle?(Sprite.SourceRect), Color.White, 0f, new Vector2(width / 2, width), scale.Value * 4f, flip ? SpriteEffects.FlipHorizontally : SpriteEffects.None, Math.Max(0f, drawOnTop ? 0.991f : (StandingPixel.Y / 10000f)));
+			b.Draw(Game1.shadowTexture, getLocalPosition(Game1.viewport) + new Vector2(width * 2, width * 4), new Microsoft.Xna.Framework.Rectangle?(Game1.shadowTexture.Bounds), Color.White, 0f, new Vector2(Game1.shadowTexture.Bounds.Center.X, Game1.shadowTexture.Bounds.Center.Y), 3f + yOffset / 20f * width / 16, SpriteEffects.None, (StandingPixel.Y - 1) / 10000f);
 		}
 
 		public override int takeDamage(int damage, int xTrajectory, int yTrajectory, bool isBomb, double addedPrecision, Farmer who)
 		{
 			int result = base.takeDamage(damage, xTrajectory, yTrajectory, isBomb, addedPrecision, who);
+
 			if (Health <= 0)
 			{
 				ModEntry.BossDeath(currentLocation, this, difficulty);

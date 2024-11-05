@@ -35,7 +35,6 @@ namespace BossCreatures
 			Scale = ModEntry.Config.SerpentBossScale;
 			unhitableHeight = 0;
 			hitableHeight = Scale * height - unhitableHeight;
-
 			this.difficulty = difficulty;
 			Health = (int)Math.Round(Health * 15 * difficulty);
 			MaxHealth = Health;
@@ -67,12 +66,10 @@ namespace BossCreatures
 		public override void behaviorAtGameTick(GameTime time)
 		{
 			base.behaviorAtGameTick(time);
-
 			if (Health <= 0)
 			{
 				return;
 			}
-
 			timeUntilNextAttack -= time.ElapsedGameTime.Milliseconds;
 			if (attackState.Value == 0 && withinPlayerThreshold(5))
 			{
@@ -89,6 +86,7 @@ namespace BossCreatures
 			else if (totalFireTime > 0)
 			{
 				Farmer player = Player;
+
 				if (!firing.Value)
 				{
 					if (player != null)
@@ -107,8 +105,10 @@ namespace BossCreatures
 							firing.Set(true);
 							currentLocation.playSound("furnace");
 						}
+
 						float fire_angle = 0f;
 						Vector2 shot_origin = new(GetBoundingBox().Center.X, GetBoundingBox().Center.Y);
+
 						faceGeneralDirection(player.Position, 0, false);
 						switch (facingDirection.Value)
 						{
@@ -133,9 +133,13 @@ namespace BossCreatures
 								break;
 						}
 						fire_angle += (float)Math.Sin((double)((float)totalFireTime / 1000f * 180f) * 3.1415926535897931 / 180.0) * 25f;
+
 						Vector2 shot_velocity = new((float)Math.Cos((double)fire_angle * 3.1415926535897931 / 180.0), -(float)Math.Sin((double)fire_angle * 3.1415926535897931 / 180.0));
+
 						shot_velocity *= 10f;
+
 						BasicProjectile projectile = new((int)Math.Round(10 * difficulty), 10, 0, 1, 0.196349546f, shot_velocity.X, shot_velocity.Y, shot_origin, "", "", "", false, false, currentLocation, this);
+
 						projectile.ignoreTravelGracePeriod.Value = true;
 						projectile.maxTravelDistance.Value = 512;
 						currentLocation.projectiles.Add(projectile);
@@ -181,11 +185,11 @@ namespace BossCreatures
 		{
 			if (Utility.isOnScreen(Position, 128))
 			{
-				b.Draw(Game1.shadowTexture, getLocalPosition(Game1.viewport) + new Vector2(64f, GetBoundingBox().Height), new Rectangle?(Game1.shadowTexture.Bounds), Color.White, 0f, new Vector2((float)Game1.shadowTexture.Bounds.Center.X, (float)Game1.shadowTexture.Bounds.Center.Y), 4f, SpriteEffects.None, (StandingPixel.Y - 1) / 10000f);
-				b.Draw(Sprite.Texture, getLocalPosition(Game1.viewport) + new Vector2(width*2, GetBoundingBox().Height / 2), new Rectangle?(Sprite.SourceRect), Color.White, rotation, new Vector2(width/2, height/2), scale.Value * 4f, flip ? SpriteEffects.FlipHorizontally : SpriteEffects.None, Math.Max(0f, drawOnTop ? 0.991f : ((StandingPixel.Y + 8) / 10000f)));
+				b.Draw(Game1.shadowTexture, getLocalPosition(Game1.viewport) + new Vector2(64f, GetBoundingBox().Height), new Rectangle?(Game1.shadowTexture.Bounds), Color.White, 0f, new Vector2(Game1.shadowTexture.Bounds.Center.X, Game1.shadowTexture.Bounds.Center.Y), 4f, SpriteEffects.None, (StandingPixel.Y - 1) / 10000f);
+				b.Draw(Sprite.Texture, getLocalPosition(Game1.viewport) + new Vector2(width * 2, GetBoundingBox().Height / 2), new Rectangle?(Sprite.SourceRect), Color.White, rotation, new Vector2(width / 2, height / 2), scale.Value * 4f, flip ? SpriteEffects.FlipHorizontally : SpriteEffects.None, Math.Max(0f, drawOnTop ? 0.991f : ((StandingPixel.Y + 8) / 10000f)));
 				if (isGlowing)
 				{
-					b.Draw(Sprite.Texture, getLocalPosition(Game1.viewport) + new Vector2(width*2, GetBoundingBox().Height / 2), new Rectangle?(Sprite.SourceRect), glowingColor * glowingTransparency, rotation, new Vector2(width/2, height/2), scale.Value * 4f, flip ? SpriteEffects.FlipHorizontally : SpriteEffects.None, Math.Max(0f, drawOnTop ? 0.991f : ((StandingPixel.Y + 8) / 10000f + 0.0001f)));
+					b.Draw(Sprite.Texture, getLocalPosition(Game1.viewport) + new Vector2(width * 2, GetBoundingBox().Height / 2), new Rectangle?(Sprite.SourceRect), glowingColor * glowingTransparency, rotation, new Vector2(width/2, height/2), scale.Value * 4f, flip ? SpriteEffects.FlipHorizontally : SpriteEffects.None, Math.Max(0f, drawOnTop ? 0.991f : ((StandingPixel.Y + 8) / 10000f + 0.0001f)));
 				}
 			}
 		}
@@ -193,6 +197,7 @@ namespace BossCreatures
 		public override int takeDamage(int damage, int xTrajectory, int yTrajectory, bool isBomb, double addedPrecision, Farmer who)
 		{
 			int result = base.takeDamage(damage, xTrajectory, yTrajectory, isBomb, addedPrecision, who);
+
 			if (Health <= 0)
 			{
 				ModEntry.BossDeath(currentLocation, this, difficulty);

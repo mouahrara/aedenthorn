@@ -16,7 +16,6 @@ namespace BossCreatures
 		private readonly int width;
 		private readonly int height;
 		private readonly float unhitableHeight;
-		private readonly float hitableHeight;
 		public int timeUntilNextAttack;
 		public readonly NetBool firing = new(false);
 		public NetInt attackState = new();
@@ -37,14 +36,11 @@ namespace BossCreatures
 			Sprite.UpdateSourceRect();
 			Scale = ModEntry.Config.SlimeBossScale;
 			unhitableHeight = Scale * height * 1 / 3;
-			hitableHeight = Scale * height - unhitableHeight;
-
 			this.difficulty = difficulty;
 			Health = (int)Math.Round(Health * 10 * difficulty);
 			MaxHealth = Health;
 			DamageToFarmer = (int)Math.Round(damageToFarmer.Value * 2 * difficulty);
 			farmerPassesThrough = true;
-
 			timeUntilNextAttack = 100;
 			moveTowardPlayerThreshold.Value = 20;
 		}
@@ -75,15 +71,14 @@ namespace BossCreatures
 		public override void behaviorAtGameTick(GameTime time)
 		{
 			base.behaviorAtGameTick(time);
-
 			if (Health <= 0)
 			{
 				return;
 			}
-
 			timeUntilNextAttack -= time.ElapsedGameTime.Milliseconds;
 
 			FarmerCollection.Enumerator enumerator = currentLocation.farmers.GetEnumerator();
+
 			while (enumerator.MoveNext())
 			{
 				if (enumerator.Current.currentLocation == currentLocation && enumerator.Current.GetBoundingBox().Intersects(GetBoundingBox()))
@@ -111,6 +106,7 @@ namespace BossCreatures
 			else if (totalFireTime > 0)
 			{
 				Farmer player = Player;
+
 				if (!firing.Value)
 				{
 					if (player != null)
@@ -131,7 +127,9 @@ namespace BossCreatures
 						{
 							firing.Set(true);
 						}
+
 						float fire_angle = 0f;
+
 						faceGeneralDirection(player.Position, 0, false);
 						switch (facingDirection.Value)
 						{
@@ -149,24 +147,24 @@ namespace BossCreatures
 								break;
 						}
 						fire_angle += (float)Math.Sin((double)(totalFireTime / 1000f * 180f) * 3.1415926535897931 / 180.0) * 25f;
-						Vector2 shot_velocity = new((float)Math.Cos((double)fire_angle * 3.1415926535897931 / 180.0), -(float)Math.Sin((double)fire_angle * 3.1415926535897931 / 180.0));
-						shot_velocity *= 5f;
 
+						Vector2 shot_velocity = new((float)Math.Cos((double)fire_angle * 3.1415926535897931 / 180.0), -(float)Math.Sin((double)fire_angle * 3.1415926535897931 / 180.0));
+
+						shot_velocity *= 5f;
 						for (int i = 0; i < 8; i++)
 						{
 							bool one = i < 4;
 							bool two = i % 4 < 2;
 							bool three = i % 2 == 0;
-
 							Vector2 v = new((three ? shot_velocity.X : shot_velocity.Y) * (one ? -1 : 1), (three ? shot_velocity.Y : shot_velocity.X) * (two ? -1 : 1));
 							BasicProjectile projectile = new BossProjectile((int)(5 * difficulty), 766, 0, 1, 0.196349546f, v.X, v.Y, new Vector2(Position.X + projectileOffsetX, Position.Y + projectileOffsetY), "", "", "", false, false, currentLocation, this, null, "766", "13", true)
 							{
 								IgnoreLocationCollision = true
 							};
+
 							projectile.ignoreTravelGracePeriod.Value = true;
 							projectile.maxTravelDistance.Value = 512;
 							currentLocation.projectiles.Add(projectile);
-
 							if (!ModEntry.IsLessThanHalfHealth(this))
 							{
 								i++;
@@ -211,15 +209,17 @@ namespace BossCreatures
 		public override int takeDamage(int damage, int xTrajectory, int yTrajectory, bool isBomb, double addedPrecision, Farmer who)
 		{
 			int result = base.takeDamage(damage, xTrajectory, yTrajectory, isBomb, addedPrecision, who);
+
 			if (Health <= 0)
 			{
 				ModEntry.BossDeath(currentLocation, this, difficulty);
 			}
 			else
 			{
-				if(Game1.random.NextDouble() < 0.5f)
-					currentLocation.characters.Add(new GreenSlime(Position, (int)(120*difficulty)));
-
+				if (Game1.random.NextDouble() < 0.5f)
+				{
+					currentLocation.characters.Add(new GreenSlime(Position, (int)(120 * difficulty)));
+				}
 				currentLocation.characters[^1].setTrajectory(xTrajectory / 8 + Game1.random.Next(-20, 20), yTrajectory / 8 + Game1.random.Next(-20, 20));
 				currentLocation.characters[^1].willDestroyObjectsUnderfoot = false;
 				currentLocation.characters[^1].moveTowardPlayer(20);

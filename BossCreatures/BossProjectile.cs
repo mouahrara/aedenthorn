@@ -18,7 +18,6 @@ namespace BossCreatures
 		{
 			this.debuff.Value = debuff;
 			this.startingPosition = startingPosition;
-
 			pullPlayerIn = pullIn;
 		}
 
@@ -32,7 +31,8 @@ namespace BossCreatures
 			if (pullPlayerIn)
 			{
 				Vector2 newPos = player.Position + (startingPosition - player.Position) * 0.02f;
-				if(location.isTilePassable(new Location((int)(newPos.X/64), (int)(newPos.Y/64)), Game1.viewport))
+
+				if (location.isTilePassable(new Location((int)(newPos.X / 64), (int)(newPos.Y / 64)), Game1.viewport))
 				{
 					player.Position = newPos;
 				}

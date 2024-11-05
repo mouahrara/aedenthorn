@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.Monsters;
-using StardewValley.Network;
 
 namespace BossCreatures
 {
@@ -29,17 +28,15 @@ namespace BossCreatures
 			base.onDealContactDamage(who);
 		}
 
-		private int wasHitCounter;
-		private bool turningRight;
-		private float targetRotation;
-
 		public override void behaviorAtGameTick(GameTime time)
 		{
 			base.behaviorAtGameTick(time);
 			faceDirection(0);
+
 			float xSlope = -(float)(Player.GetBoundingBox().Center.X - GetBoundingBox().Center.X);
 			float ySlope = Player.GetBoundingBox().Center.Y - GetBoundingBox().Center.Y;
 			float t = Math.Max(1f, Math.Abs(xSlope) + Math.Abs(ySlope));
+
 			if (t < 64f)
 			{
 				xVelocity = Math.Max(-7f, Math.Min(7f, xVelocity * 1.1f));
@@ -69,7 +66,9 @@ namespace BossCreatures
 				rotation %= 6.28318548f;
 				wasHitCounter = 5 + Game1.random.Next(-1, 2);
 			}
+
 			float maxAccel = Math.Min(7f, Math.Max(2f, 7f - t / 64f / 2f))*2;
+
 			xSlope = (float)Math.Cos(rotation + 1.5707963267948966);
 			ySlope = -(float)Math.Sin(rotation + 1.5707963267948966);
 			xVelocity += -xSlope * maxAccel / 6f + Game1.random.Next(-10, 10) / 100f;

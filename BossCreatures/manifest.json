@@ -1,11 +1,11 @@
 ﻿{
 	"Name": "Boss Creatures",
 	"Author": "aedenthorn",
-	"Version": "1.5.1-unofficial.1-mouahrara",
+	"Version": "1.5.1-unofficial.2-mouahrara",
 	"Description": "Spawns boss creatures in dungeons and around Stardew Valley.",
 	"UniqueID": "Aedenthorn.BossCreatures",
 	"EntryDll": "BossCreatures.dll",
-	"MinimumApiVersion": "4.0.0",
+	"MinimumApiVersion": "4.1.0",
 	"UpdateKeys": [
 		"Nexus:5864",
 		"UpdateManifest:https://raw.githubusercontent.com/mouahrara/aedenthorn/master/update-manifest.json@BossCreatures"
