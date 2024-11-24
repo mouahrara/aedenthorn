@@ -2,6 +2,11 @@
 
 # Release notes
 
+## 1.5.1-unofficial.3-mouahrara
+Released on 24 November, 2024, for SMAPI 4.1.0 or later.
+* Fixed an issue where ghosts spawned by the Ghost Boss were only moving upwards 🔧
+* Fixed a minor bug 🔧
+
 ## 1.5.1-unofficial.2-mouahrara
 Released on 5 November, 2024, for SMAPI 4.1.0 or later.
 * Migrated to 1.6.9 and code maintenance 🚀

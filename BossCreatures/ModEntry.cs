@@ -5,11 +5,11 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.GameData;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Monsters;
 using Object = StardewValley.Object;
-using StardewValley.GameData;
 
 namespace BossCreatures
 {
@@ -624,7 +624,7 @@ namespace BossCreatures
 
 		private static void SetBattleWeather(GameLocation location)
 		{
-			if (!Config.ModEnabled || !Config.BattleWeather)
+			if (!Config.ModEnabled || !Config.BattleWeather || !location.IsOutdoors)
 				return;
 
 			Game1.isRaining = !Game1.isGreenRain;
@@ -633,6 +633,7 @@ namespace BossCreatures
 			location.GetWeather().isRaining.Value = Game1.isRaining;
 			location.GetWeather().isSnowing.Value = Game1.isSnowing;
 			location.GetWeather().isLightning.Value = Game1.isLightning;
+			Game1.updateWeatherIcon();
 		}
 
 		private void OnGameLaunched(object sender, GameLaunchedEventArgs e)
@@ -658,6 +659,7 @@ namespace BossCreatures
 					{
 						if (BossHere(Game1.player.currentLocation) != null)
 						{
+							SetDefaultWeather(Game1.player.currentLocation);
 							RevertMusic(Game1.player.currentLocation);
 						}
 						OnDayEnding(null, null);

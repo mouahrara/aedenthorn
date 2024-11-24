@@ -7,6 +7,10 @@ namespace BossCreatures
 {
 	internal class ToughGhost : Ghost
 	{
+		private new int wasHitCounter;
+		private new bool turningRight;
+		private new float targetRotation;
+
 		public ToughGhost()
 		{
 		}
