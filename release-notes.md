@@ -2,6 +2,10 @@
 
 # Global release notes
 
+## 24 November 2024
+* Released Boss Creatures version [1.5.1-unofficial.3-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BossCreatures/release-notes.md#151-unofficial3-mouahrara)
+* Released Floating Garden Pots version [0.1.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/FloatingGardenPots/release-notes.md#011-unofficial2-mouahrara)
+
 ## 11 November 2024
 * Released Advanced Cooking version [0.1.5-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AdvancedCooking/release-notes.md#015-unofficial2-mouahrara)
 

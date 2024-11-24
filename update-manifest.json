@@ -117,7 +117,7 @@
 			"Name": "Boss Creatures",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#BossCreatures",
 			"Versions": [
-				{ "Version": "1.5.1-unofficial.2-mouahrara" }
+				{ "Version": "1.5.1-unofficial.3-mouahrara" }
 			]
 		},
 		"BuffFramework": {
@@ -299,7 +299,7 @@
 			"Name": "Floating Garden Pots",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#FloatingGardenPots",
 			"Versions": [
-				{ "Version": "0.1.1-unofficial.1-mouahrara" }
+				{ "Version": "0.1.1-unofficial.2-mouahrara" }
 			]
 		},
 		"GalaxyWeaponChoice": {
