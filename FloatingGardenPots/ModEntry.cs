@@ -15,12 +15,12 @@ namespace FloatingGardenPots
 	{
 		internal static IMonitor SMonitor;
 		internal static IModHelper SHelper;
+		internal static IManifest SModManifest;
 		internal static ModConfig Config;
-
 		internal static ModEntry context;
 
 		public const string modKey = "aedenthorn.FloatingGardenPots";
-		internal static Dictionary<GameLocation, Dictionary<Vector2, Vector2>> offsetDict = new();
+		internal static Dictionary<GameLocation, Dictionary<Vector2, Vector2>> offsetDictionary = new();
 
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
 		/// <param name="helper">Provides simplified APIs for writing mods.</param>
@@ -29,9 +29,9 @@ namespace FloatingGardenPots
 			Config = Helper.ReadConfig<ModConfig>();
 
 			context = this;
-
 			SMonitor = Monitor;
 			SHelper = helper;
+			SModManifest = ModManifest;
 
 			Helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
 			Helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
@@ -46,8 +46,8 @@ namespace FloatingGardenPots
 					postfix: new HarmonyMethod(typeof(Object_canBePlacedHere_Patch), nameof(Object_canBePlacedHere_Patch.Postfix))
 				);
 				harmony.Patch(
-					original: AccessTools.Method(typeof(GameLocation), nameof(GameLocation.checkAction)),
-					prefix: new HarmonyMethod(typeof(GameLocation_checkAction_Patch), nameof(GameLocation_checkAction_Patch.Prefix))
+					original: AccessTools.Method(typeof(Object), nameof(Object.placementAction)),
+					prefix: new HarmonyMethod(typeof(Object_placementAction_Patch), nameof(Object_placementAction_Patch.Prefix))
 				);
 				harmony.Patch(
 					original: AccessTools.Method(typeof(IndoorPot), nameof(IndoorPot.DayUpdate)),
@@ -67,7 +67,7 @@ namespace FloatingGardenPots
 
 		private void GameLoop_SaveLoaded(object sender, StardewModdingAPI.Events.SaveLoadedEventArgs e)
 		{
-			offsetDict.Clear();
+			offsetDictionary.Clear();
 		}
 
 		private void GameLoop_GameLaunched(object sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
