@@ -2,6 +2,10 @@
 
 # Release notes
 
+## 1.5.1-unofficial.4-mouahrara
+Released on 30 November, 2024, for SMAPI 4.1.0 or later.
+* Fixed `NullReferenceException` when modifying GMCM options from the main menu 🔧
+
 ## 1.5.1-unofficial.3-mouahrara
 Released on 24 November, 2024, for SMAPI 4.1.0 or later.
 * Fixed an issue where ghosts spawned by the Ghost Boss were only moving upwards 🔧

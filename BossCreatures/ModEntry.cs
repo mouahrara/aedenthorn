@@ -673,7 +673,7 @@ namespace BossCreatures
 				name: () => SHelper.Translation.Get("GMCM.BattleWeather.Name"),
 				getValue: () => Config.BattleWeather,
 				setValue: value => {
-					if (BossHere(Game1.player.currentLocation) != null)
+					if (Context.IsWorldReady && BossHere(Game1.player.currentLocation) != null)
 					{
 						if (value == false)
 						{
