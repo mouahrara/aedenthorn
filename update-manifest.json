@@ -117,7 +117,7 @@
 			"Name": "Boss Creatures",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#BossCreatures",
 			"Versions": [
-				{ "Version": "1.5.1-unofficial.3-mouahrara" }
+				{ "Version": "1.5.1-unofficial.4-mouahrara" }
 			]
 		},
 		"BuffFramework": {
@@ -461,6 +461,13 @@
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#WallPlanters",
 			"Versions": [
 				{ "Version": "0.1.2-unofficial.1-mouahrara" }
+			]
+		},
+		"WallTelevisions": {
+			"Name": "Wall Televisions",
+			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#WallTelevisions",
+			"Versions": [
+				{ "Version": "0.2.1-unofficial.1-mouahrara" }
 			]
 		},
 		"WateringCanTweaks": {

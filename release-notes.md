@@ -2,6 +2,10 @@
 
 # Global release notes
 
+## 30 November 2024
+* Released Boss Creatures version [1.5.1-unofficial.4-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BossCreatures/release-notes.md#151-unofficial4-mouahrara)
+* Released Wall Televisions version [0.2.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/WallTelevisions/release-notes.md#021-unofficial1-mouahrara)
+
 ## 24 November 2024
 * Released Boss Creatures version [1.5.1-unofficial.3-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BossCreatures/release-notes.md#151-unofficial3-mouahrara)
 * Released Floating Garden Pots version [0.1.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/FloatingGardenPots/release-notes.md#011-unofficial2-mouahrara)
@@ -217,6 +221,7 @@
   * TreeTweaks ➜ CustomTreeTweaks 
   * TwoPlayerPrairieKing ➜ PlayPrairieKingWithNPCs
   * WallPlanter ➜ WallPlanters
+  * WallTelevision ➜ WallTelevisions
   * WeatherTotems ➜ WeatherTotem
   * YAJM ➜ YetAnotherJumpMod
 * Removed release files
