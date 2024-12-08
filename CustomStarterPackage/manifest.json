@@ -1,11 +1,11 @@
 ﻿{
 	"Name": "Custom Starter Package",
 	"Author": "aedenthorn",
-	"Version": "0.2.1-unofficial.2-mouahrara",
+	"Version": "0.2.1-unofficial.3-mouahrara",
 	"Description": "Replace the 15 parsnip seeds you get at the beginning of the game with whatever seeds, items, weapons, tools, clothing, etc.",
 	"UniqueID": "aedenthorn.CustomStarterPackage",
 	"EntryDll": "CustomStarterPackage.dll",
-	"MinimumApiVersion": "4.0.0",
+	"MinimumApiVersion": "4.1.0",
 	"UpdateKeys": [
 		"Nexus:14152",
 		"UpdateManifest:https://raw.githubusercontent.com/mouahrara/aedenthorn/master/update-manifest.json@CustomStarterPackage"
