@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net.Mail;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json.Linq;
@@ -10,6 +11,7 @@ using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Objects;
 using StardewValley.TokenizableStrings;
+using StardewValley.Tools;
 using Object = StardewValley.Object;
 
 namespace BuffFramework
@@ -85,37 +87,33 @@ namespace BuffFramework
 			if (!Config.ModEnabled || !who.IsLocalPlayer)
 				return;
 
-			foreach(var kvp in buffDict)
+			foreach (KeyValuePair<string, Dictionary<string, object>> entry in buffDictionary)
 			{
-				var key = kvp.Key;
-				var value = kvp.Value;
-				string id = GetBuffId(key, value);
+				string id = GetBuffId(entry.Key, entry.Value);
 
-				if (id is null)
-					continue;
-
-				string consume = null;
-
-				foreach (var p in value)
+				if (id is not null)
 				{
-					switch (p.Key.ToLower())
+					string consume = null;
+
+					foreach (KeyValuePair<string, object> property in entry.Value)
 					{
-						case "consume":
-							consume = GetString(p.Value);
+						switch (property.Key.ToLower())
+						{
+							case "consume":
+								consume = GetString(property.Value);
+								break;
+						}
+						if (consume is not null)
 							break;
 					}
-					if (consume is not null)
-						break;
-				}
-
-
-				if (consume is not null && Game1.player.isEating && Game1.player.itemToEat is Object @object)
-				{
-					bool isCategory = int.TryParse(consume, out int category);
-
-					if (@object.QualifiedItemId.Equals(consume) || @object.ItemId.Equals(consume) || @object.Name.Equals(consume) || (isCategory && category.Equals(consume)) || @object.HasContextTag(consume))
+					if (consume is not null && Game1.player.isEating && Game1.player.itemToEat is Object @object)
 					{
-						CreateOrUpdateBuff(who, id, value);
+						bool isCategory = int.TryParse(consume, out int category);
+
+						if (@object.QualifiedItemId.Equals(consume) || @object.ItemId.Equals(consume) || @object.Name.Equals(consume) || (isCategory && category.Equals(consume)) || @object.HasContextTag(consume))
+						{
+							CreateOrUpdateBuff(who, id, entry.Value);
+						}
 					}
 				}
 			}
@@ -129,91 +127,138 @@ namespace BuffFramework
 			Dictionary<string, (Dictionary<string, object>, string)> buffsToAdd = new();
 			Dictionary<string, (string, List<string>)> buffsToRemove = new();
 
-			foreach(var kvp in buffDict)
+			foreach (KeyValuePair<string, Dictionary<string, object>> entry in buffDictionary)
 			{
-				var key = kvp.Key;
-				var value = kvp.Value;
-				string id = GetBuffId(key, value);
+				string id = GetBuffId(entry.Key, entry.Value);
 				bool isValid = true;
 
-				if (id is null)
-					continue;
-
-				string hat = null;
-				string shirt = null;
-				string pants = null;
-				string boots = null;
-				string ring = null;
-
-				foreach (var p in value)
+				if (id is not null)
 				{
-					switch (p.Key.ToLower())
-					{
-						case "hat":
-							hat = GetString(p.Value);
-							break;
-						case "shirt":
-							shirt = GetString(p.Value);
-							break;
-						case "pants":
-							pants = GetString(p.Value);
-							break;
-						case "boots":
-							boots = GetString(p.Value);
-							break;
-						case "ring":
-							ring = GetString(p.Value);
-							break;
-					}
-					if (hat is not null && shirt is not null && pants is not null && boots is not null && ring is not null)
-						break;
-				}
+					string currentItem = null;
+					string inventoryContains = null;
+					string hat = null;
+					string shirt = null;
+					string pants = null;
+					string boots = null;
+					string ring = null;
 
-				if (hat is null && shirt is null && pants is null && boots is null && ring is null)
-					continue;
-
-				static bool isValidRing(Ring ring, string name)
-				{
-					if (ring.Name == name)
+					foreach (KeyValuePair<string, object> property in entry.Value)
 					{
-						return true;
-					}
-					else if (ring is CombinedRing)
-					{
-						foreach(Ring r in (ring as CombinedRing).combinedRings)
+						switch (property.Key.ToLower())
 						{
-							if(r.Name == name)
+							case "helditem":
+							case "currentitem":
+								currentItem = GetString(property.Value);
+								break;
+							case "inventorycontains":
+								inventoryContains = GetString(property.Value);
+								break;
+							case "hat":
+								hat = GetString(property.Value);
+								break;
+							case "shirt":
+								shirt = GetString(property.Value);
+								break;
+							case "pants":
+								pants = GetString(property.Value);
+								break;
+							case "boots":
+								boots = GetString(property.Value);
+								break;
+							case "ring":
+								ring = GetString(property.Value);
+								break;
+						}
+						if (currentItem is not null && inventoryContains is not null && hat is not null && shirt is not null && pants is not null && boots is not null && ring is not null)
+							break;
+					}
+					if (currentItem is not null || inventoryContains is not null || hat is not null || shirt is not null || pants is not null || boots is not null || ring is not null)
+					{
+						static bool isValidRing(Ring ring, string name)
+						{
+							if (ring.Name == name)
 							{
 								return true;
 							}
+							else if (ring is CombinedRing)
+							{
+								foreach (Ring r in (ring as CombinedRing).combinedRings)
+								{
+									if (r.Name == name)
+									{
+										return true;
+									}
+								}
+							}
+							return false;
 						}
+
+						if (currentItem is not null)
+						{
+							isValid = currentItem switch
+							{
+								"TypeTool" => Game1.player.CurrentItem is Tool && (Game1.player.CurrentItem is not MeleeWeapon mw || mw.isScythe()) && Game1.player.CurrentItem is not Slingshot,
+								"TypeEnchantableTool" => Game1.player.CurrentItem is Pickaxe or Axe or Hoe or WateringCan or FishingRod or Pan,
+								"TypePickaxe" => Game1.player.CurrentItem is Pickaxe,
+								"TypeAxe" => Game1.player.CurrentItem is Axe,
+								"TypeHoe" => Game1.player.CurrentItem is Hoe,
+								"TypeScythe" => Game1.player.CurrentItem is MeleeWeapon mw && mw.isScythe(),
+								"TypeWateringCan" => Game1.player.CurrentItem is WateringCan,
+								"TypeFishingRod" => Game1.player.CurrentItem is FishingRod,
+								"TypePan" => Game1.player.CurrentItem is Pan,
+								"TypeShears" => Game1.player.CurrentItem is Shears,
+								"TypeMilkPail" => Game1.player.CurrentItem is MilkPail,
+								"TypeWand" => Game1.player.CurrentItem is Wand,
+								"TypeLantern" => Game1.player.CurrentItem is Lantern,
+								"TypeRaft" => Game1.player.CurrentItem is Raft,
+								"TypeGenericTool" => Game1.player.CurrentItem is GenericTool,
+								"TypeWeapon" => (Game1.player.CurrentItem is MeleeWeapon mw && !mw.isScythe()) || Game1.player.CurrentItem is Slingshot,
+								"TypeMeleeWeapon" => Game1.player.CurrentItem is MeleeWeapon mw && !mw.isScythe(),
+								"TypeSword" => Game1.player.CurrentItem is MeleeWeapon mw && !mw.isScythe() && (mw.type.Value == 0 || mw.type.Value == 3),
+								"TypeStabbingSword" => Game1.player.CurrentItem is MeleeWeapon mw && !mw.isScythe() && mw.type.Value == 0,
+								"TypeSlashingSword" or "TypeDefenseSword" => Game1.player.CurrentItem is MeleeWeapon mw && !mw.isScythe() && mw.type.Value == 3,
+								"TypeDagger" => Game1.player.CurrentItem is MeleeWeapon mw && !mw.isScythe() && mw.type.Value == 1,
+								"TypeClub" or "TypeHammer" => Game1.player.CurrentItem is MeleeWeapon mw && !mw.isScythe() && mw.type.Value == 2,
+								"TypeSlingshot" => Game1.player.CurrentItem is Slingshot,
+								_ => Game1.player.CurrentItem is not null && Game1.player.CurrentItem.Name == currentItem
+							};
+						}
+						if (isValid && inventoryContains is not null && (Game1.player.Items is null || !Game1.player.Items.Any(item => item is not null && (item.Name == inventoryContains || (item is Tool tool && tool.attachments.Any(attachment => attachment is not null && attachment.Name == inventoryContains))))))
+						{
+							isValid = false;
+						}
+						if (isValid && hat is not null && (Game1.player.hat.Value is null || Game1.player.hat.Value.Name != hat))
+						{
+							isValid = false;
+						}
+						if (isValid && shirt is not null && (Game1.player.shirtItem.Value is null || Game1.player.shirtItem.Value.Name != shirt))
+						{
+							isValid = false;
+						}
+						if (isValid && pants is not null && (Game1.player.pantsItem.Value is null || Game1.player.pantsItem.Value.Name != pants))
+						{
+							isValid = false;
+						}
+						if (isValid && boots is not null && (Game1.player.boots.Value is null || Game1.player.boots.Value.Name != boots))
+						{
+							isValid = false;
+						}
+						if (isValid && ring is not null && (Game1.player.leftRing.Value is null || !isValidRing(Game1.player.leftRing.Value, ring)) && (Game1.player.rightRing.Value is null || !isValidRing(Game1.player.rightRing.Value, ring)))
+						{
+							isValid = false;
+						}
+						if (isValid)
+						{
+							buffsToAdd[entry.Key] = new(entry.Value, id);
+						}
+						buffsToRemove[entry.Key] = (id, GetAdditionalBuffsAsTupleList(entry.Value)?.Select(t => t.Item1).ToList());
 					}
-					return false;
 				}
-
-				if (hat is not null && (Game1.player.hat.Value is null || Game1.player.hat.Value.Name != hat))
-					isValid = false;
-				if (isValid && shirt is not null && (Game1.player.shirtItem.Value is null || Game1.player.shirtItem.Value.Name != shirt))
-					isValid = false;
-				if (isValid && pants is not null && (Game1.player.pantsItem.Value is null || Game1.player.pantsItem.Value.Name != pants))
-					isValid = false;
-				if (isValid && boots is not null && (Game1.player.boots.Value is null || Game1.player.boots.Value.Name != boots))
-					isValid = false;
-				if (isValid && ring is not null && (Game1.player.leftRing.Value is null || !isValidRing(Game1.player.leftRing.Value, ring)) && (Game1.player.rightRing.Value is null || !isValidRing(Game1.player.rightRing.Value, ring)))
-					isValid = false;
-				if (isValid)
-				{
-					buffsToAdd[key] = new (value, id);
-				}
-				buffsToRemove[key] = (id, GetAdditionalBuffsAsTupleList(value)?.Select(t => t.Item1).ToList());
 			}
-			foreach (var kvp in buffsToRemove)
+			foreach ((string key, (string id, List<string> additionalBuffsIds)) in buffsToRemove)
 			{
-				if (!buffsToAdd.ContainsKey(kvp.Key))
+				if (!buffsToAdd.ContainsKey(key))
 				{
-					string id = kvp.Value.Item1;
-					List<string> additionalBuffsIds = kvp.Value.Item2;
-
 					if (Game1.player.hasBuff(id))
 					{
 						Game1.player.buffs.Remove(id);
@@ -227,9 +272,9 @@ namespace BuffFramework
 					}
 				}
 			}
-			foreach (var kvp in buffsToAdd)
+			foreach ((_, (Dictionary<string, object> value, string id)) in buffsToAdd)
 			{
-				CreateOrUpdateBuff(Game1.player, kvp.Value.Item2, kvp.Value.Item1);
+				CreateOrUpdateBuff(Game1.player, id, value);
 			}
 		}
 
@@ -238,53 +283,59 @@ namespace BuffFramework
 			if (!Config.ModEnabled)
 				return;
 
-			foreach(var kvp in buffDict)
+			foreach (KeyValuePair<string, Dictionary<string, object>> entry in buffDictionary)
 			{
-				var key = kvp.Key;
-				var value = kvp.Value;
-				string id = GetBuffId(key, value);
+				string id = GetBuffId(entry.Key, entry.Value);
 
-				if (id is null)
-					continue;
-
-				string consume = null;
-				string hat = null;
-				string shirt = null;
-				string pants = null;
-				string boots = null;
-				string ring = null;
-
-				foreach (var p in value)
+				if (id is not null)
 				{
-					switch (p.Key.ToLower())
+					string consume = null;
+					string currentItem = null;
+					string inventoryContains = null;
+					string hat = null;
+					string shirt = null;
+					string pants = null;
+					string boots = null;
+					string ring = null;
+
+					foreach (KeyValuePair<string, object> property in entry.Value)
 					{
-						case "consume":
-							consume = GetString(p.Value);
-							break;
-						case "hat":
-							hat = GetString(p.Value);
-							break;
-						case "shirt":
-							shirt = GetString(p.Value);
-							break;
-						case "pants":
-							pants = GetString(p.Value);
-							break;
-						case "boots":
-							boots = GetString(p.Value);
-							break;
-						case "ring":
-							ring = GetString(p.Value);
+						switch (property.Key.ToLower())
+						{
+							case "consume":
+								consume = GetString(property.Value);
+								break;
+							case "helditem":
+							case "currentitem":
+								currentItem = GetString(property.Value);
+								break;
+							case "inventorycontains":
+								inventoryContains = GetString(property.Value);
+								break;
+							case "hat":
+								hat = GetString(property.Value);
+								break;
+							case "shirt":
+								shirt = GetString(property.Value);
+								break;
+							case "pants":
+								pants = GetString(property.Value);
+								break;
+							case "boots":
+								boots = GetString(property.Value);
+								break;
+							case "ring":
+								ring = GetString(property.Value);
+								break;
+						}
+						if (consume is not null || currentItem is not null || inventoryContains is not null || hat is not null || shirt is not null || pants is not null || boots is not null || ring is not null)
 							break;
 					}
-					if (consume is not null || hat is not null || shirt is not null || pants is not null || boots is not null || ring is not null)
-						break;
+					if (consume is null && currentItem is null && inventoryContains is null && hat is null && shirt is null && pants is null && boots is null && ring is null)
+					{
+						CreateOrUpdateBuff(Game1.player, id, entry.Value);
+					}
 				}
-
-				if (consume is not null || hat is not null || shirt is not null || pants is not null || boots is not null || ring is not null)
-					continue;
-
-				CreateOrUpdateBuff(Game1.player, id, value);
 			}
 		}
 
@@ -293,45 +344,43 @@ namespace BuffFramework
 			if (!Config.ModEnabled)
 				return;
 
-			var oldBuffDict = buffDict;
-			SHelper.GameContent.InvalidateCache(dictKey);
-			buffDict = SHelper.GameContent.Load<Dictionary<string, Dictionary<string, object>>>(dictKey);
+			Dictionary<string, Dictionary<string, object>> oldBuffDict = buffDictionary;
+
+			SHelper.GameContent.InvalidateCache(dictionaryKey);
+			buffDictionary = SHelper.GameContent.Load<Dictionary<string, Dictionary<string, object>>>(dictionaryKey);
 			foreach (BuffFrameworkAPI instance in APIInstances)
 			{
-				foreach (var kvp in instance.dictionary)
+				foreach ((string key, (Dictionary<string, object> value, Func<bool> function)) in instance.dictionary)
 				{
-					if (kvp.Value.Item2 is null || kvp.Value.Item2())
+					if (function is null || function())
 					{
-						buffDict.TryAdd(kvp.Key, kvp.Value.Item1);
+						buffDictionary.TryAdd(key, value);
 					}
 					else
 					{
-						buffDict.Remove(kvp.Key);
+						buffDictionary.Remove(key);
 					}
 				}
 			}
-			foreach (var kvp in oldBuffDict)
+			foreach (KeyValuePair<string, Dictionary<string, object>> entry in oldBuffDict)
 			{
-				var key = kvp.Key;
-				var value = kvp.Value;
-
-				if (!buffDict.ContainsKey(key))
+				if (!buffDictionary.ContainsKey(entry.Key))
 				{
-					string id = GetBuffId(key, value);
+					string id = GetBuffId(entry.Key, entry.Value);
 
-					if (id is null)
-						continue;
-
-					List<string> additionalBuffsIds = GetAdditionalBuffsAsTupleList(value)?.Select(t => t.Item1).ToList();
-
-					if (Game1.player.hasBuff(id))
+					if (id is not null)
 					{
-						Game1.player.buffs.Remove(id);
-						if (additionalBuffsIds is not null)
+						List<string> additionalBuffsIds = GetAdditionalBuffsAsTupleList(entry.Value)?.Select(t => t.Item1).ToList();
+
+						if (Game1.player.hasBuff(id))
 						{
-							foreach (string additionalBuffsId in additionalBuffsIds)
+							Game1.player.buffs.Remove(id);
+							if (additionalBuffsIds is not null)
 							{
-								Game1.player.buffs.Remove(additionalBuffsId);
+								foreach (string additionalBuffsId in additionalBuffsIds)
+								{
+									Game1.player.buffs.Remove(additionalBuffsId);
+								}
 							}
 						}
 					}
@@ -347,20 +396,19 @@ namespace BuffFramework
 			string buffId = null;
 			string id;
 
-			foreach (var p in value)
+			foreach (KeyValuePair<string, object> property in value)
 			{
-				switch (p.Key.ToLower())
+				switch (property.Key.ToLower())
 				{
 					case "which":
-						which = GetIntAsString(p.Value);
+						which = GetIntAsString(property.Value);
 						break;
 					case "id":
 					case "buffid":
-						buffId = GetString(p.Value);
+						buffId = GetString(property.Value);
 						break;
 				}
 			}
-
 			if (which is not null && int.Parse(which) >= 0)
 			{
 				id = which;
@@ -373,7 +421,7 @@ namespace BuffFramework
 				}
 				else
 				{
-					buffDict.Remove(key);
+					buffDictionary.Remove(key);
 					SMonitor.Log($"{key}: Which and Id (or BuffId) fields are both missing", LogLevel.Error);
 					return null;
 				}
@@ -424,19 +472,19 @@ namespace BuffFramework
 			int? duration = null;
 			int? maxDuration = null;
 
-			foreach (var p in value)
+			foreach (KeyValuePair<string, object> property in value)
 			{
-				switch (p.Key.ToLower())
+				switch (property.Key.ToLower())
 				{
 					case "texturepath":
 					case "icontexture":
-						iconTexture = GetString(p.Value);
+						iconTexture = GetString(property.Value);
 						break;
 					case "duration":
-						duration = GetInt(p.Value) * 1000;
+						duration = GetInt(property.Value) * 1000;
 						break;
 					case "maxduration":
-						maxDuration = GetInt(p.Value) * 1000;
+						maxDuration = GetInt(property.Value) * 1000;
 						break;
 				}
 			}
@@ -459,7 +507,6 @@ namespace BuffFramework
 				buff.millisecondsDuration = Buff.ENDLESS;
 				buff.totalMillisecondsDuration = Buff.ENDLESS;
 			}
-
 			if (!string.IsNullOrEmpty(iconTexture))
 			{
 				Texture2D texture = SHelper.GameContent.Load<Texture2D>(iconTexture);
@@ -468,21 +515,21 @@ namespace BuffFramework
 				int textureWidth = texture.Width;
 				int textureHeight = texture.Height;
 
-				foreach (var p in value)
+				foreach (KeyValuePair<string, object> property in value)
 				{
-					switch (p.Key.ToLower())
+					switch (property.Key.ToLower())
 					{
 						case "texturex":
-							textureX = GetInt(p.Value);
+							textureX = GetInt(property.Value);
 							break;
 						case "texturey":
-							textureY = GetInt(p.Value);
+							textureY = GetInt(property.Value);
 							break;
 						case "texturewidth":
-							textureWidth = GetInt(p.Value);
+							textureWidth = GetInt(property.Value);
 							break;
 						case "textureheight":
-							textureHeight = GetInt(p.Value);
+							textureHeight = GetInt(property.Value);
 							break;
 					}
 				}
@@ -493,14 +540,14 @@ namespace BuffFramework
 				buff.iconTexture ??= ExtractTexture(Game1.mouseCursors, 320, 496, 16, 16);
 			}
 
-			foreach (var p in value)
+			foreach (KeyValuePair<string, object> property in value)
 			{
-				switch (p.Key.ToLower())
+				switch (property.Key.ToLower())
 				{
 					case "iconspriteindex":
 					case "sheetindex":
 					case "iconsheetindex":
-						buff.iconSheetIndex = Math.Max(0, GetInt(p.Value));
+						buff.iconSheetIndex = Math.Max(0, GetInt(property.Value));
 						if (string.IsNullOrEmpty(iconTexture))
 						{
 							buff.iconTexture = Game1.buffsIcons;
@@ -508,92 +555,92 @@ namespace BuffFramework
 						break;
 					case "name":
 					case "displayname":
-						buff.displayName = GetString(p.Value, true);
+						buff.displayName = GetString(property.Value, true);
 						break;
 					case "displaydescription":
 					case "description":
-						buff.description = GetString(p.Value, true);
+						buff.description = GetString(property.Value, true);
 						break;
 					case "source":
-						buff.source = GetString(p.Value);
+						buff.source = GetString(property.Value);
 						break;
 					case "displaysource":
-						buff.displaySource = GetString(p.Value, true);
+						buff.displaySource = GetString(property.Value, true);
 						break;
 					case "visibility":
 					case "visible":
-						buff.visible = GetBool(p.Value);
+						buff.visible = GetBool(property.Value);
 						break;
 					case "farming":
 					case "farminglevel":
-						buff.effects.FarmingLevel.Value = GetFloat(p.Value);
+						buff.effects.FarmingLevel.Value = GetFloat(property.Value);
 						break;
 					case "mining":
 					case "mininglevel":
-						buff.effects.MiningLevel.Value = GetFloat(p.Value);
+						buff.effects.MiningLevel.Value = GetFloat(property.Value);
 						break;
 					case "fishing":
 					case "fishinglevel":
-						buff.effects.FishingLevel.Value = GetFloat(p.Value);
+						buff.effects.FishingLevel.Value = GetFloat(property.Value);
 						break;
 					case "foraging":
 					case "foraginglevel":
-						buff.effects.ForagingLevel.Value = GetFloat(p.Value);
+						buff.effects.ForagingLevel.Value = GetFloat(property.Value);
 						break;
 					case "combat":
 					case "combatlevel":
-						buff.effects.CombatLevel.Value = GetFloat(p.Value);
+						buff.effects.CombatLevel.Value = GetFloat(property.Value);
 						break;
 					case "attack":
-						buff.effects.Attack.Value = GetFloat(p.Value);
+						buff.effects.Attack.Value = GetFloat(property.Value);
 						break;
 					case "attackmultiplier":
-						buff.effects.AttackMultiplier.Value = GetFloat(p.Value);
+						buff.effects.AttackMultiplier.Value = GetFloat(property.Value);
 						break;
 					case "criticalchancemultiplier":
-						buff.effects.CriticalChanceMultiplier.Value = GetFloat(p.Value);
+						buff.effects.CriticalChanceMultiplier.Value = GetFloat(property.Value);
 						break;
 					case "criticalpowermultiplier":
-						buff.effects.CriticalPowerMultiplier.Value = GetFloat(p.Value);
+						buff.effects.CriticalPowerMultiplier.Value = GetFloat(property.Value);
 						break;
 					case "weaponprecisionmultiplier":
-						buff.effects.WeaponPrecisionMultiplier.Value = GetFloat(p.Value);
+						buff.effects.WeaponPrecisionMultiplier.Value = GetFloat(property.Value);
 						break;
 					case "weaponspeedmultiplier":
-						buff.effects.WeaponSpeedMultiplier.Value = GetFloat(p.Value);
+						buff.effects.WeaponSpeedMultiplier.Value = GetFloat(property.Value);
 						break;
 					case "weightmultiplier":
 					case "knockbackmultiplier":
-						buff.effects.KnockbackMultiplier.Value = GetFloat(p.Value);
+						buff.effects.KnockbackMultiplier.Value = GetFloat(property.Value);
 						break;
 					case "defense":
-						buff.effects.Defense.Value = GetFloat(p.Value);
+						buff.effects.Defense.Value = GetFloat(property.Value);
 						break;
 					case "immunity":
-						buff.effects.Immunity.Value = GetFloat(p.Value);
+						buff.effects.Immunity.Value = GetFloat(property.Value);
 						break;
 					case "maxenergy":
 					case "maxstamina":
-						buff.effects.MaxStamina.Value = GetFloat(p.Value);
+						buff.effects.MaxStamina.Value = GetFloat(property.Value);
 						break;
 					case "luck":
-						buff.effects.LuckLevel.Value = GetFloat(p.Value);
+						buff.effects.LuckLevel.Value = GetFloat(property.Value);
 						break;
 					case "magneticradius":
-						buff.effects.MagneticRadius.Value = GetFloat(p.Value);
+						buff.effects.MagneticRadius.Value = GetFloat(property.Value);
 						break;
 					case "speed":
-						buff.effects.Speed.Value = GetFloat(p.Value);
+						buff.effects.Speed.Value = GetFloat(property.Value);
 						break;
 					case "glowcolor":
 					case "glow":
-						if (p.Value is JObject j)
+						if (property.Value is JObject j)
 						{
 							buff.glow = new Color((byte)(long)j["R"], (byte)(long)j["G"], (byte)(long)j["B"], (byte)(long)j["A"]);
 						}
 						else
 						{
-							Color? c = Utility.StringToColor(p.Value.ToString());
+							Color? c = Utility.StringToColor(property.Value.ToString());
 
 							if (c.HasValue)
 							{
@@ -603,19 +650,19 @@ namespace BuffFramework
 						break;
 					case "healthregen":
 					case "healthregeneration":
-						HealthRegenerationBuffs.TryAdd(id, GetFloatAsString(p.Value));
+						HealthRegenerationBuffs.TryAdd(id, GetFloatAsString(property.Value));
 						break;
 					case "energyregen":
 					case "energyregeneration":
 					case "staminaregen":
 					case "staminaregeneration":
-						StaminaRegenerationBuffs.TryAdd(id, GetFloatAsString(p.Value));
+						StaminaRegenerationBuffs.TryAdd(id, GetFloatAsString(property.Value));
 						break;
 					case "glowrate":
-						GlowRateBuffs.TryAdd(id, GetFloatAsString(p.Value));
+						GlowRateBuffs.TryAdd(id, GetFloatAsString(property.Value));
 						break;
 					case "sound":
-						soundBuffs.TryAdd(id, (GetString(p.Value), null));
+						soundBuffs.TryAdd(id, (GetString(property.Value), null));
 						break;
 				}
 			}
@@ -653,12 +700,12 @@ namespace BuffFramework
 
 		public static List<(string, bool)> GetAdditionalBuffsAsTupleList(Dictionary<string, object> value, bool visibility = true)
 		{
-			foreach (var p in value)
+			foreach (KeyValuePair<string, object> property in value)
 			{
-				switch (p.Key.ToLower())
+				switch (property.Key.ToLower())
 				{
 					case "additionalbuffs":
-						return GetAdditionalBuffsAsTupleListInternal(p.Value, visibility);
+						return GetAdditionalBuffsAsTupleListInternal(property.Value, visibility);
 				}
 			}
 
@@ -681,20 +728,20 @@ namespace BuffFramework
 							bool visible = defaultVisibility;
 							string id = null;
 
-							foreach (var p in additionalBuffDictionary)
+							foreach (KeyValuePair<string, object> property in additionalBuffDictionary)
 							{
-								switch (p.Key.ToLower())
+								switch (property.Key.ToLower())
 								{
 									case "which":
-										which = GetIntAsString(p.Value);
+										which = GetIntAsString(property.Value);
 										break;
 									case "id":
 									case "buffid":
-										buffId = GetString(p.Value);
+										buffId = GetString(property.Value);
 										break;
 									case "visibility":
 									case "visible":
-										visible = GetBool(p.Value);
+										visible = GetBool(property.Value);
 										break;
 								}
 							}
@@ -718,23 +765,6 @@ namespace BuffFramework
 			}
 
 			return null;
-		}
-
-		public static bool InsensitiveTryGetValue<TKey, TValue>(Dictionary<TKey, TValue> dictionary, TKey key, out TValue value)
-		{
-			if (dictionary == null)
-				throw new ArgumentNullException(nameof(dictionary));
-
-			foreach (var kvp in dictionary)
-			{
-				if (StringComparer.OrdinalIgnoreCase.Equals(kvp.Key, key))
-				{
-					value = kvp.Value;
-					return true;
-				}
-			}
-			value = default;
-			return false;
 		}
 
 		public static int GetInt(object value)
@@ -919,6 +949,7 @@ namespace BuffFramework
 			Texture2D resizedTexture = new(sourceTexture.GraphicsDevice, newWidth, newHeight);
 			Color[] sourceData = new Color[sourceTexture.Width * sourceTexture.Height];
 			Color[] resizedData = new Color[newWidth * newHeight];
+
 			sourceTexture.GetData(sourceData);
 
 			float scaleX = (float)sourceTexture.Width / newWidth;

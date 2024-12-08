@@ -5,16 +5,92 @@ using System.Reflection.Emit;
 using HarmonyLib;
 using Microsoft.Xna.Framework.Audio;
 using StardewValley;
+using StardewValley.Objects;
 
 namespace BuffFramework
 {
 	public partial class ModEntry
 	{
+		public class Farmer_ActiveItemSetter_Patch
+		{
+			public static void Postfix()
+			{
+				invokeApplyBuffsOnEquipOnNextTick = true;
+			}
+		}
+
+		public class Farmer_shiftToolbar_Patch
+		{
+			public static void Postfix()
+			{
+				invokeApplyBuffsOnEquipOnNextTick = true;
+			}
+		}
+
+		public class Tool_attach_Patch
+		{
+			public static void Postfix()
+			{
+				invokeApplyBuffsOnEquipOnNextTick = true;
+			}
+		}
+
+		public class Farmer_farmerInit_Patch
+		{
+			public static void Postfix(Farmer __instance)
+			{
+				__instance.hat.fieldChangeEvent += Hat_fieldChangeEvent;
+				__instance.shirtItem.fieldChangeEvent += ShirtItem_fieldChangeEvent;
+				__instance.pantsItem.fieldChangeEvent += PantsItem_fieldChangeEvent;
+				__instance.boots.fieldChangeEvent += Boots_fieldChangeEvent;
+				__instance.leftRing.fieldChangeEvent += LeftRing_fieldChangeEvent;
+				__instance.rightRing.fieldChangeEvent += RightRing_fieldChangeEvent;
+			}
+
+			public static void Hat_fieldChangeEvent(Netcode.NetRef<Hat> field, Hat oldValue, Hat newValue)
+			{
+				invokeApplyBuffsOnEquipOnNextTick = true;
+			}
+
+			public static void ShirtItem_fieldChangeEvent(Netcode.NetRef<Clothing> field, Clothing oldValue, Clothing newValue)
+			{
+				invokeApplyBuffsOnEquipOnNextTick = true;
+			}
+
+			public static void PantsItem_fieldChangeEvent(Netcode.NetRef<Clothing> field, Clothing oldValue, Clothing newValue)
+			{
+				invokeApplyBuffsOnEquipOnNextTick = true;
+			}
+
+			public static void Boots_fieldChangeEvent(Netcode.NetRef<Boots> field, Boots oldValue, Boots newValue)
+			{
+				invokeApplyBuffsOnEquipOnNextTick = true;
+			}
+
+			public static void LeftRing_fieldChangeEvent(Netcode.NetRef<Ring> field,Ring oldValue, Ring newValue)
+			{
+				invokeApplyBuffsOnEquipOnNextTick = true;
+			}
+
+			public static void RightRing_fieldChangeEvent(Netcode.NetRef<Ring> field, Ring oldValue, Ring newValue)
+			{
+				invokeApplyBuffsOnEquipOnNextTick = true;
+			}
+		}
+
+		public class Farmer_doneEating_Patch
+		{
+			public static void Prefix(Farmer __instance)
+			{
+				ApplyBuffsOnEat(__instance);
+			}
+		}
+
 		public class Buff_OnAdded_Patch
 		{
 			public static void Postfix(Buff __instance)
 			{
-				if(!Config.ModEnabled)
+				if (!Config.ModEnabled)
 					return;
 
 				if (soundBuffs.ContainsKey(__instance.id))
@@ -35,7 +111,7 @@ namespace BuffFramework
 		{
 			public static void Postfix(Buff __instance)
 			{
-				if(!Config.ModEnabled)
+				if (!Config.ModEnabled)
 					return;
 
 				if (soundBuffs.ContainsKey(__instance.id))
@@ -57,57 +133,6 @@ namespace BuffFramework
 			}
 		}
 
-		public class Farmer_doneEating_Patch
-		{
-			public static void Prefix(Farmer __instance)
-			{
-				ApplyBuffsOnEat(__instance);
-			}
-		}
-
-		public class Farmer_farmerInit_Patch
-		{
-			public static void Postfix(Farmer __instance)
-			{
-				__instance.hat.fieldChangeEvent += Hat_fieldChangeEvent;
-				__instance.shirtItem.fieldChangeEvent += ShirtItem_fieldChangeEvent;
-				__instance.pantsItem.fieldChangeEvent += PantsItem_fieldChangeEvent;
-				__instance.boots.fieldChangeEvent += Boots_fieldChangeEvent;
-				__instance.leftRing.fieldChangeEvent += LeftRing_fieldChangeEvent;
-				__instance.rightRing.fieldChangeEvent += RightRing_fieldChangeEvent;
-			}
-
-			public static void Hat_fieldChangeEvent(Netcode.NetRef<StardewValley.Objects.Hat> field, StardewValley.Objects.Hat oldValue, StardewValley.Objects.Hat newValue)
-			{
-				ApplyBuffsOnEquip();
-			}
-
-			public static void ShirtItem_fieldChangeEvent(Netcode.NetRef<StardewValley.Objects.Clothing> field, StardewValley.Objects.Clothing oldValue, StardewValley.Objects.Clothing newValue)
-			{
-				ApplyBuffsOnEquip();
-			}
-
-			public static void PantsItem_fieldChangeEvent(Netcode.NetRef<StardewValley.Objects.Clothing> field, StardewValley.Objects.Clothing oldValue, StardewValley.Objects.Clothing newValue)
-			{
-				ApplyBuffsOnEquip();
-			}
-
-			public static void Boots_fieldChangeEvent(Netcode.NetRef<StardewValley.Objects.Boots> field, StardewValley.Objects.Boots oldValue, StardewValley.Objects.Boots newValue)
-			{
-				ApplyBuffsOnEquip();
-			}
-
-			public static void LeftRing_fieldChangeEvent(Netcode.NetRef<StardewValley.Objects.Ring> field, StardewValley.Objects.Ring oldValue, StardewValley.Objects.Ring newValue)
-			{
-				ApplyBuffsOnEquip();
-			}
-
-			public static void RightRing_fieldChangeEvent(Netcode.NetRef<StardewValley.Objects.Ring> field, StardewValley.Objects.Ring oldValue, StardewValley.Objects.Ring newValue)
-			{
-				ApplyBuffsOnEquip();
-			}
-		}
-
 		public class BuffManager_GetValues_Patch
 		{
 			public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
@@ -122,6 +147,7 @@ namespace BuffFramework
 						{
 							new(OpCodes.Call, typeof(ModEntry).GetMethod(nameof(GetGlowRate), BindingFlags.Public | BindingFlags.Static))
 						};
+
 						list.InsertRange(i, replacementInstructions);
 						i += replacementInstructions.Length;
 						list.RemoveAt(i);

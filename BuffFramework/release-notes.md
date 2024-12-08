@@ -2,6 +2,69 @@
 
 # Release notes
 
+## 0.6.1-unofficial.8-mouahrara
+Released on 9 December, 2024, for SMAPI 4.1.0 or later.
+* Added the **CurrentItem** field, alias **HeldItem**, to trigger a buff when an item or an item type is held by the player ✨
+* Added the **InventoryContains** field to trigger a buff when the player has an item in their inventory ✨
+
+The new **CurrentItem** field allows you to specify an item or item type that the player must hold for the buff to be applied. You can use the name of an item or one of the following item types:
+* `TypeTool`: Tools (including scythes)
+* `TypeEnchantableTool`: Enchantable tools (pickaxes, axes, hoes, watering cans, fishing rods, or pans)
+* `TypePickaxe`: Pickaxes
+* `TypeAxe`: Axes
+* `TypeHoe`: Hoes
+* `TypeScythe`: Scythes
+* `TypeWateringCan`: Watering cans
+* `TypeFishingRod`: Fishing rods
+* `TypePan`: Pans
+* `TypeShears`: Shears
+* `TypeMilkPail`: Milk pails
+* `TypeWand`: Wands
+* `TypeLantern`: Lanterns (_unused by the game_)
+* `TypeRaft`: Rafts (_unused by the game_)
+* `TypeGenericTool`: Generic tools (may be used by mods adding custom tools)
+* `TypeWeapon`: Melee weapons or slingshots
+* `TypeMeleeWeapon`: Melee weapons
+* `TypeSword`: Stabbing swords or slashing swords (in most cases, you'll want to use this instead of `TypeStabbingSword` or `TypeSlashingSword`)
+* `TypeStabbingSword`: Stabbing swords
+* `TypeSlashingSword` alias `TypeDefenseSword`: Slashing swords
+* `TypeDagger`: Daggers
+* `TypeClub` alias `TypeHammer`: Clubs
+* `TypeSlingshot`: Slingshots
+
+For example, the following content pack adds an invisible buff that decreases the player's speed by 1 when holding a Club, and a buff that grants +128 magnetism when the player has a Magnet in their inventory:
+
+```json
+{
+	"Format": "2.4.0",
+	"Changes": [
+		{
+			"Action": "EditData",
+			"Target": "aedenthorn.BuffFramework/dictionary",
+			"Entries": {
+				"YourName.YourModName/TypeClub": {
+					"Id": "YourName.YourModName/TypeClub",
+					"Source": "TheInternalNameOfYourBuffSource",
+					"CurrentItem": "TypeClub",
+					"Speed": "-1",
+					"Visible": false
+				},
+				"YourName.YourModName/Magnet": {
+					"Id": "YourName.YourModName/Magnet",
+					"Name": "{{i18n:Magnet.Name}}",
+					"Description": "{{i18n:Magnet.Description}}",
+					"Source": "TheInternalNameOfYourBuffSource",
+					"DisplaySource": "{{i18n:Magnet.Source}}",
+					"IconSheetIndex": 8,
+					"InventoryContains": "Magnet",
+					"MagneticRadius": "128"
+				}
+			}
+		}
+	]
+}
+```
+
 ## 0.6.1-unofficial.7-mouahrara
 Released on 26 August, 2024, for SMAPI 4.0.0 or later.
 * The glow effect of buffs is now paused during cutscenes and festivals ✨
@@ -42,7 +105,7 @@ Released on 12 May, 2024, for SMAPI 4.0.0 or later.
 
 The new **AdditionalBuffs** field allows you to specify a list of buffs to apply in addition to the current custom buff. It's important to note that you cannot define another custom buff added via the framework as an additional buff. The **duration**, **source**, and **visibility** of buffs added in this way match those of the custom buff in which they are defined. However, you can modify the visibility by explicitly defining the **Visible** field.
 
-For example, the following content pack adds a buff that grants +1 attack and +5 magnetism, while also applying the **Monster Musk** buff (Id: 24) invisibly when the Soul Sapper Ring is equipped:
+For example, the following content pack adds a buff that grants +1 attack and +32 magnetism, while also applying the **Monster Musk** buff (Id: 24) invisibly when the Soul Sapper Ring is equipped:
 
 ```json
 {
@@ -61,7 +124,7 @@ For example, the following content pack adds a buff that grants +1 attack and +5
 					"IconSheetIndex": 14,
 					"Ring": "Soul Sapper Ring",
 					"Attack": "1",
-					"MagneticRadius": "5",
+					"MagneticRadius": "32",
 					"AdditionalBuffs": [
 						{
 							"Id": "24",

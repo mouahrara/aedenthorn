@@ -21,13 +21,13 @@ namespace BuffFramework
 
 		public bool Remove(string key)
 		{
-			ModEntry.buffDict.Remove(key);
+			ModEntry.buffDictionary.Remove(key);
 			return dictionary.Remove(key);
 		}
 
 		public void UpdateBuffs()
 		{
-			ModEntry.UpdateBuffs();
+			ModEntry.invokeUpdateBuffsOnNextTick = true;
 		}
 	}
 }

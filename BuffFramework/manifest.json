@@ -1,11 +1,11 @@
 ﻿{
 	"Name": "Buff Framework",
 	"Author": "aedenthorn",
-	"Version": "0.6.1-unofficial.7-mouahrara",
+	"Version": "0.6.1-unofficial.8-mouahrara",
 	"Description": "Lets modders trigger buffs using Content Patcher.",
 	"UniqueID": "aedenthorn.BuffFramework",
 	"EntryDll": "BuffFramework.dll",
-	"MinimumApiVersion": "4.0.0",
+	"MinimumApiVersion": "4.1.0",
 	"UpdateKeys": [
 		"Nexus:17746",
 		"UpdateManifest:https://raw.githubusercontent.com/mouahrara/aedenthorn/master/update-manifest.json@BuffFramework"
