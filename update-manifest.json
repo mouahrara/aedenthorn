@@ -124,7 +124,7 @@
 			"Name": "Buff Framework",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#BuffFramework",
 			"Versions": [
-				{ "Version": "0.6.1-unofficial.7-mouahrara" }
+				{ "Version": "0.6.1-unofficial.8-mouahrara" }
 			]
 		},
 		"BulkAnimalPurchase": {
@@ -243,7 +243,7 @@
 			"Name": "Custom Starter Package",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#CustomStarterPackage",
 			"Versions": [
-				{ "Version": "0.2.1-unofficial.2-mouahrara" }
+				{ "Version": "0.2.1-unofficial.3-mouahrara" }
 			]
 		},
 		"CustomToolbar": {

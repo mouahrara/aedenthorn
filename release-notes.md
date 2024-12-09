@@ -2,6 +2,10 @@
 
 # Global release notes
 
+## 9 December 2024
+* Released Buff Framework version [0.6.1-unofficial.8-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BuffFramework/release-notes.md#061-unofficial8-mouahrara)
+* Released Custom Starter Package version [0.2.1-unofficial.3-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CustomStarterPackage/release-notes.md#021-unofficial3-mouahrara)
+
 ## 30 November 2024
 * Released Boss Creatures version [1.5.1-unofficial.4-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BossCreatures/release-notes.md#151-unofficial4-mouahrara)
 * Released Wall Televisions version [0.2.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/WallTelevisions/release-notes.md#021-unofficial1-mouahrara)
