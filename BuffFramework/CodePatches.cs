@@ -120,7 +120,7 @@ namespace BuffFramework
 					{
 						ICue cue = soundBuffs[__instance.id].Item2;
 
-						if (cue.IsPlaying)
+						if (cue is not null && cue.IsPlaying)
 						{
 							cue.Stop(AudioStopOptions.Immediate);
 						}
