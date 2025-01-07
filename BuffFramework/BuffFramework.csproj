@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<Version>0.6.1-unofficial.9-mouahrara</Version>
+		<Version>0.6.1-unofficial.10-mouahrara</Version>
 		<TargetFramework>net6.0</TargetFramework>
 		<EnableHarmony>true</EnableHarmony>
 	</PropertyGroup>

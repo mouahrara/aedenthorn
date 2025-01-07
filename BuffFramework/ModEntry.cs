@@ -159,7 +159,7 @@ namespace BuffFramework
 				totalStaminaRegeneration += GetFloat(staminaRegen);
 			}
 			totalHealthRegeneration += healthRegenerationRemainder;
-			Game1.player.Stamina = Math.Clamp(Game1.player.Stamina + totalStaminaRegeneration, 0, Game1.player.MaxStamina);
+			Game1.player.Stamina = Game1.player.Stamina + totalStaminaRegeneration;
 			Game1.player.health = Math.Clamp(Game1.player.health + (int)totalHealthRegeneration, 0, Game1.player.maxHealth);
 			healthRegenerationRemainder = totalHealthRegeneration % 1;
 		}
