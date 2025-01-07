@@ -2,6 +2,9 @@
 
 # Global release notes
 
+## 7 January 2025
+* Released Buff Framework version [0.6.1-unofficial.10-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BuffFramework/release-notes.md#061-unofficial10-mouahrara)
+
 ## 21 December 2024
 * Released Buff Framework version [0.6.1-unofficial.9-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BuffFramework/release-notes.md#061-unofficial9-mouahrara)
 
