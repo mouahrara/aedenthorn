@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using HarmonyLib;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -6,6 +7,7 @@ using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.ItemTypeDefinitions;
 using StardewValley.Objects;
+using Object = StardewValley.Object;
 
 namespace ConnectedGardenPots
 {
@@ -14,9 +16,14 @@ namespace ConnectedGardenPots
 	{
 		internal static IMonitor SMonitor;
 		internal static IModHelper SHelper;
+		internal static IManifest SModManifest;
 		internal static ModConfig Config;
 		internal static ModEntry context;
 
+		private const string alternativeTextureOwnerKey = "AlternativeTextureOwner";
+		private const string alternativeTextureOwnerStardewDefaultValue = "Stardew.Default";
+		private const string wallPlantersOffsetKey = "aedenthorn.WallPlanters/offset";
+		private const string disconnectedKey = "aedenthorn.ConnectedGardenPots/disconnected";
 		private static Texture2D gardenPotspriteSheet;
 
 		/// <summary>The mod entry point, called after the mod is first loaded.</summary>
@@ -26,12 +33,13 @@ namespace ConnectedGardenPots
 			Config = Helper.ReadConfig<ModConfig>();
 
 			context = this;
-
 			SMonitor = Monitor;
 			SHelper = helper;
+			SModManifest = ModManifest;
 
 			helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
 			helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
+			helper.Events.Input.ButtonPressed += Input_ButtonPressed;
 
 			// Load Harmony patches
 			try
@@ -62,6 +70,27 @@ namespace ConnectedGardenPots
 			}
 		}
 
+		private void Input_ButtonPressed(object sender, ButtonPressedEventArgs e)
+		{
+			if (!Config.EnableMod || !Context.IsWorldReady)
+				return;
+
+			if (Config.DisconnectKeys.Keybinds[0].Buttons.All(button => SHelper.Input.IsDown(button) || SHelper.Input.IsSuppressed(button)))
+			{
+				if (Game1.currentLocation.objects.TryGetValue(Game1.currentCursorTile, out Object obj) && obj is IndoorPot && !obj.modData.ContainsKey(wallPlantersOffsetKey) && (!obj.modData.ContainsKey(alternativeTextureOwnerKey) || obj.modData[alternativeTextureOwnerKey] == alternativeTextureOwnerStardewDefaultValue))
+				{
+					if (obj.modData.ContainsKey(disconnectedKey))
+					{
+						obj.modData.Remove(disconnectedKey);
+					}
+					else
+					{
+						obj.modData.Add(disconnectedKey, "T");
+					}
+				}
+			}
+		}
+
 		private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
 		{
 			try
@@ -76,24 +105,33 @@ namespace ConnectedGardenPots
 
 		private void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
 		{
-			// get Generic Mod Config Menu's API (if it's installed)
-			var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
-			if (configMenu is null)
-				return;
+			// Get Generic Mod Config Menu's API
+			IGenericModConfigMenuApi gmcm = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
 
-			// register mod
-			configMenu.Register(
-				mod: ModManifest,
-				reset: () => Config = new ModConfig(),
-				save: () => Helper.WriteConfig(Config)
-			);
+			if (gmcm is not null)
+			{
+				// Register mod
+				gmcm.Register(
+					mod: ModManifest,
+					reset: () => Config = new ModConfig(),
+					save: () => Helper.WriteConfig(Config)
+				);
 
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.ModEnabled.Name"),
-				getValue: () => Config.EnableMod,
-				setValue: value => Config.EnableMod = value
-			);
+				// Main section
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.ModEnabled.Name"),
+					getValue: () => Config.EnableMod,
+					setValue: value => Config.EnableMod = value
+				);
+				gmcm.AddKeybindList(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.DisconnectKeys.Name"),
+					tooltip: () => SHelper.Translation.Get("GMCM.DisconnectKeys.Tooltip"),
+					getValue: () => Config.DisconnectKeys,
+					setValue: value => Config.DisconnectKeys = value
+				);
+			}
 		}
 	}
 }

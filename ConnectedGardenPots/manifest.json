@@ -1,11 +1,11 @@
 ﻿{
 	"Name": "Connected Garden Pots",
 	"Author": "aedenthorn",
-	"Version": "0.1.1-unofficial.1-mouahrara",
+	"Version": "0.1.1-unofficial.2-mouahrara",
 	"Description": "Draws adjacent garden pots connected as one big garden plot.",
 	"UniqueID": "aedenthorn.ConnectedGardenPots",
 	"EntryDll": "ConnectedGardenPots.dll",
-	"MinimumApiVersion": "4.0.0",
+	"MinimumApiVersion": "4.1.0",
 	"UpdateKeys": [
 		"Nexus:11411",
 		"UpdateManifest:https://raw.githubusercontent.com/mouahrara/aedenthorn/master/update-manifest.json@ConnectedGardenPots"

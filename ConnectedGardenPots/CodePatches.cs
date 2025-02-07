@@ -10,11 +10,10 @@ namespace ConnectedGardenPots
 	public partial class ModEntry
 	{
 		internal static IndoorPot currentInstance = null;
-		internal static bool drawingConnectedPot;
-		internal static int potIndex;
-		internal static int topIndex;
-		internal static int leftIndex;
-		internal static int rightIndex;
+		internal static bool drawingConnectedPot = false;
+		internal static int topIndex = -2;
+		internal static int leftIndex = -2;
+		internal static int rightIndex = -2;
 
 		public class IndoorPot_draw_Patch
 		{
@@ -25,7 +24,6 @@ namespace ConnectedGardenPots
 
 			public static void Postfix(IndoorPot __instance, SpriteBatch spriteBatch, int x, int y, float alpha)
 			{
-				currentInstance = null;
 				if (drawingConnectedPot && gardenPotspriteSheet is not null)
 				{
 					Vector2 scaleFactor = __instance.getScale() * 4f;
@@ -47,6 +45,7 @@ namespace ConnectedGardenPots
 					}
 					drawingConnectedPot = false;
 				}
+				currentInstance = null;
 			}
 		}
 
@@ -54,7 +53,7 @@ namespace ConnectedGardenPots
 		{
 			public static bool Prefix(ref Texture2D __result)
 			{
-				if(!Config.EnableMod || currentInstance is null || currentInstance.modData.ContainsKey("aedenthorn.WallPlanters/offset") || !IsConnectedPot(currentInstance))
+				if (!Config.EnableMod || currentInstance is null || currentInstance.modData.ContainsKey(disconnectedKey) || currentInstance.modData.ContainsKey(wallPlantersOffsetKey) || (currentInstance.modData.ContainsKey(alternativeTextureOwnerKey) && currentInstance.modData[alternativeTextureOwnerKey] != alternativeTextureOwnerStardewDefaultValue) || !IsConnectedPot(currentInstance))
 					return true;
 
 				__result = gardenPotspriteSheet;
@@ -66,11 +65,10 @@ namespace ConnectedGardenPots
 		{
 			public static bool Prefix(ref Rectangle __result)
 			{
-				if(!Config.EnableMod || currentInstance is null || currentInstance.modData.ContainsKey("aedenthorn.WallPlanters/offset") || !IsConnectedPot(currentInstance))
+				if (!Config.EnableMod || currentInstance is null || currentInstance.modData.ContainsKey(disconnectedKey) || currentInstance.modData.ContainsKey(wallPlantersOffsetKey) || (currentInstance.modData.ContainsKey(alternativeTextureOwnerKey) && currentInstance.modData[alternativeTextureOwnerKey] != alternativeTextureOwnerStardewDefaultValue) || !IsConnectedPot(currentInstance))
 					return true;
 
-				drawingConnectedPot = false;
-
+				int potIndex;
 				bool[] potTiles = new bool[9];
 				Vector2 tile = currentInstance.TileLocation;
 
@@ -78,8 +76,7 @@ namespace ConnectedGardenPots
 				{
 					for (int y = 0; y < 3; y++)
 					{
-						int i = 3 * y + x;
-						potTiles[i] = Game1.currentLocation.objects.TryGetValue(tile + new Vector2(x - 1, y - 1), out Object obj) && obj is IndoorPot && !obj.modData.ContainsKey("aedenthorn.WallPlanters/offset");
+						potTiles[3 * y + x] = Game1.currentLocation.objects.TryGetValue(tile + new Vector2(x - 1, y - 1), out Object obj) && obj is IndoorPot && !obj.modData.ContainsKey(disconnectedKey) && !obj.modData.ContainsKey(wallPlantersOffsetKey) && (!obj.modData.ContainsKey(alternativeTextureOwnerKey) || obj.modData[alternativeTextureOwnerKey] == alternativeTextureOwnerStardewDefaultValue);
 					}
 				}
 				topIndex = -2;
@@ -177,13 +174,13 @@ namespace ConnectedGardenPots
 						potIndex = 0;
 					}
 				}
-				if(potIndex == 0)
+				if (potIndex == 0)
 				{
 					if (!potTiles[3])
 					{
 						leftIndex = potTiles[6] ? 2 : 0;
 					}
-					else if(!potTiles[6])
+					else if (!potTiles[6])
 					{
 						leftIndex = 4;
 					}
@@ -216,11 +213,12 @@ namespace ConnectedGardenPots
 			{
 				for (int y = 0; y < 3; y++)
 				{
-					if (Game1.currentLocation.objects.TryGetValue(tile + new Vector2(x - 1, y - 1), out Object obj) && obj is IndoorPot && !obj.modData.ContainsKey("aedenthorn.WallPlanters/offset"))
+					if (Game1.currentLocation.objects.TryGetValue(tile + new Vector2(x - 1, y - 1), out Object obj) && obj is IndoorPot && !obj.modData.ContainsKey(disconnectedKey) && !obj.modData.ContainsKey(wallPlantersOffsetKey) && (!obj.modData.ContainsKey(alternativeTextureOwnerKey) || obj.modData[alternativeTextureOwnerKey] == alternativeTextureOwnerStardewDefaultValue))
 					{
-						int i = 3 * y + x;
-						if (i % 2 == 1)
+						if ((3 * y + x) % 2 == 1)
+						{
 							return true;
+						}
 					}
 				}
 			}
