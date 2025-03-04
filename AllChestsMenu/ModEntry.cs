@@ -61,117 +61,120 @@ namespace AllChestsMenu
 
 		public void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
 		{
-			var phoneAPI = Helper.ModRegistry.GetApi<IMobilePhoneApi>("aedenthorn.MobilePhone");
+			// Get Mobile Phone's API
+			IMobilePhoneApi phoneAPI = Helper.ModRegistry.GetApi<IMobilePhoneApi>("aedenthorn.MobilePhone");
 
 			phoneAPI?.AddApp("aedenthorn.AllChestsMenu", "AllChestsMenu", OpenMenu, Helper.ModContent.Load<Texture2D>(Path.Combine("assets", "icon.png")));
 
-			// get Generic Mod Config Menu's API (if it's installed)
-			var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
-			if (configMenu is null)
-				return;
+			// Get Generic Mod Config Menu's API
+			IGenericModConfigMenuApi gmcm = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
 
-			// register mod
-			configMenu.Register(
-				mod: ModManifest,
-				reset: () => Config = new ModConfig(),
-				save: () => Helper.WriteConfig(Config)
-			);
+			if (gmcm is not null)
+			{
+				// Register mod
+				gmcm.Register(
+					mod: ModManifest,
+					reset: () => Config = new ModConfig(),
+					save: () => Helper.WriteConfig(Config)
+				);
 
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.ModEnabled.Name"),
-				getValue: () => Config.ModEnabled,
-				setValue: value => Config.ModEnabled = value
-			);
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.LimitToCurrentLocation.Name"),
-				getValue: () => Config.LimitToCurrentLocation,
-				setValue: value => Config.LimitToCurrentLocation = value
-			);
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.IncludeFridge.Name"),
-				getValue: () => Config.IncludeFridge,
-				setValue: value => Config.IncludeFridge = value
-			);
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.IncludeMiniFridges.Name"),
-				getValue: () => Config.IncludeMiniFridges,
-				setValue: value => Config.IncludeMiniFridges = value
-			);
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.IncludeShippingBin.Name"),
-				getValue: () => Config.IncludeShippingBin,
-				setValue: value => Config.IncludeShippingBin = value
-			);
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.UnrestrictedShippingBin.Name"),
-				tooltip: () => SHelper.Translation.Get("GMCM.UnrestrictedShippingBin.Tooltip"),
-				getValue: () => Config.UnrestrictedShippingBin,
-				setValue: value => Config.UnrestrictedShippingBin = value
-			);
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.IncludeMiniShippingBins.Name"),
-				getValue: () => Config.IncludeMiniShippingBins,
-				setValue: value => Config.IncludeMiniShippingBins = value
-			);
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.IncludeJunimoChests.Name"),
-				getValue: () => Config.IncludeJunimoChests,
-				setValue: value => Config.IncludeJunimoChests = value
-			);
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.IncludeAutoGrabbers.Name"),
-				getValue: () => Config.IncludeAutoGrabbers,
-				setValue: value => Config.IncludeAutoGrabbers = value
-			);
-			configMenu.AddTextOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.SecondarySortingPriority.Name"),
-				getValue: () => Config.SecondarySortingPriority,
-				setValue: value => Config.SecondarySortingPriority = value,
-				allowedValues: new string[] { "X", "Y" }
-			);
-			configMenu.AddKeybind(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.MenuKey.Name"),
-				getValue: () => Config.MenuKey,
-				setValue: value => Config.MenuKey = value
-			);
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.ModToOpen.Name"),
-				getValue: () => Config.ModToOpen,
-				setValue: value => Config.ModToOpen = value
-			);
-			configMenu.AddKeybind(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.ModKey.Name"),
-				tooltip: () => SHelper.Translation.Get("GMCM.ModKey.Tooltip"),
-				getValue: () => Config.ModKey,
-				setValue: value => Config.ModKey = value
-			);
-			configMenu.AddKeybind(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.ModKey2.Name"),
-				tooltip: () => SHelper.Translation.Get("GMCM.ModKey2.Tooltip"),
-				getValue: () => Config.ModKey2,
-				setValue: value => Config.ModKey2 = value
-			);
-			configMenu.AddKeybind(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.SwitchButton.Name"),
-				tooltip: () => SHelper.Translation.Get("GMCM.SwitchButton.Tooltip"),
-				getValue: () => Config.SwitchButton,
-				setValue: value => Config.SwitchButton = value
-			);
+				// Main section
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.ModEnabled.Name"),
+					getValue: () => Config.ModEnabled,
+					setValue: value => Config.ModEnabled = value
+				);
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.LimitToCurrentLocation.Name"),
+					getValue: () => Config.LimitToCurrentLocation,
+					setValue: value => Config.LimitToCurrentLocation = value
+				);
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.IncludeFridge.Name"),
+					getValue: () => Config.IncludeFridge,
+					setValue: value => Config.IncludeFridge = value
+				);
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.IncludeMiniFridges.Name"),
+					getValue: () => Config.IncludeMiniFridges,
+					setValue: value => Config.IncludeMiniFridges = value
+				);
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.IncludeShippingBin.Name"),
+					getValue: () => Config.IncludeShippingBin,
+					setValue: value => Config.IncludeShippingBin = value
+				);
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.UnrestrictedShippingBin.Name"),
+					tooltip: () => SHelper.Translation.Get("GMCM.UnrestrictedShippingBin.Tooltip"),
+					getValue: () => Config.UnrestrictedShippingBin,
+					setValue: value => Config.UnrestrictedShippingBin = value
+				);
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.IncludeMiniShippingBins.Name"),
+					getValue: () => Config.IncludeMiniShippingBins,
+					setValue: value => Config.IncludeMiniShippingBins = value
+				);
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.IncludeJunimoChests.Name"),
+					getValue: () => Config.IncludeJunimoChests,
+					setValue: value => Config.IncludeJunimoChests = value
+				);
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.IncludeAutoGrabbers.Name"),
+					getValue: () => Config.IncludeAutoGrabbers,
+					setValue: value => Config.IncludeAutoGrabbers = value
+				);
+				gmcm.AddTextOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.SecondarySortingPriority.Name"),
+					getValue: () => Config.SecondarySortingPriority,
+					setValue: value => Config.SecondarySortingPriority = value,
+					allowedValues: new string[] { "X", "Y" }
+				);
+				gmcm.AddKeybind(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.MenuKey.Name"),
+					getValue: () => Config.MenuKey,
+					setValue: value => Config.MenuKey = value
+				);
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.ModToOpen.Name"),
+					getValue: () => Config.ModToOpen,
+					setValue: value => Config.ModToOpen = value
+				);
+				gmcm.AddKeybind(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.ModKey.Name"),
+					tooltip: () => SHelper.Translation.Get("GMCM.ModKey.Tooltip"),
+					getValue: () => Config.ModKey,
+					setValue: value => Config.ModKey = value
+				);
+				gmcm.AddKeybind(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.ModKey2.Name"),
+					tooltip: () => SHelper.Translation.Get("GMCM.ModKey2.Tooltip"),
+					getValue: () => Config.ModKey2,
+					setValue: value => Config.ModKey2 = value
+				);
+				gmcm.AddKeybind(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.SwitchButton.Name"),
+					tooltip: () => SHelper.Translation.Get("GMCM.SwitchButton.Tooltip"),
+					getValue: () => Config.SwitchButton,
+					setValue: value => Config.SwitchButton = value
+				);
+			}
 		}
 	}
 }

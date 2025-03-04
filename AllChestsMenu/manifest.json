@@ -1,7 +1,7 @@
 ﻿{
 	"Name": "All Chests Menu",
 	"Author": "aedenthorn",
-	"Version": "0.3.2-unofficial.4-mouahrara",
+	"Version": "0.3.2-unofficial.5-mouahrara",
 	"Description": "Provides access to a menu displaying inventories of all player chests and the player backpack.",
 	"UniqueID": "aedenthorn.AllChestsMenu",
 	"EntryDll": "AllChestsMenu.dll",

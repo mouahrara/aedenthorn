@@ -2,6 +2,10 @@
 
 # Release notes
 
+## 0.3.2-unofficial.5-mouahrara
+Released on 8 March, 2025, for SMAPI 4.1.0 or later.
+* Fixed a minor bug 🔧
+
 ## 0.3.2-unofficial.4-mouahrara
 Released on 5 November, 2024, for SMAPI 4.1.0 or later.
 * The chests from the [Overworld Chests](https://www.nexusmods.com/stardewvalley/mods/7710) mod are no longer added to the All Chests Menu ✨

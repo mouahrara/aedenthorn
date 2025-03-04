@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<Version>0.3.2-unofficial.4-mouahrara</Version>
+		<Version>0.3.2-unofficial.5-mouahrara</Version>
 		<TargetFramework>net6.0</TargetFramework>
 	</PropertyGroup>
 	<ItemGroup>

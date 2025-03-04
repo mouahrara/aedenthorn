@@ -1662,6 +1662,7 @@ namespace AllChestsMenu
 			{
 				DropHeldItem();
 			}
+			Game1.getFarm().getShippingBin(Game1.player).RemoveEmptySlots();
 		}
 	}
 }
