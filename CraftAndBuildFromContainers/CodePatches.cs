@@ -129,6 +129,7 @@ namespace CraftAndBuildFromContainers
 					return true;
 
 				ConsumeIngredientsFromInventoryOrContainers(__instance.ingredients.Select(item => new KeyValuePair<string, int>(item.ItemId, item.Stack)).ToList());
+				Game1.player.Money -= __instance.Blueprint.BuildCost;
 				return false;
 			}
 		}

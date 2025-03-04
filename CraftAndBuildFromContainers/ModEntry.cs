@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using HarmonyLib;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -96,97 +95,99 @@ namespace CraftAndBuildFromContainers
 
 		private void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
 		{
-			// get Generic Mod Config Menu's API (if it's installed)
-			var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
-			if (configMenu is null)
-				return;
+			// Get Generic Mod Config Menu's API
+			IGenericModConfigMenuApi gmcm = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
 
-			// register mod
-			configMenu.Register(
-				mod: ModManifest,
-				reset: () => Config = new ModConfig(),
-				save: () => Helper.WriteConfig(Config)
-			);
+			if (gmcm is not null)
+			{
+				// Register mod
+				gmcm.Register(
+					mod: ModManifest,
+					reset: () => Config = new ModConfig(),
+					save: () => Helper.WriteConfig(Config)
+				);
 
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.ModEnabled.Name"),
-				getValue: () => Config.ModEnabled,
-				setValue: value => Config.ModEnabled = value
-			);
-			configMenu.AddKeybind(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.ToggleButton.Name"),
-				getValue: () => Config.ToggleButton,
-				setValue: value => Config.ToggleButton = value
-			);
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.EnableForShopTrading.Name"),
-				getValue: () => Config.EnableForShopTrading,
-				setValue: value => Config.EnableForShopTrading = value
-			);
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.EnableForCrafting.Name"),
-				getValue: () => Config.EnableForCrafting,
-				setValue: value => Config.EnableForCrafting = value
-			);
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.EnableForBuilding.Name"),
-				getValue: () => Config.EnableForBuilding,
-				setValue: value => Config.EnableForBuilding = value
-			);
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.EnableEverywhere.Name"),
-				getValue: () => Config.EnableEverywhere,
-				setValue: value => Config.EnableEverywhere = value
-			);
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.IncludeFridge.Name"),
-				getValue: () => Config.IncludeFridge,
-				setValue: value => Config.IncludeFridge = value
-			);
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.IncludeMiniFridges.Name"),
-				getValue: () => Config.IncludeMiniFridges,
-				setValue: value => Config.IncludeMiniFridges = value
-			);
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.IncludeShippingBin.Name"),
-				getValue: () => Config.IncludeShippingBin,
-				setValue: value => Config.IncludeShippingBin = value
-			);
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.UnrestrictedShippingBin.Name"),
-				tooltip: () => SHelper.Translation.Get("GMCM.UnrestrictedShippingBin.Tooltip"),
-				getValue: () => Config.UnrestrictedShippingBin,
-				setValue: value => Config.UnrestrictedShippingBin = value
-			);
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.IncludeMiniShippingBins.Name"),
-				getValue: () => Config.IncludeMiniShippingBins,
-				setValue: value => Config.IncludeMiniShippingBins = value
-			);
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.IncludeJunimoChests.Name"),
-				getValue: () => Config.IncludeJunimoChests,
-				setValue: value => Config.IncludeJunimoChests = value
-			);
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.IncludeAutoGrabbers.Name"),
-				getValue: () => Config.IncludeAutoGrabbers,
-				setValue: value => Config.IncludeAutoGrabbers = value
-			);
+				// Main section
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.ModEnabled.Name"),
+					getValue: () => Config.ModEnabled,
+					setValue: value => Config.ModEnabled = value
+				);
+				gmcm.AddKeybind(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.ToggleButton.Name"),
+					getValue: () => Config.ToggleButton,
+					setValue: value => Config.ToggleButton = value
+				);
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.EnableForShopTrading.Name"),
+					getValue: () => Config.EnableForShopTrading,
+					setValue: value => Config.EnableForShopTrading = value
+				);
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.EnableForCrafting.Name"),
+					getValue: () => Config.EnableForCrafting,
+					setValue: value => Config.EnableForCrafting = value
+				);
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.EnableForBuilding.Name"),
+					getValue: () => Config.EnableForBuilding,
+					setValue: value => Config.EnableForBuilding = value
+				);
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.EnableEverywhere.Name"),
+					getValue: () => Config.EnableEverywhere,
+					setValue: value => Config.EnableEverywhere = value
+				);
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.IncludeFridge.Name"),
+					getValue: () => Config.IncludeFridge,
+					setValue: value => Config.IncludeFridge = value
+				);
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.IncludeMiniFridges.Name"),
+					getValue: () => Config.IncludeMiniFridges,
+					setValue: value => Config.IncludeMiniFridges = value
+				);
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.IncludeShippingBin.Name"),
+					getValue: () => Config.IncludeShippingBin,
+					setValue: value => Config.IncludeShippingBin = value
+				);
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.UnrestrictedShippingBin.Name"),
+					tooltip: () => SHelper.Translation.Get("GMCM.UnrestrictedShippingBin.Tooltip"),
+					getValue: () => Config.UnrestrictedShippingBin,
+					setValue: value => Config.UnrestrictedShippingBin = value
+				);
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.IncludeMiniShippingBins.Name"),
+					getValue: () => Config.IncludeMiniShippingBins,
+					setValue: value => Config.IncludeMiniShippingBins = value
+				);
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.IncludeJunimoChests.Name"),
+					getValue: () => Config.IncludeJunimoChests,
+					setValue: value => Config.IncludeJunimoChests = value
+				);
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.IncludeAutoGrabbers.Name"),
+					getValue: () => Config.IncludeAutoGrabbers,
+					setValue: value => Config.IncludeAutoGrabbers = value
+				);
+			}
 		}
 
 	}

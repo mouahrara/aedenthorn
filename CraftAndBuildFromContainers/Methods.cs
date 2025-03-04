@@ -35,15 +35,6 @@ namespace CraftAndBuildFromContainers
 
 			void AddContainersFromLocation(GameLocation location)
 			{
-				if (location is FarmHouse && Config.IncludeFridge)
-				{
-					FarmHouse farmhouse = location as FarmHouse;
-
-					if (farmhouse.upgradeLevel > 0)
-					{
-						list.Add(farmhouse.fridge.Value.Items);
-					}
-				}
 				if (location is Farm farm && Config.IncludeShippingBin)
 				{
 					if (Config.UnrestrictedShippingBin)
@@ -52,7 +43,16 @@ namespace CraftAndBuildFromContainers
 					}
 					else
 					{
-						list.Add(new Inventory() { Game1.getFarm().lastItemShipped });
+						list.Add(new LastShippedInventory());
+					}
+				}
+				if (location is FarmHouse && Config.IncludeFridge)
+				{
+					FarmHouse farmhouse = location as FarmHouse;
+
+					if (farmhouse.upgradeLevel > 0)
+					{
+						list.Add(farmhouse.fridge.Value.Items);
 					}
 				}
 				foreach (Object obj in location.objects.Values)
@@ -178,7 +178,7 @@ namespace CraftAndBuildFromContainers
 				}
 				SMonitor.Log($"Missing {value} of item {recipe.Key}.");
 			}
-			RestoreShippingBinNulls();
+			ClearShippingBinNulls();
 		}
 
 		private static int ConsumeFromPlayerInventory(string itemId, int count)
@@ -211,7 +211,7 @@ namespace CraftAndBuildFromContainers
 
 			foreach (IInventory items in containers)
 			{
-				int value = items.ReduceId(itemId, count);
+				int value = (items as LastShippedInventory)?.ReduceId(itemId, count) ?? items.ReduceId(itemId, count);
 
 				consumedCount += value;
 				count -= value;
@@ -223,14 +223,10 @@ namespace CraftAndBuildFromContainers
 			return consumedCount;
 		}
 
-		private static void RestoreShippingBinNulls()
+		private static void ClearShippingBinNulls()
 		{
 			IInventory shippingBin = Game1.getFarm().getShippingBin(Game1.player);
 
-			if (Game1.getFarm().lastItemShipped is not null && Game1.getFarm().lastItemShipped.Stack <= 0)
-			{
-				Game1.getFarm().lastItemShipped = null;
-			}
 			for (int i = shippingBin.Count - 1; i >= 0; i--)
 			{
 				if (shippingBin[i] is null || shippingBin[i].Stack <= 0)
@@ -238,7 +234,6 @@ namespace CraftAndBuildFromContainers
 					shippingBin.RemoveAt(i);
 				}
 			}
-			shippingBin.Add(null);
 		}
 	}
 }

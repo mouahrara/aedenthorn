@@ -2,6 +2,11 @@
 
 # Release notes
 
+## 0.3.2-unofficial.2-mouahrara
+Released on 8 March, 2025, for SMAPI 4.1.0 or later.
+* Fixed an issue where constructing buildings did not deduct money from the wallet 🔧
+* Fixed an issue where the last shipped item was still retrievable from the shipping bin after being consumed 🔧
+
 ## 0.3.2-unofficial.1-mouahrara
 Released on 16 October, 2024, for SMAPI 4.0.0 or later.
 * Migrated to 1.6.0 and project cleanup 🚀
