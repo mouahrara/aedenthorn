@@ -2,6 +2,11 @@
 
 # Global release notes
 
+## 8 March 2025
+* Released All Chests Menu version [0.3.2-unofficial.5-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AllChestsMenu/release-notes.md#032-unofficial5-mouahrara)
+* Released Connected Garden Pots version [0.1.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/ConnectedGardenPots/release-notes.md#011-unofficial2-mouahrara)
+* Released Craft and Build from Containers version [0.3.2-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CraftAndBuildFromContainers/release-notes.md#032-unofficial2-mouahrara)
+
 ## 7 January 2025
 * Released Buff Framework version [0.6.1-unofficial.10-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BuffFramework/release-notes.md#061-unofficial10-mouahrara)
 

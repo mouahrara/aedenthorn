@@ -54,7 +54,7 @@
 			"Name": "All Chests Menu",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#AllChestsMenu",
 			"Versions": [
-				{ "Version": "0.3.2-unofficial.4-mouahrara" }
+				{ "Version": "0.3.2-unofficial.5-mouahrara" }
 			]
 		},
 		"AnimatedParrotAndPerch": {
@@ -152,7 +152,7 @@
 			"Name": "Connected Garden Pots",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#ConnectedGardenPots",
 			"Versions": [
-				{ "Version": "0.1.1-unofficial.1-mouahrara" }
+				{ "Version": "0.1.1-unofficial.2-mouahrara" }
 			]
 		},
 		"CooperativeEggHunt": {
@@ -180,7 +180,7 @@
 			"Name": "Craft and Build from Containers",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#CraftAndBuildFromContainers",
 			"Versions": [
-				{ "Version": "0.3.2-unofficial.1-mouahrara" }
+				{ "Version": "0.3.2-unofficial.2-mouahrara" }
 			]
 		},
 		"CropGrowthInfo": {
