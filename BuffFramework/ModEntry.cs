@@ -6,7 +6,6 @@ using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Buffs;
-using StardewValley.Menus;
 
 namespace BuffFramework
 {

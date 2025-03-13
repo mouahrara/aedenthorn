@@ -95,13 +95,9 @@ namespace BuffFramework
 
 				if (soundBuffs.ContainsKey(__instance.id))
 				{
-					ICue cue = null;
+					ICue cue = Game1.soundBank.GetCue(soundBuffs[__instance.id].Item1);
 
-					if (Game1.soundBank.Exists(soundBuffs[__instance.id].Item1))
-					{
-						cue = Game1.soundBank.GetCue(soundBuffs[__instance.id].Item1);
-						cue.Play();
-					};
+					cue.Play();
 					soundBuffs[__instance.id] = (soundBuffs[__instance.id].Item1, cue);
 				}
 			}
@@ -116,15 +112,12 @@ namespace BuffFramework
 
 				if (soundBuffs.ContainsKey(__instance.id))
 				{
-					if (Game1.soundBank.Exists(soundBuffs[__instance.id].Item1))
-					{
-						ICue cue = soundBuffs[__instance.id].Item2;
+					ICue cue = soundBuffs[__instance.id].Item2;
 
-						if (cue is not null && cue.IsPlaying)
-						{
-							cue.Stop(AudioStopOptions.Immediate);
-						}
-					};
+					if (cue is not null && cue.IsPlaying)
+					{
+						cue.Stop(AudioStopOptions.Immediate);
+					}
 				}
 				HealthRegenerationBuffs.Remove(__instance.id);
 				StaminaRegenerationBuffs.Remove(__instance.id);

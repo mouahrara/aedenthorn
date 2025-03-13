@@ -2,6 +2,10 @@
 
 # Release notes
 
+## 0.6.1-unofficial.11-mouahrara
+Released on 13 March, 2025, for SMAPI 4.1.0 or later.
+* Fixed Android compatibility 🔧
+
 ## 0.6.1-unofficial.10-mouahrara
 Released on 7 January, 2025, for SMAPI 4.1.0 or later.
 * Fixed an issue where it was impossible to collapse due to over-exertion 🔧
