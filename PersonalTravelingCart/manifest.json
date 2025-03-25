@@ -1,0 +1,13 @@
+﻿{
+	"Name": "Personal Traveling Cart",
+	"Author": "aedenthorn",
+	"Version": "0.3.6-unofficial.1-mouahrara",
+	"Description": "Hitches a traveling cart to your horse that you can enter, decorate, store things, and even sleep in.",
+	"UniqueID": "aedenthorn.PersonalTravelingCart",
+	"EntryDll": "PersonalTravelingCart.dll",
+	"MinimumApiVersion": "4.1.0",
+	"UpdateKeys": [
+		"Nexus:14087",
+		"UpdateManifest:https://raw.githubusercontent.com/mouahrara/aedenthorn/master/update-manifest.json@PersonalTravelingCart"
+	]
+}

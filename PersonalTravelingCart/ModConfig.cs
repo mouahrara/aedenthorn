@@ -1,14 +1,15 @@
 ﻿using StardewModdingAPI;
 
-namespace PersonalTravellingCart
+namespace PersonalTravelingCart
 {
 	public class ModConfig
 	{
 		public bool ModEnabled { get; set; } = true;
 		public bool DrawCartExterior { get; set; } = true;
 		public bool DrawCartExteriorWeather { get; set; } = true;
-		public bool Debug { get; set; } = false;
+		public bool CollisionsEnabled { get; set; } = true;
 		public SButton HitchButton { get; set; } = SButton.Back;
-		public string ThisPlayerCartLocationName { get; set; } = null;
+		public bool WarpHorsesOnDayStart { get; set; } = false;
+		public bool Debug { get; set; } = false;
 	}
 }
