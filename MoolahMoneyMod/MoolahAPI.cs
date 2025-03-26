@@ -1,23 +1,24 @@
-﻿using StardewValley;
-using System.Numerics;
+﻿using System.Numerics;
+using StardewValley;
 
-namespace Moolah
+namespace MoolahMoneyMod
 {
-	public class MoolahAPI : IMoolahAPI
+	public class MoolahMoneyModAPI : IMoolahMoneyModAPI
 	{
-		public BigInteger GetTotalMoolah(Farmer f)
+		public BigInteger GetMoolah(Farmer who)
 		{
-			return ModEntry.GetTotalMoolah(f);
+			return ModEntry.GetMoolah(who);
 		}
-		public void AddMoolah(Farmer f, BigInteger add)
+
+		public void AddMoolah(Farmer who, BigInteger value)
 		{
-			BigInteger total = ModEntry.GetTotalMoolah(f) + add;
-			f._money = ModEntry.AdjustMoney(f, total);
+			ModEntry.SetMoolah(who, ModEntry.GetMoolah(who) + value);
 		}
 	}
-	public interface IMoolahAPI
+
+	public interface IMoolahMoneyModAPI
 	{
-		public BigInteger GetTotalMoolah(Farmer f);
+		public BigInteger GetMoolah(Farmer f);
 		public void AddMoolah(Farmer f, BigInteger add);
 	}
 }

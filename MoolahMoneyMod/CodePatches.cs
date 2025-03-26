@@ -1,79 +1,73 @@
-﻿using HarmonyLib;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using StardewValley;
-using StardewValley.BellsAndWhistles;
-using StardewValley.Menus;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Text;
+using HarmonyLib;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using StardewValley;
+using StardewValley.BellsAndWhistles;
+using StardewValley.Menus;
+using StardewValley.SpecialOrders;
 using Object = StardewValley.Object;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 
-namespace Moolah
+namespace MoolahMoneyMod
 {
 	public partial class ModEntry
 	{
-		[HarmonyPatch(typeof(Farmer), nameof(Farmer._money))]
-		[HarmonyPatch(MethodType.Setter)]
 		public class Farmer__money_Setter_Patch
 		{
 			public static void Prefix(Farmer __instance, ref int value)
 			{
-				if (!Config.EnableMod)
+				if (!Config.ModEnabled)
 					return;
-				BigInteger moocha = 0;
-				if (__instance.modData.TryGetValue(moochaKey, out string moochaString))
-					moocha = BigInteger.Parse(moochaString);
-				value = AdjustMoney(__instance, value + moocha);
 
-				//SMonitor.Log($"Total money: {value + moocha}");
+				BigInteger moolah = 0;
+
+				if (__instance.modData.TryGetValue(moolahKey, out string moolahString))
+				{
+					moolah = BigInteger.Parse(moolahString);
+				}
+				value = StoreOverflowAndClampMoney(__instance, value + moolah);
 			}
 		}
-		[HarmonyPatch(typeof(Farmer), nameof(Farmer.addUnearnedMoney))]
+
 		public class Farmer_addUnearnedMoney_Patch
 		{
 			public static bool Prefix(Farmer __instance, ref int money)
 			{
-				if (!Config.EnableMod)
+				if (!Config.ModEnabled)
 					return true;
-				BigInteger total = GetTotalMoolah(__instance) + money;
-				if(total > maxValue)
+
+				BigInteger total = GetMoolah(__instance) + money;
+
+				if (total > int.MaxValue)
 				{
-					__instance._money = AdjustMoney(__instance, total);
+					SetMoolah(__instance, total);
 					return false;
 				}
 				return true;
 			}
 		}
-		[HarmonyPatch(typeof(Game1), "_newDayAfterFade")]
+
 		public class Game1_newDayAfterFade_Patch
 		{
 			public static void Prefix()
 			{
-				if (!Config.EnableMod || (!Game1.player.useSeparateWallets && !Game1.player.IsMainPlayer))
+				if (!Config.ModEnabled || (!Game1.player.useSeparateWallets && !Game1.player.IsMainPlayer))
 					return;
 
-				shippingBin.Value = Game1.getFarm().getShippingBin(Game1.player).ToArray();
-				BigInteger previous = GetTotalMoolah(Game1.player);
+				BigInteger previous = GetMoolah(Game1.player);
 				BigInteger total = new(0);
-				if (Config.Debug && false)
-				{
-					Object obj = new Object(64, 999, false, 2000000000);
-					List<Object> list = new();
-					for (int i = 0; i < 100; i++)
-					{
-						list.Add(obj);
-					}
-					shippingBin.Value = list.ToArray();
-				}
+
+				shippingBin.Value = Game1.getFarm().getShippingBin(Game1.player).ToArray();
 				foreach (Item item in shippingBin.Value)
 				{
 					BigInteger item_value = 0;
+
 					if (item is Object)
 					{
 						item_value = new BigInteger((item as Object).sellToStorePrice(-1L)) * item.Stack;
@@ -84,42 +78,37 @@ namespace Moolah
 					{
 						foreach (SpecialOrder order in Game1.player.team.specialOrders)
 						{
-							if (order.onItemShipped != null)
-							{
-								order.onItemShipped(Game1.player, item, item_value > int.MaxValue ? int.MaxValue : (int)item_value);
-							}
+							order.onItemShipped?.Invoke(Game1.player, item, item_value > int.MaxValue ? int.MaxValue : (int)item_value);
 						}
 					}
 				}
 				SMonitor.Log($"Made {total} moolah today");
-				Game1.player.Money = AdjustMoney(Game1.player, total + previous);
+				SetMoolah(Game1.player, total + previous);
 				Game1.getFarm().getShippingBin(Game1.player).Clear();
 			}
 		}
-		[HarmonyPatch(typeof(DayTimeMoneyBox), nameof(DayTimeMoneyBox.drawMoneyBox))]
+
 		public class DayTimeMoneyBox_drawMoneyBox_Patch
 		{
 			public static bool Prefix(DayTimeMoneyBox __instance, SpriteBatch b, int overrideX, int overrideY)
 			{
-				if (!Config.EnableMod || Game1.player is null)
+				if (!Config.ModEnabled || Game1.player is null)
 					return true;
 
-				BigInteger moocha = GetTotalMoolah(Game1.player);
+				BigInteger moolah = GetMoolah(Game1.player);
+				int extraDigits = moolah.ToString().Length - 8;
 
-				AccessTools.Method(typeof(DayTimeMoneyBox), "updatePosition").Invoke(__instance, new object[] { });
-				b.Draw(Game1.mouseCursors, ((overrideY != -1) ? new Vector2((overrideX == -1) ? __instance.position.X : ((float)overrideX), (float)(overrideY - 172)) : __instance.position) + new Vector2((float)(28 + ((__instance.moneyShakeTimer > 0) ? Game1.random.Next(-3, 4) : 0)), (float)(172 + ((__instance.moneyShakeTimer > 0) ? Game1.random.Next(-3, 4) : 0))), new Rectangle?(new Rectangle(340, 472, 65, 17)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.9f);
-
-				int extraDigits = moocha.ToString().Length - 8;
-				if(extraDigits > 0)
+				AccessTools.Method(typeof(DayTimeMoneyBox), "updatePosition").Invoke(__instance, Array.Empty<object>());
+				b.Draw(Game1.mouseCursors, ((overrideY != -1) ? new Vector2((overrideX == -1) ? __instance.position.X : overrideX, overrideY - 172) : __instance.position) + new Vector2(28 + ((__instance.moneyShakeTimer > 0) ? Game1.random.Next(-3, 4) : 0), 172 + ((__instance.moneyShakeTimer > 0) ? Game1.random.Next(-3, 4) : 0)), new Rectangle?(new Rectangle(340, 472, 65, 17)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.9f);
+				if (extraDigits > 0)
 				{
-					b.Draw(Game1.mouseCursors, ((overrideY != -1) ? new Vector2((overrideX == -1) ? __instance.position.X : ((float)overrideX), (float)(overrideY - 172)) : __instance.position) + new Vector2((float)(28 + ((__instance.moneyShakeTimer > 0) ? Game1.random.Next(-3, 4) : 0)) - (extraDigits) * 24, (float)(172 + ((__instance.moneyShakeTimer > 0) ? Game1.random.Next(-3, 4) : 0))), new Rectangle?(new Rectangle(340, 472, 11, 17)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.9f);
+					b.Draw(Game1.mouseCursors, ((overrideY != -1) ? new Vector2((overrideX == -1) ? __instance.position.X : overrideX, overrideY - 172) : __instance.position) + new Vector2((float)(28 + ((__instance.moneyShakeTimer > 0) ? Game1.random.Next(-3, 4) : 0)) - extraDigits * 24, 172 + ((__instance.moneyShakeTimer > 0) ? Game1.random.Next(-3, 4) : 0)), new Rectangle?(new Rectangle(340, 472, 11, 17)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.9f);
 					for (int i = 0; i < extraDigits; i++)
 					{
-						b.Draw(Game1.mouseCursors, ((overrideY != -1) ? new Vector2((overrideX == -1) ? __instance.position.X : ((float)overrideX), (float)(overrideY - 172)) : __instance.position) + new Vector2((float)(68 + ((__instance.moneyShakeTimer > 0) ? Game1.random.Next(-3, 4) : 0)) - (i + 1) * 24, (float)(180 + ((__instance.moneyShakeTimer > 0) ? Game1.random.Next(-3, 4) : 0))), new Rectangle?(new Rectangle(356, 474, 6, 15)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.9f);
+						b.Draw(Game1.mouseCursors, ((overrideY != -1) ? new Vector2((overrideX == -1) ? __instance.position.X : overrideX, overrideY - 172) : __instance.position) + new Vector2((float)(68 + ((__instance.moneyShakeTimer > 0) ? Game1.random.Next(-3, 4) : 0)) - (i + 1) * 24, 180 + ((__instance.moneyShakeTimer > 0) ? Game1.random.Next(-3, 4) : 0)), new Rectangle?(new Rectangle(356, 474, 6, 15)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.9f);
 					}
 				}
-
-				DrawMoneyDial(__instance.moneyDial, b, ((overrideY != -1) ? new Vector2((overrideX == -1) ? __instance.position.X : ((float)overrideX), (float)(overrideY - 172)) : __instance.position) + new Vector2((float)(68 + ((__instance.moneyShakeTimer > 0) ? Game1.random.Next(-3, 4) : 0)), (float)(196 + ((__instance.moneyShakeTimer > 0) ? Game1.random.Next(-3, 4) : 0))), moocha, -1);
+				DrawMoneyDial(__instance.moneyDial, b, ((overrideY != -1) ? new Vector2((overrideX == -1) ? __instance.position.X : overrideX, overrideY - 172) : __instance.position) + new Vector2((float)(68 + ((__instance.moneyShakeTimer > 0) ? Game1.random.Next(-3, 4) : 0)), 196 + ((__instance.moneyShakeTimer > 0) ? Game1.random.Next(-3, 4) : 0)), moolah);
 				if (__instance.moneyShakeTimer > 0)
 				{
 					__instance.moneyShakeTimer -= Game1.currentGameTime.ElapsedGameTime.Milliseconds;
@@ -127,229 +116,259 @@ namespace Moolah
 				return false;
 			}
 		}
-		[HarmonyPatch(typeof(InventoryPage), nameof(InventoryPage.draw))]
+
 		public class InventoryPage_draw_Patch
 		{
 			public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 			{
 				SMonitor.Log($"Transpiling InventoryPage.draw");
+				List<CodeInstruction> list = instructions.ToList();
 
-				var codes = new List<CodeInstruction>(instructions);
-				for (int i = 0; i < codes.Count; i++)
+				for (int i = 0; i < list.Count; i++)
 				{
-					if (codes[i].opcode == OpCodes.Callvirt && codes[i].operand is MethodInfo && (MethodInfo)codes[i].operand == AccessTools.PropertyGetter(typeof(Farmer), nameof(Farmer.Money)) && codes[i + 1].opcode == OpCodes.Call && codes[i + 1].operand is MethodInfo && (MethodInfo)codes[i + 1].operand == AccessTools.Method(typeof(Utility), nameof(Utility.getNumberWithCommas)))
+					if (list[i].opcode == OpCodes.Callvirt && list[i].operand is MethodInfo info && info == AccessTools.PropertyGetter(typeof(Farmer), nameof(Farmer.Money)) && list[i + 1].opcode == OpCodes.Call && list[i + 1].operand is MethodInfo info1 && info1 == AccessTools.Method(typeof(Utility), nameof(Utility.getNumberWithCommas)))
 					{
-						SMonitor.Log("Switching shown money");
-						codes[i + 1].operand = AccessTools.Method(typeof(InventoryPage_draw_Patch), nameof(InventoryPage_draw_Patch.GetMoney));
-						break;
+						list[i + 1].operand = AccessTools.Method(typeof(ModEntry), nameof(GetMoney));
+						list.RemoveAt(i--);
+					}
+					else if (list[i].opcode == OpCodes.Callvirt && list[i].operand is MethodInfo info2 && info2 == AccessTools.PropertyGetter(typeof(Farmer), nameof(Farmer.totalMoneyEarned)) && list[i + 1].opcode == OpCodes.Call && list[i + 1].operand is MethodInfo info3 && info3 == AccessTools.Method(typeof(Utility), nameof(Utility.getNumberWithCommas)))
+					{
+						list[i + 1].operand = AccessTools.Method(typeof(ModEntry), nameof(GetTotalMoneyEarned));
+						list.RemoveAt(i--);
 					}
 				}
-
-				return codes.AsEnumerable();
-			}
-
-			private static string GetMoney(int money)
-			{
-				var m = GetTotalMoolah(Game1.player);
-				if (m.ToString().Length < 10)
-					return Utility.getNumberWithCommas((int)m);
-				return string.Format("{0:#.##E+0}", m);
+				return list;
 			}
 		}
-		[HarmonyPatch(typeof(MoneyDial), nameof(MoneyDial.draw))]
+
 		public class MoneyDial_draw_Patch
 		{
-			public static bool Prefix(MoneyDial __instance)
+			public static bool Prefix()
 			{
-				if (!Config.EnableMod || string.IsNullOrEmpty(Config.Separator) || !Environment.StackTrace.Contains("ShippingMenu"))
+				if (!Config.ModEnabled || !Environment.StackTrace.Contains("ShippingMenu"))
 					return true;
-				return false;
 
+				return false;
 			}
 		}
-		[HarmonyPatch(typeof(ShippingMenu), new Type[] { typeof(IList<Item>) })]
-		[HarmonyPatch(MethodType.Constructor)]
+
 		public class ShippingMenu_Patch
 		{
 			public static void Prefix(ShippingMenu __instance)
 			{
-				if (!Config.EnableMod)
+				if (!Config.ModEnabled)
 					return;
 
 				categoryTotals.Value = new() { 0, 0, 0, 0, 0, 0 };
 				itemValues.Value = new();
 				singleItemValues.Value = new();
 				moneyDialDataList.Value = new() { new(), new(), new(), new(), new(), new() };
-
-				foreach (var j in Game1.player.displayedShippedItems)
+				foreach (Item item in Game1.player.displayedShippedItems)
 				{
-					if (j is Object)
+					if (item is Object obj)
 					{
-						Object o = j as Object;
-						int category = __instance.getCategoryIndexForObject(o);
-						int sell_to_store_price = o.sellToStorePrice(-1L);
-						BigInteger price = new BigInteger(sell_to_store_price) * o.Stack;
+						int category = __instance.getCategoryIndexForObject(obj);
+						int sell_to_store_price = obj.sellToStorePrice(-1L);
+						BigInteger price = new BigInteger(sell_to_store_price) * obj.Stack;
+
 						categoryTotals.Value[category] += price;
 						categoryTotals.Value[5] += price;
-						itemValues.Value[j] = price;
-						singleItemValues.Value[j] = sell_to_store_price;
+						itemValues.Value[item] = price;
+						singleItemValues.Value[item] = sell_to_store_price;
 					}
 				}
 			}
 		}
-		[HarmonyPatch(typeof(ShippingMenu), nameof(ShippingMenu.draw))]
-		public class ShippingMenun_draw_Patch
+
+		public class ShippingMenu_draw_Patch
 		{
-			public static void Prefix(ShippingMenu __instance, List<List<Item>> ___categoryItems, ref List<Item> __state)
+			public static void Postfix(ShippingMenu __instance, SpriteBatch b, int ___introTimer, int ___itemSlotWidth, List<MoneyDial> ___categoryDials, List<List<Item>> ___categoryItems, bool ___outro)
 			{
-				if (!Config.EnableMod || __instance.currentPage == -1)
+				if (!Config.ModEnabled || ___outro)
 					return;
-				__state = ___categoryItems[__instance.currentPage].ToList();
-				___categoryItems[__instance.currentPage].Clear();
-			}
-			public static void Postfix(ShippingMenu __instance, SpriteBatch b, int ___introTimer, int ___itemSlotWidth, int ___categoryLabelsWidth, List<MoneyDial> ___categoryDials, List<List<Item>> ___categoryItems, bool ___outro, List<Item> __state)
-			{
-				if (!Config.EnableMod || ___outro)
-					return;
-				if(__instance.currentPage == -1)
+
+				if (__instance.currentPage == -1)
 				{
-					int i = 0;
-					foreach (ClickableTextureComponent c in __instance.categories)
+					int languageSpecificOffset = (Game1.content.GetCurrentLanguage() == LocalizedContentManager.LanguageCode.ru) ? 64 : 0;
+					int index = 0;
+
+					foreach (ClickableTextureComponent category in __instance.categories)
 					{
-						if (___introTimer < 2500 - i * 500)
+						if (___introTimer < 2500 - index * 500)
 						{
-							var ct = categoryTotals.Value[i];
-							Vector2 start = c.getVector2() + new Vector2(12f, -8f);
-							for (int j = Math.Min(-4, -(ct.ToString().Length - 6)); j < 0; j++)
+							Vector2 vector = category.getVector2() + new Vector2(12 - languageSpecificOffset, -8f);
+
+							for (int n = Math.Min(0, 6 - categoryTotals.Value[index].ToString().Length); n < 0; n++)
 							{
-								b.Draw(Game1.mouseCursors, start + new Vector2((float)(-(float)___itemSlotWidth - 192 - 24 + j * 6 * 4), 12f), new Rectangle?(new Rectangle(355, 476, 7, 11)), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.88f);
+								b.Draw(Game1.mouseCursors, vector + new Vector2(-___itemSlotWidth + languageSpecificOffset - 192 - 24 + n * 6 * 4, 12f), new Rectangle(355, 476, 7, 11), Color.White, 0f, Vector2.Zero, 4f, SpriteEffects.None, 0.88f);
 							}
-							DrawMoneyDial(___categoryDials[i], b, start + new Vector2((float)(-(float)___itemSlotWidth - 192 - 72 + 4), 20f), ct, i);
+							DrawMoneyDial(___categoryDials[index], b, vector + new Vector2(-___itemSlotWidth + languageSpecificOffset - 192 - 72 + 4, 20f), categoryTotals.Value[index], index);
 						}
-						i++;
+						index++;
 					}
 				}
 				else
 				{
-					___categoryItems[__instance.currentPage] = __state;
-					Vector2 position = new Vector2((float)(__instance.xPositionOnScreen + 32), (float)(__instance.yPositionOnScreen + 32));
-					for (int k = __instance.currentTab * __instance.itemsPerCategoryPage; k < __instance.currentTab * __instance.itemsPerCategoryPage + __instance.itemsPerCategoryPage; k++)
+					int width = Math.Min(__instance.width, 1280);
+					int height = Math.Min(__instance.height, 920);
+					int x = Game1.uiViewport.Width / 2 - width / 2;
+					int y = Game1.uiViewport.Height / 2 - height / 2;
+					Vector2 location = new(x + 32, y + 32);
+
+					IClickableMenu.drawTextureBox(b, x, y, width, height, Color.White);
+					for (int i = __instance.currentTab * __instance.itemsPerCategoryPage; i < __instance.currentTab * __instance.itemsPerCategoryPage + __instance.itemsPerCategoryPage; i++)
 					{
-						if (___categoryItems[__instance.currentPage].Count > k)
+						if (___categoryItems[__instance.currentPage].Count > i)
 						{
-							Item item = ___categoryItems[__instance.currentPage][k];
-							item.drawInMenu(b, position, 1f, 1f, 1f, StackDrawType.Draw);
-							bool show_single_item_price = true;
-							if (LocalizedContentManager.CurrentLanguageLatin)
+							Item item = ___categoryItems[__instance.currentPage][i];
+							string singleItemValueText = item.DisplayName + " x" + Game1.content.LoadString("Strings\\StringsFromCSFiles:LoadGameMenu.cs.11020", singleItemValues.Value[item]);
+							string itemValueText = Game1.content.LoadString("Strings\\StringsFromCSFiles:LoadGameMenu.cs.11020", GetNumberWithSeparator(itemValues.Value[item]));
+							int textPositionX = (int)location.X + width - 64 - SpriteText.getWidthOfString(itemValueText);
+
+							item.drawInMenu(b, location, 1f, 1f, 1f, StackDrawType.Draw);
+							while (SpriteText.getWidthOfString(singleItemValueText + itemValueText) < width - 192)
 							{
-								string line_string;
-								if (show_single_item_price)
-								{
-									line_string = item.DisplayName + " x" + Game1.content.LoadString("Strings\\StringsFromCSFiles:LoadGameMenu.cs.11020", singleItemValues.Value[item]);
-								}
-								else
-								{
-									line_string = item.DisplayName + ((item.Stack > 1) ? (" x" + item.Stack.ToString()) : "");
-								}
-								SpriteText.drawString(b, line_string, (int)position.X + 64 + 12, (int)position.Y + 12, 999999, -1, 999999, 1f, 0.88f, false, -1, "", -1, SpriteText.ScrollTextAlignment.Left);
-								string dots = ".";
-								for (int l = 0; l < __instance.width - 96 - SpriteText.getWidthOfString(line_string + Game1.content.LoadString("Strings\\StringsFromCSFiles:LoadGameMenu.cs.11020", itemValues.Value[item]), 999999); l += SpriteText.getWidthOfString(" .", 999999))
-								{
-									dots += " .";
-								}
-								SpriteText.drawString(b, dots, (int)position.X + 80 + SpriteText.getWidthOfString(line_string, 999999), (int)position.Y + 8, 999999, -1, 999999, 1f, 0.88f, false, -1, "", -1, SpriteText.ScrollTextAlignment.Left);
-								SpriteText.drawString(b, Game1.content.LoadString("Strings\\StringsFromCSFiles:LoadGameMenu.cs.11020", itemValues.Value[item]), (int)position.X + __instance.width - 64 - SpriteText.getWidthOfString(Game1.content.LoadString("Strings\\StringsFromCSFiles:LoadGameMenu.cs.11020", itemValues.Value[item]), 999999), (int)position.Y + 12, 999999, -1, 999999, 1f, 0.88f, false, -1, "", -1, SpriteText.ScrollTextAlignment.Left);
+								singleItemValueText += " .";
 							}
-							else
+							if (SpriteText.getWidthOfString(singleItemValueText + itemValueText) >= width)
 							{
-								string dotsAndName;
-								if (show_single_item_price)
-								{
-									dotsAndName = item.DisplayName + " x" + Game1.content.LoadString("Strings\\StringsFromCSFiles:LoadGameMenu.cs.11020", singleItemValues.Value[item]);
-								}
-								else
-								{
-									dotsAndName = item.DisplayName + ((item.Stack > 1) ? (" x" + item.Stack.ToString()) : ".");
-								}
-								string qtyTxt = Game1.content.LoadString("Strings\\StringsFromCSFiles:LoadGameMenu.cs.11020", itemValues.Value[item]);
-								int qtyPosX = (int)position.X + __instance.width - 64 - SpriteText.getWidthOfString(Game1.content.LoadString("Strings\\StringsFromCSFiles:LoadGameMenu.cs.11020", itemValues.Value[item]), 999999);
-								SpriteText.getWidthOfString(dotsAndName + qtyTxt, 999999);
-								while (SpriteText.getWidthOfString(dotsAndName + qtyTxt, 999999) < 1123)
-								{
-									dotsAndName += " .";
-								}
-								if (SpriteText.getWidthOfString(dotsAndName + qtyTxt, 999999) >= 1155)
-								{
-									dotsAndName = dotsAndName.Remove(dotsAndName.Length - 1);
-								}
-								SpriteText.drawString(b, dotsAndName, (int)position.X + 64 + 12, (int)position.Y + 12, 999999, -1, 999999, 1f, 0.88f, false, -1, "", -1, SpriteText.ScrollTextAlignment.Left);
-								SpriteText.drawString(b, qtyTxt, qtyPosX, (int)position.Y + 12, 999999, -1, 999999, 1f, 0.88f, false, -1, "", -1, SpriteText.ScrollTextAlignment.Left);
+								singleItemValueText = singleItemValueText.Remove(singleItemValueText.Length - 1);
 							}
-							position.Y += 68f;
+							SpriteText.drawString(b, singleItemValueText, (int)location.X + 64 + 12, (int)location.Y + 12);
+							SpriteText.drawString(b, itemValueText, textPositionX, (int)location.Y + 12);
+							location.Y += 68f;
 						}
 					}
 				}
 				if (!Game1.options.SnappyMenus || (___introTimer <= 0 && !___outro))
 				{
 					Game1.mouseCursorTransparency = 1f;
-					__instance.drawMouse(b, false, -1);
+					__instance.drawMouse(b);
 				}
 			}
 		}
-		[HarmonyPatch(typeof(LocalizedContentManager), nameof(LocalizedContentManager.LoadString), new Type[] { typeof(string), typeof(object) })]
+
 		public class LocalizedContentManager_LoadString_Patch
 		{
-			public static void Prefix(string path, ref object sub1)
+			public static void Prefix1(string path, ref object sub1)
 			{
-				if (!Config.EnableMod || string.IsNullOrEmpty(Config.Separator) || path != "Strings\\StringsFromCSFiles:LoadGameMenu.cs.11020" || (sub1 is not int && sub1 is not BigInteger))
+				object sub2 = null;
+				object sub3 = null;
+
+				Prefix(path, ref sub1, ref sub2, ref sub3);
+			}
+
+			public static void Prefix2(string path, ref object sub1, ref object sub2)
+			{
+				object sub3 = null;
+
+				Prefix(path, ref sub1, ref sub2, ref sub3);
+			}
+
+			public static void Prefix3(string path, ref object sub1, ref object sub2, ref object sub3)
+			{
+				Prefix(path, ref sub1, ref sub2, ref sub3);
+			}
+
+			public static void Prefix4(string path, ref object[] substitutions)
+			{
+				if (substitutions is not null)
+				{
+					object sub1 = substitutions.Length > 0 ? substitutions[0] : null;
+					object sub2 = substitutions.Length > 1 ? substitutions[1] : null;
+					object sub3 = substitutions.Length > 2 ? substitutions[2] : null;
+
+					Prefix(path, ref sub1, ref sub2, ref sub3);
+				}
+			}
+
+			public static void Prefix(string path, ref object sub1, ref object sub2, ref object sub3)
+			{
+				if (!Config.ModEnabled || string.IsNullOrEmpty(Config.Separator))
 					return;
-				sub1 = CheckIntToString(sub1.ToString());
+
+				if ((sub1 is int || sub1 is BigInteger) && (path == "Strings\\UI:AnimalQuery_Sell" || path == "Strings\\UI:Inventory_CurrentFunds" || path == "Strings\\UI:Inventory_TotalEarnings" || path == "Strings\\UI:Inventory_CurrentFunds_Separate" || path == "Strings\\UI:Inventory_TotalEarnings_Separate" || path == "Strings\\UI:LetterViewer_MoneyIncluded" || path == "Strings\\UI:ItemList_ItemsLostValue" || path == "Strings\\Locations:BusStop_BuyTicketToDesert" || path == "Strings\\Locations:ScienceHouse_Carpenter_UpgradeHouse2" || path == "Strings\\Locations:BuyTicket" || path == "Strings\\StringsFromMaps:MovieTheater_CranePlay" || path == "Strings\\1_6_Strings:GoldenParrot_Yes" || path == "Strings\\1_6_Strings:Joja_Debt_Notice" || path == "Strings\\StringsFromCSFiles:Event.cs.1058" || path == "Strings\\StringsFromCSFiles:Event.cs.1068" || path == "Strings\\StringsFromCSFiles:LoadGameMenu.cs.11020" || path == "Strings\\StringsFromCSFiles:FishingQuest.cs.13248" || path == "Strings\\StringsFromCSFiles:FishingQuest.cs.13274" || path == "Strings\\StringsFromCSFiles:ItemDeliveryQuest.cs.13607"))
+				{
+					sub1 = CheckIntToString(sub1.ToString());
+				}
+				if ((sub2 is int || sub2 is BigInteger) && (path == "Strings\\UI:Chat_SeparatedWallets" || path == "Strings\\Locations:MineCart_DestinationWithPrice"))
+				{
+					sub2 = CheckIntToString(sub2.ToString());
+				}
+				if ((sub3 is int || sub3 is BigInteger) && (path == "Strings\\UI:Chat_SentMoney"))
+				{
+					sub3 = CheckIntToString(sub3.ToString());
+				}
 			}
 		}
-		[HarmonyPatch(typeof(IClickableMenu), nameof(IClickableMenu.drawHoverText), new Type[] { typeof(SpriteBatch), typeof(StringBuilder), typeof(SpriteFont), typeof(int), typeof(int), typeof(int), typeof(string), typeof(int), typeof(string[]), typeof(Item), typeof(int), typeof(int), typeof(int), typeof(int), typeof(int), typeof(float), typeof(CraftingRecipe), typeof(IList<Item>) })]
+
+		public class Utility_getNumberWithCommas_Patch
+		{
+			public static bool Prefix(int number, ref string __result)
+			{
+				if (!Config.ModEnabled || string.IsNullOrEmpty(Config.Separator))
+					return true;
+
+				__result = GetNumberWithSeparator(number);
+				return false;
+			}
+		}
+
 		public class IClickableMenu_drawHoverText_Patch
 		{
 			public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 			{
 				SMonitor.Log($"Transpiling IClickableMenu.drawHoverText");
+				List<CodeInstruction> list =instructions.ToList();
 
-				var codes = new List<CodeInstruction>(instructions);
-				for (int i = 0; i < codes.Count; i++)
+				for (int i = 0; i < list.Count; i++)
 				{
-					if (codes[i].opcode == OpCodes.Call && codes[i].operand is MethodInfo && (MethodInfo)codes[i].operand == AccessTools.Method(typeof(int), nameof(int.ToString)))
+					if (list[i].opcode == OpCodes.Call && list[i].operand is MethodInfo info && info == AccessTools.Method(typeof(int), nameof(int.ToString)))
 					{
-						SMonitor.Log("Checking int to string");
-						codes.Insert(i + 1, new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModEntry), nameof(ModEntry.CheckIntToString))));
+						list.Insert(i + 1, new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModEntry), nameof(CheckIntToString))));
 						i++;
 					}
 				}
-
-				return codes.AsEnumerable();
+				return list;
 			}
-
 		}
-		[HarmonyPatch(typeof(ShopMenu), nameof(ShopMenu.draw))]
+
 		public class ShopMenu_draw_Patch
 		{
 			public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 			{
 				SMonitor.Log($"Transpiling ShopMenu.draw");
+				List<CodeInstruction> list = instructions.ToList();
 
-				var codes = new List<CodeInstruction>(instructions);
-				for (int i = 0; i < codes.Count; i++)
+				for (int i = 0; i < list.Count; i++)
 				{
-					if (codes[i].opcode == OpCodes.Call && codes[i].operand is MethodInfo && (MethodInfo)codes[i].operand == AccessTools.Method(typeof(int), nameof(int.ToString)))
+					if (list[i].opcode == OpCodes.Call && list[i].operand is MethodInfo info && info == AccessTools.Method(typeof(int), nameof(int.ToString)))
 					{
-						SMonitor.Log("Checking int to string");
-						codes.Insert(i + 1, new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModEntry), nameof(ModEntry.CheckIntToString))));
+						list.Insert(i + 1, new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ModEntry), nameof(CheckIntToString))));
 						i++;
 					}
 				}
-
-				return codes.AsEnumerable();
+				return list;
 			}
-
 		}
 
+		public class SaveFileSlot_drawSlotMoney_Patch
+		{
+			public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+			{
+				SMonitor.Log($"Transpiling SaveFileSlot.drawSlotMoney");
+				List<CodeInstruction> list = instructions.ToList();
+
+				for (int i = 0; i < list.Count; i++)
+				{
+					if (list[i].opcode == OpCodes.Callvirt && list[i].operand is MethodInfo info && info == AccessTools.PropertyGetter(typeof(Farmer), nameof(Farmer.Money)) && list[i + 1].opcode == OpCodes.Call && list[i + 1].operand is MethodInfo info1 && info1 == AccessTools.Method(typeof(Utility), nameof(Utility.getNumberWithCommas)))
+					{
+						list[i + 1].operand = AccessTools.Method(typeof(ModEntry), nameof(GetMoney));
+						list.RemoveAt(i--);
+					}
+				}
+				return list;
+			}
+		}
 	}
 }

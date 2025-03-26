@@ -1,26 +1,24 @@
-﻿using StardewModdingAPI.Utilities;
-using System;
-using System.Numerics;
+﻿using System.Numerics;
 
-namespace Moolah
+namespace MoolahMoneyMod
 {
 	public class MoneyDialData
 	{
-		public BigInteger previousTarget = new();
 		public BigInteger currentValue = new();
-		public BigInteger flipSpeed = new();
-		public BigInteger soundTime = new();
-		public BigInteger moneyShineTimer = new();
+		public BigInteger previousTargetValue = new();
+		public BigInteger speed = new();
+		public BigInteger soundTimer = new();
 		public BigInteger moneyMadeAccumulator = new();
+		public BigInteger moneyShineTimer = new();
 
 		public void Reset()
 		{
-			previousTarget = 0;
 			currentValue = 0;
-			flipSpeed = 0;
-			soundTime = 0;
-			moneyShineTimer = 0;
+			previousTargetValue = 0;
+			speed = 0;
+			soundTimer = 0;
 			moneyMadeAccumulator = 0;
+			moneyShineTimer = 0;
 		}
 	}
 }
