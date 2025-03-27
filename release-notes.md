@@ -2,6 +2,9 @@
 
 # Global release notes
 
+## 28 March 2025
+* Released Moolah Money Mod version [0.6.6-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/MoolahMoneyMod/release-notes.md#066-unofficial2-mouahrara)
+
 ## 27 March 2025
 * Released Moolah Money Mod version [0.6.6-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/MoolahMoneyMod/release-notes.md#066-unofficial1-mouahrara)
 * Released Overworld Chests version [0.5.4-unofficial.3-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/OverworldChests/release-notes.md#054-unofficial3-mouahrara)
