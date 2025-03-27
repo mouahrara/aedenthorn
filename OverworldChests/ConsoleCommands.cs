@@ -16,7 +16,7 @@ namespace OverworldChests
 			if (!IsSaveLoaded())
 				return;
 
-			RemoveChests();
+			RemoveChests(true);
 			SMonitor.Log("Overworld chests removed.", LogLevel.Info);
 		}
 
@@ -25,7 +25,7 @@ namespace OverworldChests
 			if (!IsSaveLoaded())
 				return;
 
-			SpawnChests();
+			SpawnChests(true);
 			SMonitor.Log("Overworld chests spawned.", LogLevel.Info);
 		}
 
@@ -34,7 +34,7 @@ namespace OverworldChests
 			if (!IsSaveLoaded())
 				return;
 
-			RespawnChests();
+			RespawnChests(true);
 			SMonitor.Log("Overworld chests respawned.", LogLevel.Info);
 		}
 

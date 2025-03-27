@@ -1,7 +1,8 @@
 {
 	// GMCM
 	"GMCM.ModEnabled.Name": "Activer le Mod",
-	"GMCM.AllowIndoorSpawns.Name": "Autoriser les apparitions en intérieur",
+	"GMCM.IncludeIndoorLocations.Name": "Inclure les lieux intérieurs",
+	"GMCM.IncludeIndoorLocations.Tooltip": "Détermine si des coffres apparaissent dans les lieux intérieurs.",
 	"GMCM.RespawnInterval.Name": "Intervalle de réapparition",
 	"GMCM.RoundNumberOfChestsUp.Name": "Arrondir le nombre de coffres vers le haut",
 	"GMCM.RoundNumberOfChestsUp.Tooltip": "Détermine s'il faut arrondir les fractions vers le haut, de sorte que pratiquement tous les emplacements, peu importe leur taille, auront au moins un coffre. Sinon, ils seront arrondis vers le bas et les petits emplacements n'auront probablement aucun coffre.",

@@ -4,8 +4,8 @@ namespace OverworldChests
 {
 	public class ModConfig
 	{
-		public bool EnableMod { get; set; } = true;
-		public bool AllowIndoorSpawns { get; set; } = true;
+		public bool ModEnabled { get; set; } = true;
+		public bool IncludeIndoorLocations { get; set; } = true;
 		public string OnlyAllowLocations { get; set; } = "";
 		public string DisallowLocations { get; set; } = "";
 		public bool RoundNumberOfChestsUp { get; set; } = false;

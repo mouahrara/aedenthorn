@@ -1,7 +1,8 @@
 {
 	// GMCM
 	"GMCM.ModEnabled.Name": "Mod Enabled",
-	"GMCM.AllowIndoorSpawns.Name": "Allow Indoor Spawns",
+	"GMCM.IncludeIndoorLocations.Name": "Include Indoor Locations",
+	"GMCM.IncludeIndoorLocations.Tooltip": "Determines whether chests spawn in indoor locations.",
 	"GMCM.RespawnInterval.Name": "Respawn Interval",
 	"GMCM.RoundNumberOfChestsUp.Name": "Round Number Of Chests Up",
 	"GMCM.RoundNumberOfChestsUp.Tooltip": "Determines whether to round fractions up, so pretty much any location no matter how small will have at least one chest. Otherwise, it will round down and small locations will likely have no chests.",

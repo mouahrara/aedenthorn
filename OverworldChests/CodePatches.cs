@@ -9,14 +9,10 @@ namespace OverworldChests
 		{
 			public static bool Prefix(Chest __instance)
 			{
-				if (!Config.EnableMod)
-					return true;
-				if (!__instance.modData.ContainsKey(modKey))
-					return true;
-				if (!__instance.Location.objects.ContainsKey(__instance.TileLocation) || (__instance.Items.Count > 0 && __instance.Items[0] != null))
+				if (!Config.ModEnabled || !__instance.modData.ContainsKey(modKey) || !__instance.Location.objects.ContainsKey(__instance.TileLocation) || (__instance.Items.Count > 0 && __instance.Items[0] is not null))
 					return true;
 
-				SMonitor.Log($"removing chest at {__instance.TileLocation}");
+				SMonitor.Log($"Removing chest at {__instance.TileLocation}");
 				__instance.Location.objects.Remove(__instance.TileLocation);
 				return false;
 			}
@@ -26,15 +22,11 @@ namespace OverworldChests
 		{
 			public static void Postfix(Chest __instance)
 			{
-				if (!Config.EnableMod)
+				if (!Config.ModEnabled || !__instance.modData.ContainsKey(modKey) || !__instance.modData.ContainsKey(modCoinKey))
 					return;
-				if (!__instance.modData.ContainsKey(modKey))
-					return;
-				if (!__instance.modData.ContainsKey(modCoinKey))
-					return;
+
 				Game1.player.Money += int.Parse(__instance.modData[modCoinKey]);
 				__instance.modData.Remove(modCoinKey);
-				return;
 			}
 		}
 	}
