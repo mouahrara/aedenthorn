@@ -66,19 +66,22 @@ namespace MoolahMoneyMod
 				shippingBin.Value = Game1.getFarm().getShippingBin(Game1.player).ToArray();
 				foreach (Item item in shippingBin.Value)
 				{
-					BigInteger item_value = 0;
+					if (item is not null)
+					{
+						BigInteger item_value = 0;
 
-					if (item is Object)
-					{
-						item_value = new BigInteger((item as Object).sellToStorePrice(-1L)) * item.Stack;
-						total += item_value;
-					}
-					Game1.player.displayedShippedItems.Add(item);
-					if (Game1.player.team.specialOrders is not null)
-					{
-						foreach (SpecialOrder order in Game1.player.team.specialOrders)
+						if (item is Object obj)
 						{
-							order.onItemShipped?.Invoke(Game1.player, item, item_value > int.MaxValue ? int.MaxValue : (int)item_value);
+							item_value = new BigInteger(obj.sellToStorePrice()) * item.Stack;
+							total += item_value;
+						}
+						Game1.player.displayedShippedItems.Add(item);
+						if (Game1.player.team.specialOrders is not null)
+						{
+							foreach (SpecialOrder order in Game1.player.team.specialOrders)
+							{
+								order.onItemShipped?.Invoke(Game1.player, item, item_value > int.MaxValue ? int.MaxValue : (int)item_value);
+							}
 						}
 					}
 				}
