@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using StardewValley;
 using StardewValley.Buildings;
 using StardewValley.Inventories;
@@ -183,7 +184,21 @@ namespace CraftAndBuildFromContainers
 
 		private static int ConsumeFromPlayerInventory(string itemId, int count)
 		{
-			return Game1.player.Items.ReduceId(itemId, count);
+			itemId = ItemRegistry.QualifyItemId(itemId);
+			if (itemId == "(O)73")
+			{
+				Game1.netWorldState.Value.GoldenWalnuts = Math.Max(0, Game1.netWorldState.Value.GoldenWalnuts - count);
+				return count;
+			}
+			else if (itemId == "(O)858")
+			{
+				Game1.player.QiGems = Math.Max(0, Game1.player.QiGems - count);
+				return count;
+			}
+			else
+			{
+				return Game1.player.Items.ReduceId(itemId, count);
+			}
 		}
 
 		private static int ConsumeFromAdditionalMaterials(List<IInventory> additionalMaterials, string itemId, int count)

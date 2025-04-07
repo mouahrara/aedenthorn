@@ -2,6 +2,10 @@
 
 # Release notes
 
+## 0.3.2-unofficial.4-mouahrara
+Released on 8 April, 2025, for SMAPI 4.1.0 or later.
+* Fixed an issue where Golden Walnuts and Qi Gems were not consumed as trade items in shops 🔧
+
 ## 0.3.2-unofficial.3-mouahrara
 Released on 13 March, 2025, for SMAPI 4.1.0 or later.
 * Fixed Android compatibility 🔧
