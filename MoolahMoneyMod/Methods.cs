@@ -72,7 +72,7 @@ namespace MoolahMoneyMod
 
 		private static void DrawMoneyDial(MoneyDial moneyDial, SpriteBatch b, Vector2 position, BigInteger target, int index = -1)
 		{
-			MoneyDialData data = index < 0 ? moneyDialData.Value : moneyDialDataList.Value[index];
+			MoneyDialData data = (0 <= index && index < moneyDialDataList.Value.Count) ? moneyDialDataList.Value[index] : moneyDialData.Value;
 			int numDigits = data.currentValue.ToString().Length;
 
 			if (data.previousTargetValue != target)
@@ -146,6 +146,7 @@ namespace MoolahMoneyMod
 			bool significant = false;
 			bool showSeparator = !string.IsNullOrEmpty(Config.Separator);
 
+			numDigits = data.currentValue.ToString().Length;
 			for (int i = 0; i < numDigits; i++)
 			{
 				int currentDigit = int.Parse(data.currentValue.ToString()[i].ToString());
@@ -164,13 +165,13 @@ namespace MoolahMoneyMod
 				}
 				xPosition += 24;
 			}
-			if (index < 0)
+			if (0 <= index && index < moneyDialDataList.Value.Count)
 			{
-				moneyDialData.Value = data;
+				moneyDialDataList.Value[index] = data;
 			}
 			else
 			{
-				moneyDialDataList.Value[index] = data;
+				moneyDialData.Value = data;
 			}
 		}
 

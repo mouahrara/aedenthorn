@@ -2,6 +2,10 @@
 
 # Release notes
 
+## 0.6.6-unofficial.3-mouahrara
+Released on 8 April, 2025, for SMAPI 4.1.0 or later.
+* Fixed `IndexOutOfRangeException` when the number of digits in the money amount decreased 🔧
+
 ## 0.6.6-unofficial.2-mouahrara
 Released on 28 March, 2025, for SMAPI 4.1.0 or later.
 * Fixed an issue that could cause a crash at the end of the day if another mod added a `null` item to the shipping bin 🔧
