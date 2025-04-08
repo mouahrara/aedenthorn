@@ -180,7 +180,7 @@
 			"Name": "Craft and Build from Containers",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#CraftAndBuildFromContainers",
 			"Versions": [
-				{ "Version": "0.3.2-unofficial.3-mouahrara" }
+				{ "Version": "0.3.2-unofficial.4-mouahrara" }
 			]
 		},
 		"CropGrowthInfo": {
@@ -383,7 +383,7 @@
 			"Name": "Moolah Money Mod",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#MoolahMoneyMod",
 			"Versions": [
-				{ "Version": "0.6.6-unofficial.2-mouahrara" }
+				{ "Version": "0.6.6-unofficial.3-mouahrara" }
 			]
 		},
 		"MoveableMailbox": {

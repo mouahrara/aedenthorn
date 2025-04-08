@@ -2,6 +2,10 @@
 
 # Global release notes
 
+## 8 April 2025
+* Released Craft and Build from Containers version [0.3.2-unofficial.4-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CraftAndBuildFromContainers/release-notes.md#032-unofficial4-mouahrara)
+* Released Moolah Money Mod version [0.6.6-unofficial.3-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/MoolahMoneyMod/release-notes.md#066-unofficial3-mouahrara)
+
 ## 28 March 2025
 * Released Moolah Money Mod version [0.6.6-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/MoolahMoneyMod/release-notes.md#066-unofficial2-mouahrara)
 
