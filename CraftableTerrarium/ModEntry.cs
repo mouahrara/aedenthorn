@@ -61,6 +61,9 @@ namespace CraftableTerrarium
 				harmony.Patch(
 					original: AccessTools.Method(typeof(CraftingPage), "layoutRecipes"),
 					transpiler: new HarmonyMethod(typeof(CraftingPage_layoutRecipes_Patch), nameof(CraftingPage_layoutRecipes_Patch.Transpiler))
+					{
+						after = new string[] { "spacechase0.SpaceCore" }
+					}
 				);
 				harmony.Patch(
 					original: AccessTools.Method(typeof(Furniture), "loadDescription"),

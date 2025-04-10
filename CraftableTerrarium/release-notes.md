@@ -2,6 +2,10 @@
 
 # Release notes
 
+## 0.1.3-unofficial.3-mouahrara
+Released on 10 April, 2025, for SMAPI 4.1.0 or later.
+* Fixed compatibility with [SpaceCore](https://www.nexusmods.com/stardewvalley/mods/1348) 🔧
+
 ## 0.1.3-unofficial.2-mouahrara
 Released on 21 June, 2024, for SMAPI 4.0.0 or later.
 * Fixed a minor bug 🔧
