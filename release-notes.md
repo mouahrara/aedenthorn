@@ -2,6 +2,9 @@
 
 # Global release notes
 
+## 12 April 2025
+* Released Craftable Terrarium version [0.1.3-unofficial.4-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CraftableTerrarium/release-notes.md#013-unofficial4-mouahrara)
+
 ## 10 April 2025
 * Released Craftable Terrarium version [0.1.3-unofficial.3-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CraftableTerrarium/release-notes.md#013-unofficial3-mouahrara)
 * Released Mayo Mart version [0.1.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/MayoMart/release-notes.md#011-unofficial2-mouahrara)

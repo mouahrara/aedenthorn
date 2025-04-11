@@ -173,7 +173,7 @@
 			"Name": "Craftable Terrarium",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#CraftableTerrarium",
 			"Versions": [
-				{ "Version": "0.1.3-unofficial.3-mouahrara" }
+				{ "Version": "0.1.3-unofficial.4-mouahrara" }
 			]
 		},
 		"CraftAndBuildFromContainers": {
