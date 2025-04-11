@@ -2,6 +2,10 @@
 
 # Release notes
 
+## 0.1.3-unofficial.4-mouahrara
+Released on 12 April, 2025, for SMAPI 4.1.0 or later.
+* Fixed an issue where the craftable terrarium asset might not be created 🔧
+
 ## 0.1.3-unofficial.3-mouahrara
 Released on 10 April, 2025, for SMAPI 4.1.0 or later.
 * Fixed compatibility with [SpaceCore](https://www.nexusmods.com/stardewvalley/mods/1348) 🔧

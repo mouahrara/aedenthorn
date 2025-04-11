@@ -14,11 +14,11 @@ namespace CraftableTerrarium
 {
 	public partial class ModEntry : Mod
 	{
-		internal static ModEntry context;
-
-		internal static ModConfig Config;
 		internal static IMonitor SMonitor;
 		internal static IModHelper SHelper;
+		internal static IManifest SModManifest;
+		internal static ModConfig Config;
+		internal static ModEntry context;
 
 		private static string assetDirectory;
 		private static string textureFile;
@@ -29,9 +29,10 @@ namespace CraftableTerrarium
 		{
 			Config = Helper.ReadConfig<ModConfig>();
 
-			SMonitor = Monitor;
-			SHelper = Helper;
 			context = this;
+			SMonitor = Monitor;
+			SHelper = helper;
+			SModManifest = ModManifest;
 
 			helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
 			helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
@@ -95,13 +96,6 @@ namespace CraftableTerrarium
 
 		private void Content_AssetRequested(object sender, AssetRequestedEventArgs e)
 		{
-			if (e.NameWithoutLocale.IsEquivalentTo("LooseSprites/Cursors"))
-			{
-				if (Context.IsGameLaunched && !Context.IsWorldReady)
-				{
-					CreateTextureFile();
-				}
-			}
 			if (e.NameWithoutLocale.IsEquivalentTo("Data/CraftingRecipes"))
 			{
 				e.Edit(asset =>
@@ -127,34 +121,49 @@ namespace CraftableTerrarium
 			ShowFrogs(Game1.player.currentLocation);
 		}
 
+		private static void GameLoop_OneTickAfterGameLaunched(object sender, UpdateTickedEventArgs e)
+		{
+			SHelper.Events.GameLoop.UpdateTicked -= GameLoop_OneTickAfterGameLaunched;
+			SHelper.Events.GameLoop.UpdateTicked += GameLoop_TwoTicksAfterGameLaunched;
+		}
+
+		private static void GameLoop_TwoTicksAfterGameLaunched(object sender, UpdateTickedEventArgs e)
+		{
+			CreateTextureFile();
+			SHelper.Events.GameLoop.UpdateTicked -= GameLoop_TwoTicksAfterGameLaunched;
+		}
+
 		public void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
 		{
 			TokensUtility.Register();
+			SHelper.Events.GameLoop.UpdateTicked += GameLoop_OneTickAfterGameLaunched;
 
-			// get Generic Mod Config Menu's API (if it's installed)
-			var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
-			if (configMenu is null)
-				return;
+			// Get Generic Mod Config Menu's API
+			IGenericModConfigMenuApi gmcm = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
 
-			// register mod
-			configMenu.Register(
-				mod: ModManifest,
-				reset: () => Config = new ModConfig(),
-				save: () => Helper.WriteConfig(Config)
-			);
+			if (gmcm is not null)
+			{
+				// Register mod
+				gmcm.Register(
+					mod: ModManifest,
+					reset: () => Config = new ModConfig(),
+					save: () => Helper.WriteConfig(Config)
+				);
 
-			configMenu.AddNumberOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.Frogs.Name"),
-				getValue: () => Config.Frogs,
-				setValue: value => Config.Frogs = value
-			);
-			configMenu.AddTextOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.Sound.Name"),
-				getValue: () => Config.Sound,
-				setValue: value => Config.Sound = value
-			);
+				// Main section
+				gmcm.AddNumberOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.Frogs.Name"),
+					getValue: () => Config.Frogs,
+					setValue: value => Config.Frogs = value
+				);
+				gmcm.AddTextOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.Sound.Name"),
+					getValue: () => Config.Sound,
+					setValue: value => Config.Sound = value
+				);
+			}
 		}
 
 		private void Player_Warped(object sender, WarpedEventArgs e)

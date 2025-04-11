@@ -15,7 +15,7 @@ namespace CraftableTerrarium
 
 		public static void DoAction()
 		{
-			if(!string.IsNullOrEmpty(ModEntry.Config.Sound))
+			if (!string.IsNullOrEmpty(ModEntry.Config.Sound))
 			{
 				DelayedAction.playSoundAfterDelay(ModEntry.Config.Sound, Game1.random.Next(1000, 3000));
 			}

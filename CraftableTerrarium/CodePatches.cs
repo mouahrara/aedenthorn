@@ -156,7 +156,7 @@ namespace CraftableTerrarium
 		{
 			public static void Postfix(Object __instance, GameLocation location)
 			{
-				if(IsCraftableTerrarium(__instance))
+				if (IsCraftableTerrarium(__instance))
 				{
 					ShowFrogs(location);
 				}
@@ -169,7 +169,7 @@ namespace CraftableTerrarium
 			{
 				if (IsCraftableTerrarium(__instance))
 				{
-					if(!string.IsNullOrEmpty(Config.Sound))
+					if (!string.IsNullOrEmpty(Config.Sound))
 					{
 						Game1.playSound(Config.Sound);
 					}
@@ -186,7 +186,7 @@ namespace CraftableTerrarium
 				{
 					TemporaryAnimatedSprite sprite = who.currentLocation.temporarySprites.FirstOrDefault(s => s is TerrariumFrogs && (s as TerrariumFrogs).tile == __instance.TileLocation);
 
-					if(sprite is TerrariumFrogs)
+					if (sprite is TerrariumFrogs)
 					{
 						context.Monitor.Log($"Animating terrarium at tile {__instance.TileLocation}");
 						TerrariumFrogs.DoAction();
