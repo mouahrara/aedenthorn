@@ -142,7 +142,7 @@ namespace WeatherTotem
 					Game1.pauseThenMessage(2000, SHelper.Translation.GetTranslations().Any(t => t.Key.Equals($"message.{response}")) ? SHelper.Translation.Get($"message.{response}") : SHelper.Translation.Get($"message.Default"));
 				}
 				Game1.screenGlow = false;
-				if(!string.IsNullOrEmpty(Config.InvokeSound))
+				if (!string.IsNullOrEmpty(Config.InvokeSound))
 				{
 					currentLocation.playSound(Config.InvokeSound);
 				}

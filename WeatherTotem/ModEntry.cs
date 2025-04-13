@@ -12,6 +12,7 @@ namespace WeatherTotem
 	{
 		internal static IMonitor SMonitor;
 		internal static IModHelper SHelper;
+		internal static IManifest SModManifest;
 		internal static ModConfig Config;
 		internal static ModEntry context;
 
@@ -20,9 +21,9 @@ namespace WeatherTotem
 			Config = Helper.ReadConfig<ModConfig>();
 
 			context = this;
-
 			SMonitor = Monitor;
 			SHelper = helper;
+			SModManifest = ModManifest;
 
 			helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
 			helper.Events.Content.AssetRequested += Content_AssetRequested;
@@ -60,8 +61,8 @@ namespace WeatherTotem
 					IDictionary<string, ObjectData> data = asset.AsDictionary<string, ObjectData>().Data;
 
 					data["681"].Name = "Weather Totem";
-					data["681"].DisplayName = "[aedenthorn.WeatherTotems_i18n item.weather_totem.name]";
-					data["681"].Description = "[aedenthorn.WeatherTotems_i18n item.weather_totem.description]";
+					data["681"].DisplayName = "[aedenthorn.WeatherTotem_i18n item.weather_totem.name]";
+					data["681"].Description = "[aedenthorn.WeatherTotem_i18n item.weather_totem.description]";
 				});
 			}
 		}
@@ -70,69 +71,71 @@ namespace WeatherTotem
 		{
 			TokensUtility.Register();
 
-			// get Generic Mod Config Menu's API (if it's installed)
-			var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
-			if (configMenu is null)
-				return;
+			// Get Generic Mod Config Menu's API
+			IGenericModConfigMenuApi gmcm = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
 
-			// register mod
-			configMenu.Register(
-				mod: ModManifest,
-				reset: () => Config = new ModConfig(),
-				save: () => Helper.WriteConfig(Config)
-			);
+			if (gmcm is not null)
+			{
+				// Register mod
+				gmcm.Register(
+					mod: ModManifest,
+					reset: () => Config = new ModConfig(),
+					save: () => Helper.WriteConfig(Config)
+				);
 
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.ModEnabled.Name"),
-				getValue: () => Config.ModEnabled,
-				setValue: value => {
-					Config.ModEnabled = value;
-					SHelper.GameContent.InvalidateCache("Data/Objects");
-				}
-			);
-			configMenu.AddTextOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.InvokeSound.Name"),
-				getValue: () => Config.InvokeSound,
-				setValue: value => Config.InvokeSound = value
-			);
-			configMenu.AddTextOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.SunSound.Name"),
-				getValue: () => Config.SunSound,
-				setValue: value => Config.SunSound = value
-			);
-			configMenu.AddTextOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.RainSound.Name"),
-				getValue: () => Config.RainSound,
-				setValue: value => Config.RainSound = value
-			);
-			configMenu.AddTextOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.GreenRainSound.Name"),
-				getValue: () => Config.GreenRainSound,
-				setValue: value => Config.GreenRainSound = value
-			);
-			configMenu.AddTextOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.StormSound.Name"),
-				getValue: () => Config.StormSound,
-				setValue: value => Config.StormSound = value
-			);
-			configMenu.AddTextOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.SnowSound.Name"),
-				getValue: () => Config.SnowSound,
-				setValue: value => Config.SnowSound = value
-			);
-			configMenu.AddTextOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.WindSound.Name"),
-				getValue: () => Config.WindSound,
-				setValue: value => Config.WindSound = value
-			);
+				// Main section
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.ModEnabled.Name"),
+					getValue: () => Config.ModEnabled,
+					setValue: value => {
+						Config.ModEnabled = value;
+						SHelper.GameContent.InvalidateCache("Data/Objects");
+					}
+				);
+				gmcm.AddTextOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.InvokeSound.Name"),
+					getValue: () => Config.InvokeSound,
+					setValue: value => Config.InvokeSound = value
+				);
+				gmcm.AddTextOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.SunSound.Name"),
+					getValue: () => Config.SunSound,
+					setValue: value => Config.SunSound = value
+				);
+				gmcm.AddTextOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.RainSound.Name"),
+					getValue: () => Config.RainSound,
+					setValue: value => Config.RainSound = value
+				);
+				gmcm.AddTextOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.GreenRainSound.Name"),
+					getValue: () => Config.GreenRainSound,
+					setValue: value => Config.GreenRainSound = value
+				);
+				gmcm.AddTextOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.StormSound.Name"),
+					getValue: () => Config.StormSound,
+					setValue: value => Config.StormSound = value
+				);
+				gmcm.AddTextOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.SnowSound.Name"),
+					getValue: () => Config.SnowSound,
+					setValue: value => Config.SnowSound = value
+				);
+				gmcm.AddTextOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.WindSound.Name"),
+					getValue: () => Config.WindSound,
+					setValue: value => Config.WindSound = value
+				);
+			}
 		}
 	}
 }
