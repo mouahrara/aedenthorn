@@ -2,6 +2,11 @@
 
 # Global release notes
 
+## 13 April 2025
+* Released Instant Building Construction and Upgrade version [0.2.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/InstantBuildingConstructionAndUpgrade/release-notes.md#021-unofficial2-mouahrara)
+* Released Weather Totem version [0.1.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/WeatherTotem/release-notes.md#011-unofficial2-mouahrara)
+* Released Zombie Outbreak version [0.2.4-unofficial.3-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/ZombieOutbreak/release-notes.md#024-unofficial3-mouahrara)
+
 ## 12 April 2025
 * Released Craftable Terrarium version [0.1.3-unofficial.4-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CraftableTerrarium/release-notes.md#013-unofficial4-mouahrara)
 

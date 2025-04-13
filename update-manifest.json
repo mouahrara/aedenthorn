@@ -334,7 +334,7 @@
 			"Name": "Instant Building Construction and Upgrade",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#InstantBuildingConstructionAndUpgrade",
 			"Versions": [
-				{ "Version": "0.2.1-unofficial.1-mouahrara" }
+				{ "Version": "0.2.1-unofficial.2-mouahrara" }
 			]
 		},
 		"LikeADuckToWater": {
@@ -502,7 +502,7 @@
 			"Name": "Weather Totem",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#WeatherTotem",
 			"Versions": [
-				{ "Version": "0.1.1-unofficial.1-mouahrara" }
+				{ "Version": "0.1.1-unofficial.2-mouahrara" }
 			]
 		},
 		"WikiLinks": {
@@ -530,7 +530,7 @@
 			"Name": "Zombie Outbreak",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#ZombieOutbreak",
 			"Versions": [
-				{ "Version": "0.2.4-unofficial.2-mouahrara" }
+				{ "Version": "0.2.4-unofficial.3-mouahrara" }
 			]
 		}
 	}
