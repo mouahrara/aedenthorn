@@ -254,7 +254,7 @@ namespace ZombieOutbreak
 			farmer.FarmerRenderer.recolorShoes(SHelper.Reflection.GetField<NetString>(farmer.FarmerRenderer, "shoes").GetValue().Value);
 			farmer.FarmerRenderer.changeShirt(SHelper.Reflection.GetField<NetString>(farmer.FarmerRenderer, "shirt").GetValue().Value);
 			farmer.FarmerRenderer.changePants(SHelper.Reflection.GetField<NetString>(farmer.FarmerRenderer, "pants").GetValue().Value);
-			typeof(FarmerRenderer).GetMethod("textureChanged", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(farmer.FarmerRenderer, null);
+			farmer.FarmerRenderer.textureChanged();
 			SMonitor.Log($"player {farmer.Name} was cured of zombification!");
 		}
 

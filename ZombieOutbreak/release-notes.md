@@ -2,6 +2,10 @@
 
 # Release notes
 
+## 0.2.4-unofficial.3-mouahrara
+Released on 13 April, 2025, for SMAPI 4.1.0 or later.
+* Fixed `NullReferenceException` when the player cured from zombification 🔧
+
 ## 0.2.4-unofficial.2-mouahrara
 Released on 5 November, 2024, for SMAPI 4.1.0 or later.
 * Migrated to 1.6.9 and code maintenance 🚀

@@ -233,81 +233,83 @@ namespace ZombieOutbreak
 			RegisterConsoleCommands();
 			TokensUtility.Register();
 
-			// get Generic Mod Config Menu's API (if it's installed)
-			var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
-			if (configMenu is null)
-				return;
+			// Get Generic Mod Config Menu's API
+			IGenericModConfigMenuApi gmcm = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
 
-			// register mod
-			configMenu.Register(
-				mod: ModManifest,
-				reset: () => Config = new ModConfig(),
-				save: () => {
-					SHelper.GameContent.InvalidateCache(asset => asset.NameWithoutLocale.IsEquivalentTo("Data/CraftingRecipes"));
-					SHelper.GameContent.InvalidateCache(asset => asset.NameWithoutLocale.IsEquivalentTo("Data/Objects"));
-					SHelper.GameContent.InvalidateCache(asset => asset.NameWithoutLocale.IsEquivalentTo("Data/NPCGiftTastes"));
-					SHelper.GameContent.InvalidateCache(asset => asset.NameWithoutLocale.IsEquivalentTo("Data/mail"));
-					Helper.WriteConfig(Config);
-				}
-			);
-
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => Helper.Translation.Get("GMCM.ModEnabled.Name"),
-				getValue: () => Config.ModEnabled,
-				setValue: value => {
-					if (Context.IsWorldReady && Config.ModEnabled && !value)
-					{
-						foreach (string npcName in zombieNPCTextures.Keys)
-						{
-							RemoveZombieNPC(npcName);
-						}
-						foreach (long farmerId in zombieFarmerTextures.Keys)
-						{
-							RemoveZombieFarmer(farmerId);
-						}
-						zombieNPCTextures.Clear();
-						zombieNPCPortraits.Clear();
-						zombieFarmerTextures.Clear();
-						curedNPCs.Clear();
-						curedFarmers.Clear();
-						Helper.Data.WriteSaveData<List<string>>("zombiesNPC", null);
-						Helper.Data.WriteSaveData<List<long>>("zombiesFarmers", null);
+			if (gmcm is not null)
+			{
+				// Register mod
+				gmcm.Register(
+					mod: ModManifest,
+					reset: () => Config = new ModConfig(),
+					save: () => {
+						SHelper.GameContent.InvalidateCache(asset => asset.NameWithoutLocale.IsEquivalentTo("Data/CraftingRecipes"));
+						SHelper.GameContent.InvalidateCache(asset => asset.NameWithoutLocale.IsEquivalentTo("Data/Objects"));
+						SHelper.GameContent.InvalidateCache(asset => asset.NameWithoutLocale.IsEquivalentTo("Data/NPCGiftTastes"));
+						SHelper.GameContent.InvalidateCache(asset => asset.NameWithoutLocale.IsEquivalentTo("Data/mail"));
+						Helper.WriteConfig(Config);
 					}
-					Config.ModEnabled = value;
-				}
-			);
-			configMenu.AddNumberOption(
-				mod: ModManifest,
-				name: () => Helper.Translation.Get("GMCM.DailyZombificationChance.Name"),
-				getValue: () => Config.DailyZombificationChance,
-				setValue: value => Config.DailyZombificationChance = value,
-				min: 0,
-				max: 100
-			);
-			configMenu.AddNumberOption(
-				mod: ModManifest,
-				name: () => Helper.Translation.Get("GMCM.InfectionRadius.Name"),
-				getValue: () => Config.InfectionRadius,
-				setValue: value => Config.InfectionRadius = value,
-				min: 0
-			);
-			configMenu.AddNumberOption(
-				mod: ModManifest,
-				name: () => Helper.Translation.Get("GMCM.InfectionChancePerSecond.Name"),
-				getValue: () => Config.InfectionChancePerSecond,
-				setValue: value => Config.InfectionChancePerSecond = value,
-				min: 0,
-				max: 100
-			);
-			configMenu.AddNumberOption(
-				mod: ModManifest,
-				name: () => Helper.Translation.Get("GMCM.GreenTint.Name"),
-				getValue: () => Config.GreenTint,
-				setValue: value => Config.GreenTint = value,
-				min: 0,
-				max: 100
-			);
+				);
+
+				// Main section
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => Helper.Translation.Get("GMCM.ModEnabled.Name"),
+					getValue: () => Config.ModEnabled,
+					setValue: value => {
+						if (Context.IsWorldReady && Config.ModEnabled && !value)
+						{
+							foreach (string npcName in zombieNPCTextures.Keys)
+							{
+								RemoveZombieNPC(npcName);
+							}
+							foreach (long farmerId in zombieFarmerTextures.Keys)
+							{
+								RemoveZombieFarmer(farmerId);
+							}
+							zombieNPCTextures.Clear();
+							zombieNPCPortraits.Clear();
+							zombieFarmerTextures.Clear();
+							curedNPCs.Clear();
+							curedFarmers.Clear();
+							Helper.Data.WriteSaveData<List<string>>("zombiesNPC", null);
+							Helper.Data.WriteSaveData<List<long>>("zombiesFarmers", null);
+						}
+						Config.ModEnabled = value;
+					}
+				);
+				gmcm.AddNumberOption(
+					mod: ModManifest,
+					name: () => Helper.Translation.Get("GMCM.DailyZombificationChance.Name"),
+					getValue: () => Config.DailyZombificationChance,
+					setValue: value => Config.DailyZombificationChance = value,
+					min: 0,
+					max: 100
+				);
+				gmcm.AddNumberOption(
+					mod: ModManifest,
+					name: () => Helper.Translation.Get("GMCM.InfectionRadius.Name"),
+					getValue: () => Config.InfectionRadius,
+					setValue: value => Config.InfectionRadius = value,
+					min: 0
+				);
+				gmcm.AddNumberOption(
+					mod: ModManifest,
+					name: () => Helper.Translation.Get("GMCM.InfectionChancePerSecond.Name"),
+					getValue: () => Config.InfectionChancePerSecond,
+					setValue: value => Config.InfectionChancePerSecond = value,
+					min: 0,
+					max: 100
+				);
+				gmcm.AddNumberOption(
+					mod: ModManifest,
+					name: () => Helper.Translation.Get("GMCM.GreenTint.Name"),
+					getValue: () => Config.GreenTint,
+					setValue: value => Config.GreenTint = value,
+					min: 0,
+					max: 100
+				);
+			}
 		}
 	}
 }
