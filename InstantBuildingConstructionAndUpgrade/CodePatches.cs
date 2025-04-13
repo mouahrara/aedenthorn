@@ -1,5 +1,6 @@
 ﻿using StardewValley;
 using StardewValley.BellsAndWhistles;
+using StardewValley.Buildings;
 using StardewValley.Locations;
 using StardewValley.Network.NetEvents;
 
@@ -191,6 +192,38 @@ namespace InstantBuildingConstructionAndUpgrade
 				else
 				{
 					Game1.player.team.RequestSetMail(PlayerActionTarget.Host, "communityUpgradeShortcuts", MailType.Received, add: true);
+				}
+			}
+		}
+
+		public class GameLocation_buildStructure_Patch
+		{
+			public static void Postfix1(Building building, bool __result)
+			{
+				Postfix(building, __result);
+			}
+
+			public static void Postfix2(Building constructed, bool __result)
+			{
+				Postfix(constructed, __result);
+			}
+
+			public static void Postfix(Building building, bool __result)
+			{
+				if (__result && !building.isUnderConstruction())
+				{
+					Game1.player.team.constructedBuildings.Add(building.buildingType.Value);
+				}
+			}
+		}
+
+		public class Building_FinishConstruction_Patch
+		{
+			public static void Postfix(Building __instance, bool onGameStart)
+			{
+				if (!onGameStart)
+				{
+					Game1.player.team.constructedBuildings.Add(__instance.buildingType.Value);
 				}
 			}
 		}

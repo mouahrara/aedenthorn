@@ -2,6 +2,10 @@
 
 # Release notes
 
+## 0.2.1-unofficial.2-mouahrara
+Released on 13 April, 2025, for SMAPI 4.1.0 or later.
+* Fixed an issue where instant building construction would not complete related quests 🔧
+
 ## 0.2.1-unofficial.1-mouahrara
 Released on 16 October, 2024, for SMAPI 4.0.0 or later.
 * Migrated to 1.6.0 and project cleanup 🚀

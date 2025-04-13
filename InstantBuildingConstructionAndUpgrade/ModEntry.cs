@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using HarmonyLib;
+using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.Buildings;
 using StardewValley.GameData.Buildings;
 using StardewValley.GameData.HomeRenovations;
 
@@ -44,6 +46,18 @@ namespace InstantBuildingConstructionAndUpgrade
 				harmony.Patch(
 					original: AccessTools.Method(typeof(GameLocation), "communityUpgradeAccept"),
 					prefix: new HarmonyMethod(typeof(GameLocation_communityUpgradeAccept_Patch), nameof(GameLocation_communityUpgradeAccept_Patch.Prefix))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(GameLocation), nameof(GameLocation.buildStructure), new Type[] { typeof(Building), typeof(Vector2), typeof(Farmer), typeof(bool) }),
+					postfix: new HarmonyMethod(typeof(GameLocation_buildStructure_Patch), nameof(GameLocation_buildStructure_Patch.Postfix1))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(GameLocation), nameof(GameLocation.buildStructure), new Type[] { typeof(string), typeof(BuildingData), typeof(Vector2), typeof(Farmer), typeof(Building).MakeByRefType(), typeof(bool), typeof(bool) }),
+					postfix: new HarmonyMethod(typeof(GameLocation_buildStructure_Patch), nameof(GameLocation_buildStructure_Patch.Postfix2))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Building), nameof(Building.FinishConstruction)),
+					postfix: new HarmonyMethod(typeof(Building_FinishConstruction_Patch), nameof(Building_FinishConstruction_Patch.Postfix))
 				);
 			}
 			catch (Exception e)
@@ -128,53 +142,55 @@ namespace InstantBuildingConstructionAndUpgrade
 
 		private void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
 		{
-			// get Generic Mod Config Menu's API (if it's installed)
-			var configMenu = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
-			if (configMenu is null)
-				return;
+			// Get Generic Mod Config Menu's API
+			IGenericModConfigMenuApi gmcm = Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
 
-			// register mod
-			configMenu.Register(
-				mod: ModManifest,
-				reset: () => Config = new ModConfig(),
-				save: () => {
-					SHelper.GameContent.InvalidateCache(asset => asset.Name.IsEquivalentTo("Data/Buildings"));
-					SHelper.GameContent.InvalidateCache(asset => asset.Name.IsEquivalentTo("Data/HomeRenovations"));
-					SHelper.GameContent.InvalidateCache(asset => asset.NameWithoutLocale.IsEquivalentTo("Strings/Locations"));
-					Helper.WriteConfig(Config);
-				}
-			);
+			if (gmcm is not null)
+			{
+				// Register mod
+				gmcm.Register(
+					mod: ModManifest,
+					reset: () => Config = new ModConfig(),
+					save: () => {
+						SHelper.GameContent.InvalidateCache(asset => asset.Name.IsEquivalentTo("Data/Buildings"));
+						SHelper.GameContent.InvalidateCache(asset => asset.Name.IsEquivalentTo("Data/HomeRenovations"));
+						SHelper.GameContent.InvalidateCache(asset => asset.NameWithoutLocale.IsEquivalentTo("Strings/Locations"));
+						Helper.WriteConfig(Config);
+					}
+				);
 
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.ModEnabled.Name"),
-				getValue: () => Config.ModEnabled,
-				setValue: value => Config.ModEnabled = value
-			);
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.InstantBuildingConstructionAndUpgrade.Name"),
-				getValue: () => Config.InstantBuildingConstructionAndUpgrade,
-				setValue: value => Config.InstantBuildingConstructionAndUpgrade = value
-			);
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.InstantFarmhouseUpgrade.Name"),
-				getValue: () => Config.InstantFarmhouseUpgrade,
-				setValue: value => Config.InstantFarmhouseUpgrade = value
-			);
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.InstantCommunityUpgrade.Name"),
-				getValue: () => Config.InstantCommunityUpgrade,
-				setValue: value => Config.InstantCommunityUpgrade = value
-			);
-			configMenu.AddBoolOption(
-				mod: ModManifest,
-				name: () => SHelper.Translation.Get("GMCM.FreeConstructionAndUpgrade.Name"),
-				getValue: () => Config.FreeConstructionAndUpgrade,
-				setValue: value => Config.FreeConstructionAndUpgrade = value
-			);
+				// Main section
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.ModEnabled.Name"),
+					getValue: () => Config.ModEnabled,
+					setValue: value => Config.ModEnabled = value
+				);
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.InstantBuildingConstructionAndUpgrade.Name"),
+					getValue: () => Config.InstantBuildingConstructionAndUpgrade,
+					setValue: value => Config.InstantBuildingConstructionAndUpgrade = value
+				);
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.InstantFarmhouseUpgrade.Name"),
+					getValue: () => Config.InstantFarmhouseUpgrade,
+					setValue: value => Config.InstantFarmhouseUpgrade = value
+				);
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.InstantCommunityUpgrade.Name"),
+					getValue: () => Config.InstantCommunityUpgrade,
+					setValue: value => Config.InstantCommunityUpgrade = value
+				);
+				gmcm.AddBoolOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.FreeConstructionAndUpgrade.Name"),
+					getValue: () => Config.FreeConstructionAndUpgrade,
+					setValue: value => Config.FreeConstructionAndUpgrade = value
+				);
+			}
 		}
 	}
 }
