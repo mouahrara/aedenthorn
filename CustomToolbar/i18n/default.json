@@ -15,5 +15,9 @@
 	"GMCM.OffsetX.Name": "Set Offset X",
 	"GMCM.OffsetY.Name": "Set Offset Y",
 	"GMCM.PinnedPosition.Name": "Pinned Position",
+	"GMCM.PinnedPosition.top": "Top",
+	"GMCM.PinnedPosition.bottom": "Bottom",
+	"GMCM.PinnedPosition.left": "Left",
+	"GMCM.PinnedPosition.right": "Right",
 	"GMCM.PinnedPosition.Tooltip": "When pinned is set, which of the four positions to keep the toolbar in."
 }

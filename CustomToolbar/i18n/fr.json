@@ -15,5 +15,9 @@
 	"GMCM.OffsetX.Name": "Décalage X",
 	"GMCM.OffsetY.Name": "Décalage Y",
 	"GMCM.PinnedPosition.Name": "Position épinglée",
+	"GMCM.PinnedPosition.top": "Haut",
+	"GMCM.PinnedPosition.bottom": "Bas",
+	"GMCM.PinnedPosition.left": "Gauche",
+	"GMCM.PinnedPosition.right": "Droite",
 	"GMCM.PinnedPosition.Tooltip": "Lorsque la barre d'outils est épinglée, détermine la position à laquelle elle sera rattachée."
 }

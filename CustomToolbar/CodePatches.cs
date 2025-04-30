@@ -90,7 +90,7 @@ namespace CustomToolbar
 					___transparency = Math.Max(0.33f, ___transparency - 0.15f);
 				}
 			}
-			else if(__instance.xPositionOnScreen == -1 && __instance.yPositionOnScreen == -1)
+			else if (__instance.xPositionOnScreen == -1 && __instance.yPositionOnScreen == -1)
 			{
 				if (Config.Vertical)
 				{
@@ -107,7 +107,7 @@ namespace CustomToolbar
 					__instance.xPositionOnScreen = Game1.uiViewport.Width / 2 - breadth / 2 + Config.OffsetX;
 				}
 			}
-			else if(Config.Vertical)
+			else if (Config.Vertical)
 			{
 				if (Config.SetPosition)
 				{
@@ -161,7 +161,7 @@ namespace CustomToolbar
 			}
 			if (!Config.SetPosition)
 			{
-				if(__instance.xPositionOnScreen != Config.PositionX || __instance.yPositionOnScreen != Config.PositionY)
+				if (__instance.xPositionOnScreen != Config.PositionX || __instance.yPositionOnScreen != Config.PositionY)
 				{
 					Config.PositionX = __instance.xPositionOnScreen;
 					Config.PositionY = __instance.yPositionOnScreen;
@@ -221,11 +221,14 @@ namespace CustomToolbar
 		{
 			Viewport viewport = Game1.game1.GraphicsDevice.Viewport;
 			Rectangle safeArea = Utility.getSafeArea();
+
 			if (safeArea.Left > viewport.Bounds.Left)
 			{
 				marginx = safeArea.Left;
 			}
+
 			int num = safeArea.Right - viewport.Bounds.Right;
+
 			if (num > marginx)
 			{
 				marginx = num;
