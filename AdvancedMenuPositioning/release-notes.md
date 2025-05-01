@@ -2,6 +2,15 @@
 
 # Release notes
 
+## 0.2.2-unofficial.1-mouahrara
+Released on 3 May, 2025, for SMAPI 4.1.0 or later.
+* Added support for repositioning the world map menu, the NPC profile menu, and the Junimo note menu ✨
+* Fixed compatibility with [Custom Toolbar](https://www.nexusmods.com/stardewvalley/mods/11322) 🔧
+* Fixed an issue where the position of the crafting menu items was inconsistent 🔧
+* Fixed an issue where mouse scrolling was propagating to all detached menus 🔧
+* Fixed an issue where the background dimming effect could remain after detaching some menus 🔧
+* Fixed an issue where menu click detection did not scale properly with the UI scale setting 🔧
+
 ## 0.2.1-unofficial.2-mouahrara
 Released on 1 May, 2024, for SMAPI 4.0.0 or later.
 * Fixed an issue with emoji menu 🔧
