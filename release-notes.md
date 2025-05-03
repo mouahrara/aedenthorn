@@ -2,6 +2,10 @@
 
 # Global release notes
 
+## 3 May 2025
+* Released Advanced Menu Positioning version [0.2.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AdvancedMenuPositioning/release-notes.md#022-unofficial1-mouahrara)
+* Released Custom Toolbar version [0.1.3-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CustomToolbar/release-notes.md#013-unofficial1-mouahrara)
+
 ## 13 April 2025
 * Released Instant Building Construction and Upgrade version [0.2.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/InstantBuildingConstructionAndUpgrade/release-notes.md#021-unofficial2-mouahrara)
 * Released Weather Totem version [0.1.1-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/WeatherTotem/release-notes.md#011-unofficial2-mouahrara)
