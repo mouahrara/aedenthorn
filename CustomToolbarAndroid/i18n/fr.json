@@ -1,0 +1,16 @@
+{
+	// GMCM
+	"GMCM.ModEnabled.Name": "Activer le Mod",
+	"GMCM.VerticalToolbar.Name": "Barre d'outils verticale",
+	"GMCM.ToolbarSlotSize.Name": "Taille de la barre d'outils",
+	"GMCM.PinToolbar.Name": "Épingler la barre d'outils",
+	"GMCM.PinToolbar.Tooltip": "Ne pas changer de côté la barre d'outils lorsque le joueur se déplace.",
+	"GMCM.PinnedPosition.Name": "Position épinglée",
+	"GMCM.PinnedPosition.top": "Haut",
+	"GMCM.PinnedPosition.bottom": "Bas",
+	"GMCM.PinnedPosition.Tooltip": "Lorsque la barre d'outils est épinglée, détermine la position à laquelle elle sera rattachée.",
+	"GMCM.OpacityPercentage.Name": "Opacité (en %)",
+	"GMCM.OpacityPercentage.Tooltip": "Le pourcentage d’opacité de la barre d’outils lorsqu’elle est épinglée et que le joueur passe dessous.",
+	"GMCM.MaxVisibleItems.Name": "Nombre maximal d'emplacements",
+	"GMCM.MaxVisibleItems.Tooltip": "Nombre maximum d'emplacements d'objets de la barre d'outils."
+}

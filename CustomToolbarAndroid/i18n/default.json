@@ -1,0 +1,16 @@
+{
+	// GMCM
+	"GMCM.ModEnabled.Name": "Mod Enabled",
+	"GMCM.VerticalToolbar.Name": "Vertical Toolbar",
+	"GMCM.ToolbarSlotSize.Name": "Toolbar Size",
+	"GMCM.PinToolbar.Name": "Pin Toolbar",
+	"GMCM.PinToolbar.Tooltip": "Don't swap sides when player moves.",
+	"GMCM.PinnedPosition.Name": "Pinned Position",
+	"GMCM.PinnedPosition.top": "Top",
+	"GMCM.PinnedPosition.bottom": "Bottom",
+	"GMCM.PinnedPosition.Tooltip": "When pinned is set, which of the two positions to keep the toolbar in.",
+	"GMCM.OpacityPercentage.Name": "Opacity Percentage",
+	"GMCM.OpacityPercentage.Tooltip": "The opacity percentage of the toolbar when it's pinned and the player walks behind it.",
+	"GMCM.MaxVisibleItems.Name": "Max Item Slots",
+	"GMCM.MaxVisibleItems.Tooltip": "Maximum number of item slots in the toolbar."
+}
