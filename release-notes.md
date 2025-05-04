@@ -2,6 +2,9 @@
 
 # Global release notes
 
+## 5 May 2025
+* Released Custom Toolbar Android version [0.1.3-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CustomToolbarAndroid/release-notes.md#013-unofficial1-mouahrara)
+
 ## 3 May 2025
 * Released Advanced Menu Positioning version [0.2.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/AdvancedMenuPositioning/release-notes.md#022-unofficial1-mouahrara)
 * Released Custom Toolbar version [0.1.3-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CustomToolbar/release-notes.md#013-unofficial1-mouahrara)
