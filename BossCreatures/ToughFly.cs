@@ -7,8 +7,9 @@ namespace BossCreatures
 {
 	public class ToughFly : Fly
 	{
-		public ToughFly()
+		public ToughFly() : base()
 		{
+			hard = true;
 		}
 
 		public ToughFly(Vector2 position, float difficulty) : base(position, true)

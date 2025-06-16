@@ -24,17 +24,17 @@ namespace BossCreatures
 		public override void behaviorOnCollisionWithPlayer(GameLocation location, Farmer player)
 		{
 			base.behaviorOnCollisionWithPlayer(location, player);
-			if (debuff.Value != null)
+			if (debuff.Value is not null)
 			{
 				player.applyBuff(new Buff(debuff.Value));
 			}
 			if (pullPlayerIn)
 			{
-				Vector2 newPos = player.Position + (startingPosition - player.Position) * 0.02f;
+				Vector2 newPosition = player.Position + (startingPosition - player.Position) * 0.02f;
 
-				if (location.isTilePassable(new Location((int)(newPos.X / 64), (int)(newPos.Y / 64)), Game1.viewport))
+				if (location.isTilePassable(new Location((int)(newPosition.X / 64), (int)(newPosition.Y / 64)), Game1.viewport))
 				{
-					player.Position = newPos;
+					player.Position = newPosition;
 				}
 			}
 		}

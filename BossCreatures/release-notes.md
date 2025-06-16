@@ -2,6 +2,12 @@
 
 # Release notes
 
+## 1.5.1-unofficial.5-mouahrara
+Released on 16 June, 2025, for SMAPI 4.1.0 or later.
+* Added multiplayer support ✨
+* Fixed an issue where the boss health bar did not scale correctly with the zoom level 🔧
+* Fixed minor bugs 🔧
+
 ## 1.5.1-unofficial.4-mouahrara
 Released on 30 November, 2024, for SMAPI 4.1.0 or later.
 * Fixed `NullReferenceException` when modifying GMCM options from the main menu 🔧

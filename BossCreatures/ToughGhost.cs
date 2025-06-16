@@ -61,29 +61,29 @@ namespace BossCreatures
 				}
 				if (turningRight)
 				{
-					rotation -= (float)Math.Sign(targetRotation - rotation) * 0.0490873866f;
+					rotation -= Math.Sign(targetRotation - rotation) * 0.0490873866f;
 				}
 				else
 				{
-					rotation += (float)Math.Sign(targetRotation - rotation) * 0.0490873866f;
+					rotation += Math.Sign(targetRotation - rotation) * 0.0490873866f;
 				}
 				rotation %= 6.28318548f;
 				wasHitCounter = 5 + Game1.random.Next(-1, 2);
 			}
 
-			float maxAccel = Math.Min(7f, Math.Max(2f, 7f - t / 64f / 2f))*2;
+			float maxAcceleration = Math.Min(7f, Math.Max(2f, 7f - t / 64f / 2f)) * 2;
 
 			xSlope = (float)Math.Cos(rotation + 1.5707963267948966);
 			ySlope = -(float)Math.Sin(rotation + 1.5707963267948966);
-			xVelocity += -xSlope * maxAccel / 6f + Game1.random.Next(-10, 10) / 100f;
-			yVelocity += -ySlope * maxAccel / 6f + Game1.random.Next(-10, 10) / 100f;
+			xVelocity += -xSlope * maxAcceleration / 6f + Game1.random.Next(-10, 10) / 100f;
+			yVelocity += -ySlope * maxAcceleration / 6f + Game1.random.Next(-10, 10) / 100f;
 			if (Math.Abs(xVelocity) > Math.Abs(-xSlope * 7f))
 			{
-				xVelocity -= -xSlope * maxAccel / 6f;
+				xVelocity -= -xSlope * maxAcceleration / 6f;
 			}
 			if (Math.Abs(yVelocity) > Math.Abs(-ySlope * 7f))
 			{
-				yVelocity -= -ySlope * maxAccel / 6f;
+				yVelocity -= -ySlope * maxAcceleration / 6f;
 			}
 		}
 	}
