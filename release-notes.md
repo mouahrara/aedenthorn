@@ -2,6 +2,9 @@
 
 # Global release notes
 
+## 16 June 2025
+* Released Boss Creatures version [1.5.1-unofficial.5-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BossCreatures/release-notes.md#151-unofficial5-mouahrara)
+
 ## 5 May 2025
 * Released Custom Toolbar Android version [0.1.3-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CustomToolbarAndroid/release-notes.md#013-unofficial1-mouahrara)
 

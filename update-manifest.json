@@ -117,7 +117,7 @@
 			"Name": "Boss Creatures",
 			"ModPageUrl": "https://github.com/mouahrara/aedenthorn#BossCreatures",
 			"Versions": [
-				{ "Version": "1.5.1-unofficial.4-mouahrara" }
+				{ "Version": "1.5.1-unofficial.5-mouahrara" }
 			]
 		},
 		"BuffFramework": {
