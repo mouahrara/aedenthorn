@@ -2,6 +2,9 @@
 
 # Global release notes
 
+## 13 July 2025
+* Released Bulk Animal Purchase version [0.2.2-unofficial.4-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BulkAnimalPurchase/release-notes.md#022-unofficial4-mouahrara)
+
 ## 16 June 2025
 * Released Boss Creatures version [1.5.1-unofficial.5-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BossCreatures/release-notes.md#151-unofficial5-mouahrara)
 
