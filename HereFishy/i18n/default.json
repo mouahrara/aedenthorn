@@ -2,6 +2,10 @@
 	// GMCM
 	"GMCM.ModEnabled.Name": "Mod Enabled",
 	"GMCM.PlaySound.Name": "Play Sound",
+	"GMCM.VoiceGender.Name": "Voice Gender",
+	"GMCM.VoiceGender.Auto": "Auto",
+	"GMCM.VoiceGender.Male": "Male",
+	"GMCM.VoiceGender.Female": "Female",
 	"GMCM.StaminaCost.Name": "Stamina Cost",
 	"GMCM.AllowMovement.Name": "Allow Movement"
 }

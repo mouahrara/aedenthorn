@@ -2,6 +2,10 @@
 	// GMCM
 	"GMCM.ModEnabled.Name": "Activer le Mod",
 	"GMCM.PlaySound.Name": "Activer le son",
+	"GMCM.VoiceGender.Name": "Genre de la voix",
+	"GMCM.VoiceGender.Auto": "Automatique",
+	"GMCM.VoiceGender.Male": "Homme",
+	"GMCM.VoiceGender.Female": "Femme",
 	"GMCM.StaminaCost.Name": "Coût en énergie",
 	"GMCM.AllowMovement.Name": "Autoriser les déplacements"
 }
