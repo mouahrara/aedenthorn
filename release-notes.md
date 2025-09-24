@@ -2,6 +2,10 @@
 
 # Global release notes
 
+## 25 September 2025
+* Released Here Fishy version [0.6.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/HereFishy/release-notes.md#061-unofficial1-mouahrara)
+* Released Instant Building Construction and Upgrade version [0.2.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/InstantBuildingConstructionAndUpgrade/release-notes.md#022-unofficial1-mouahrara)
+
 ## 13 July 2025
 * Released Bulk Animal Purchase version [0.2.2-unofficial.4-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/BulkAnimalPurchase/release-notes.md#022-unofficial4-mouahrara)
 
