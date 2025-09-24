@@ -90,7 +90,7 @@ namespace InstantBuildingConstructionAndUpgrade
 							buildingData.BuildMaterials = new();
 						}
 					}
-				});
+				}, AssetEditPriority.Late);
 			}
 			if (Config.FreeConstructionAndUpgrade)
 			{
@@ -104,7 +104,7 @@ namespace InstantBuildingConstructionAndUpgrade
 						{
 							homeRenovation.Price = 0;
 						}
-					});
+					}, AssetEditPriority.Late);
 				}
 				if (e.NameWithoutLocale.IsEquivalentTo("Strings/Locations"))
 				{
@@ -152,9 +152,17 @@ namespace InstantBuildingConstructionAndUpgrade
 					mod: ModManifest,
 					reset: () => Config = new ModConfig(),
 					save: () => {
-						SHelper.GameContent.InvalidateCache(asset => asset.Name.IsEquivalentTo("Data/Buildings"));
-						SHelper.GameContent.InvalidateCache(asset => asset.Name.IsEquivalentTo("Data/HomeRenovations"));
-						SHelper.GameContent.InvalidateCache(asset => asset.NameWithoutLocale.IsEquivalentTo("Strings/Locations"));
+						if (CompatibilityUtility.IsSolidFoundationsLoaded)
+						{
+							ExecuteCommand("sf_reload");
+						}
+						DelayedAction.functionAfterDelay(() => {
+							DelayedAction.functionAfterDelay(() => {
+								SHelper.GameContent.InvalidateCache(asset => asset.Name.IsEquivalentTo("Data/Buildings"));
+								SHelper.GameContent.InvalidateCache(asset => asset.Name.IsEquivalentTo("Data/HomeRenovations"));
+								SHelper.GameContent.InvalidateCache(asset => asset.NameWithoutLocale.IsEquivalentTo("Strings/Locations"));
+							}, 0);
+						}, 0);
 						Helper.WriteConfig(Config);
 					}
 				);
