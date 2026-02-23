@@ -12,5 +12,9 @@
 	"GMCM.OpacityPercentage.Name": "Opacité (en %)",
 	"GMCM.OpacityPercentage.Tooltip": "Le pourcentage d’opacité de la barre d’outils lorsqu’elle est épinglée et que le joueur passe dessous.",
 	"GMCM.MaxVisibleItems.Name": "Nombre maximal d'emplacements",
-	"GMCM.MaxVisibleItems.Tooltip": "Nombre maximum d'emplacements d'objets de la barre d'outils."
+	"GMCM.MaxVisibleItems.Tooltip": "Nombre maximum d'emplacements d'objets de la barre d'outils.",
+	"GMCM.OffsetX.Name": "Décalage X",
+	"GMCM.OffsetX.Tooltip": "Le décalage en X, lorsque la barre d'outils est à l'horizontal.",
+	"GMCM.OffsetY.Name": "Décalage Y",
+	"GMCM.OffsetY.Tooltip": "Le décalage en Y, lorsque la barre d'outils est à l'horizontal."
 }

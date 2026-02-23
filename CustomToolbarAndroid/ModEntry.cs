@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using HarmonyLib;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
@@ -36,13 +37,65 @@ namespace CustomToolbarAndroid
 				Harmony harmony = new(ModManifest.UniqueID);
 
 				harmony.Patch(
+					original: AccessTools.Method(typeof(Toolbar), "testToScrollToolbar", new Type[] { typeof(int), typeof(int) }),
+					prefix: new HarmonyMethod(AccessTools.Method(typeof(ModEntry), nameof(Toolbar_testToScrollToolbar_prefix)))
+				);
+				harmony.Patch(
 					original: AccessTools.Method(typeof(Toolbar), nameof(Toolbar.draw), new Type[] { typeof(SpriteBatch) }),
 					prefix: new HarmonyMethod(AccessTools.Method(typeof(ModEntry), nameof(Toolbar_draw_prefix))),
 					transpiler: new HarmonyMethod(AccessTools.Method(typeof(ModEntry), nameof(Toolbar_draw_transpiler)))
 				);
 				harmony.Patch(
 					original: AccessTools.PropertyGetter(typeof(Toolbar), "maxVisibleItems"),
-					postfix: new HarmonyMethod(AccessTools.Method(typeof(ModEntry), nameof(Toolbar_maxVisibleItemsGetter_postfix)))
+					postfix: new HarmonyMethod(AccessTools.Method(typeof(ModEntry), nameof(Toolbar_maxVisibleItemsGetter_postfix))),
+					transpiler: new HarmonyMethod(AccessTools.Method(typeof(ModEntry), nameof(Toolbar_transpiler)))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Toolbar), "AddItems", new Type[] { typeof(int) }),
+					transpiler: new HarmonyMethod(AccessTools.Method(typeof(ModEntry), nameof(Toolbar_transpiler)))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Toolbar), "getIconPosition", new Type[] { typeof(int) }),
+					transpiler: new HarmonyMethod(AccessTools.Method(typeof(ModEntry), nameof(Toolbar_transpiler)))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Toolbar), "testToScrollToolbar", new Type[] { typeof(int), typeof(int) }),
+					transpiler: new HarmonyMethod(AccessTools.Method(typeof(ModEntry), nameof(Toolbar_transpiler)))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Toolbar), "updateDrawStartIndex", new Type[] { typeof(int), typeof(int) }),
+					transpiler: new HarmonyMethod(AccessTools.Method(typeof(ModEntry), nameof(Toolbar_transpiler)))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Toolbar), nameof(Toolbar.receiveLeftClick), new Type[] { typeof(int), typeof(int), typeof(bool) }),
+					prefix: new HarmonyMethod(AccessTools.Method(typeof(ModEntry), nameof(Toolbar_receiveLeftClick_prefix))),
+					transpiler: new HarmonyMethod(AccessTools.Method(typeof(ModEntry), nameof(Toolbar_transpiler)))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Toolbar), nameof(Toolbar.releaseLeftClick), new Type[] { typeof(int), typeof(int) }),
+					prefix: new HarmonyMethod(AccessTools.Method(typeof(ModEntry), nameof(Toolbar_releaseLeftClick_prefix))),
+					transpiler: new HarmonyMethod(AccessTools.Method(typeof(ModEntry), nameof(Toolbar_transpiler)))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Toolbar), nameof(Toolbar.performHoverAction), new Type[] { typeof(int), typeof(int) }),
+					prefix: new HarmonyMethod(AccessTools.Method(typeof(ModEntry), nameof(Toolbar_performHoverAction_prefix))),
+					transpiler: new HarmonyMethod(AccessTools.Method(typeof(ModEntry), nameof(Toolbar_transpiler)))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Toolbar), nameof(Toolbar.update), new Type[] { typeof(GameTime) }),
+					transpiler: new HarmonyMethod(AccessTools.Method(typeof(ModEntry), nameof(Toolbar_transpiler)))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Toolbar), nameof(Toolbar.draw), new Type[] { typeof(SpriteBatch) }),
+					transpiler: new HarmonyMethod(AccessTools.Method(typeof(ModEntry), nameof(Toolbar_transpiler)))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Toolbar), "resetToolbar"),
+					transpiler: new HarmonyMethod(AccessTools.Method(typeof(ModEntry), nameof(Toolbar_transpiler)))
+				);
+				harmony.Patch(
+					original: AccessTools.Method(typeof(Toolbar), "UpdateButtonBounds"),
+					transpiler: new HarmonyMethod(AccessTools.Method(typeof(ModEntry), nameof(Toolbar_transpiler)))
 				);
 			}
 			catch (Exception e)
@@ -103,7 +156,7 @@ namespace CustomToolbarAndroid
 					name: () => SHelper.Translation.Get("GMCM.PinnedPosition.Name"),
 					tooltip: () => SHelper.Translation.Get("GMCM.PinnedPosition.Tooltip"),
 					allowedValues: new string[] { "top", "bottom" },
-					formatAllowedValue: (string value) => SHelper.Translation.Get("GMCM.PinnedPosition." + value),
+					formatAllowedValue: value => SHelper.Translation.Get("GMCM.PinnedPosition." + value),
 					getValue: () => Config.PinnedPosition,
 					setValue: value => Config.PinnedPosition = value
 				);
@@ -125,6 +178,24 @@ namespace CustomToolbarAndroid
 					setValue: value => Config.MaxVisibleItems = value,
 					min: 1,
 					max: 36
+				);
+				gmcm.AddNumberOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.OffsetX.Name"),
+					tooltip: () => SHelper.Translation.Get("GMCM.OffsetX.Tooltip"),
+					getValue: () => Config.OffsetX,
+					setValue: value => Config.OffsetX = value,
+					min: 0,
+					max: (int)(Game1.uiViewport.Width / 1.546875)
+				);
+				gmcm.AddNumberOption(
+					mod: ModManifest,
+					name: () => SHelper.Translation.Get("GMCM.OffsetY.Name"),
+					tooltip: () => SHelper.Translation.Get("GMCM.OffsetY.Tooltip"),
+					getValue: () => Config.OffsetY,
+					setValue: value => Config.OffsetY = value,
+					min: 0,
+					max: (int)(Game1.uiViewport.Height / 1.546875)
 				);
 			}
 		}
