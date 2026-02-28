@@ -2,6 +2,9 @@
 
 # Global release notes
 
+## 28 February 2026
+* Released Custom Toolbar Android version [0.1.3-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CustomToolbarAndroid/release-notes.md#013-unofficial2-mouahrara)
+
 ## 25 September 2025
 * Released Here Fishy version [0.6.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/HereFishy/release-notes.md#061-unofficial1-mouahrara)
 * Released Instant Building Construction and Upgrade version [0.2.2-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/InstantBuildingConstructionAndUpgrade/release-notes.md#022-unofficial1-mouahrara)
