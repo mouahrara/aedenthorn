@@ -2,6 +2,9 @@
 
 # Global release notes
 
+## 15 June 2026
+* Released Moolah Money Mod version [0.6.7-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/MoolahMoneyMod/release-notes.md#067-unofficial1-mouahrara)
+
 ## 28 February 2026
 * Released Custom Toolbar Android version [0.1.3-unofficial.2-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/CustomToolbarAndroid/release-notes.md#013-unofficial2-mouahrara)
 
