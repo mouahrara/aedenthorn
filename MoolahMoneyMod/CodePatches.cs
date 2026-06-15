@@ -157,7 +157,7 @@ namespace MoolahMoneyMod
 
 		public class ShippingMenu_Patch
 		{
-			public static void Prefix(ShippingMenu __instance)
+			public static void Postfix(List<List<Item>> ___categoryItems)
 			{
 				if (!Config.ModEnabled)
 					return;
@@ -166,18 +166,20 @@ namespace MoolahMoneyMod
 				itemValues.Value = new();
 				singleItemValues.Value = new();
 				moneyDialDataList.Value = new() { new(), new(), new(), new(), new(), new() };
-				foreach (Item item in Game1.player.displayedShippedItems)
+				for (int category = 0; category < 5; category++)
 				{
-					if (item is Object obj)
+					foreach (Item item in ___categoryItems[category])
 					{
-						int category = __instance.getCategoryIndexForObject(obj);
-						int sell_to_store_price = obj.sellToStorePrice(-1L);
-						BigInteger price = new BigInteger(sell_to_store_price) * obj.Stack;
+						if (item is not null)
+						{
+							int sell_to_store_price = item.sellToStorePrice(-1L);
+							BigInteger price = new BigInteger(sell_to_store_price) * item.Stack;
 
-						categoryTotals.Value[category] += price;
-						categoryTotals.Value[5] += price;
-						itemValues.Value[item] = price;
-						singleItemValues.Value[item] = sell_to_store_price;
+							categoryTotals.Value[category] += price;
+							categoryTotals.Value[5] += price;
+							itemValues.Value[item] = price;
+							singleItemValues.Value[item] = sell_to_store_price;
+						}
 					}
 				}
 			}

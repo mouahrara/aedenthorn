@@ -61,7 +61,7 @@ namespace MoolahMoneyMod
 				);
 				harmony.Patch(
 					original: AccessTools.Method(typeof(Game1), "_newDayAfterFade"),
-					prefix: new HarmonyMethod(typeof(Game1_newDayAfterFade_Patch), nameof(Game1_newDayAfterFade_Patch.Prefix))
+					prefix: new HarmonyMethod(typeof(Game1_newDayAfterFade_Patch), nameof(Game1_newDayAfterFade_Patch.Prefix)) { priority = Priority.Last }
 				);
 				harmony.Patch(
 					original: AccessTools.Method(typeof(DayTimeMoneyBox), nameof(DayTimeMoneyBox.drawMoneyBox)),
@@ -77,7 +77,7 @@ namespace MoolahMoneyMod
 				);
 				harmony.Patch(
 					original: AccessTools.Constructor(typeof(ShippingMenu), new Type[] { typeof(IList<Item>) }),
-					prefix: new HarmonyMethod(typeof(ShippingMenu_Patch), nameof(ShippingMenu_Patch.Prefix))
+					postfix: new HarmonyMethod(typeof(ShippingMenu_Patch), nameof(ShippingMenu_Patch.Postfix))
 				);
 				harmony.Patch(
 					original: AccessTools.Method(typeof(ShippingMenu), nameof(ShippingMenu.draw), new Type[] { typeof(SpriteBatch) }),

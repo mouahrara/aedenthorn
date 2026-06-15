@@ -2,6 +2,10 @@
 
 # Release notes
 
+## 0.6.7-unofficial.1-mouahrara
+Released on 15 June, 2026, for SMAPI 4.1.0 or later.
+* Added compatibility with [Ship Anything](https://www.nexusmods.com/stardewvalley/mods/3782) and [Sell Everything](https://www.nexusmods.com/stardewvalley/mods/43670) ✨
+
 ## 0.6.6-unofficial.3-mouahrara
 Released on 8 April, 2025, for SMAPI 4.1.0 or later.
 * Fixed `IndexOutOfRangeException` when the number of digits in the money amount decreased 🔧
