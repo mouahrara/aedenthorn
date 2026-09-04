@@ -2,6 +2,9 @@
 
 # Global release notes
 
+## 4 September 2026
+* Released Moolah Money Mod version [0.7.1-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/MoolahMoneyMod/release-notes.md#071-unofficial1-mouahrara)
+
 ## 15 June 2026
 * Released Moolah Money Mod version [0.6.7-unofficial.1-mouahrara](https://github.com/mouahrara/aedenthorn/blob/master/MoolahMoneyMod/release-notes.md#067-unofficial1-mouahrara)
 
